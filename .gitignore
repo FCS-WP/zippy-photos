@@ -1,5 +1,7 @@
 # Ignore thir-party
 package-lock.json
+package-lock.lock
+composer.lock
 
 node_modules
 

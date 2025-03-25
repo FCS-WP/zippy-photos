@@ -6,7 +6,7 @@
  * @package Shin
  */
 
-namespace Zippy_Booking\Utils;
+namespace Zippy_Addons\Utils;
 
 defined('ABSPATH') or die();
 

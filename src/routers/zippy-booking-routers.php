@@ -1,6 +1,6 @@
 <?php
 
-namespace Zippy_Booking\Src\Routers;
+namespace Zippy_Addons\Src\Routers;
 
 /**
  * Bookings General Router
@@ -10,7 +10,7 @@ namespace Zippy_Booking\Src\Routers;
 
 defined('ABSPATH') or die();
 
-use Zippy_Booking\Src\Routers\General\Zippy_Booking_General_Router;
+use Zippy_Addons\Src\Routers\General\Zippy_General_Router;
 
 
 class Zippy_Booking_Routers
@@ -31,6 +31,6 @@ class Zippy_Booking_Routers
 
   public function __construct()
   {
-    Zippy_Booking_General_Router::get_instance();
+    Zippy_General_Router::get_instance();
   }
 }

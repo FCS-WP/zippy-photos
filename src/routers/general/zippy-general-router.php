@@ -1,5 +1,5 @@
 <?php
-namespace Zippy_Booking\Src\Routers\General;
+namespace Zippy_Addons\Src\Routers\General;
 /**
  * Bookings General Router
  *
@@ -8,19 +8,19 @@ namespace Zippy_Booking\Src\Routers\General;
 
 defined('ABSPATH') or die();
 
-use Zippy_Booking\Src\Controllers\Admin\Zippy_Admin_Booking_General_Controller;
+use Zippy_Addons\Src\Controllers\Admin\Zippy_Admin_Booking_General_Controller;
 
-use Zippy_Booking\Src\App\Models\Zippy_Api_Booking_Model;
+use Zippy_Addons\Src\App\Models\Zippy_Api_Booking_Model;
 
-use Zippy_Booking\Src\Middleware\Admin\Zippy_Booking_Permission;
+use Zippy_Addons\Src\Middleware\Admin\Zippy_Booking_Permission;
 
-class Zippy_Booking_General_Router
+class Zippy_General_Router
 {
 
   protected static $_instance = null;
 
   /**
-   * @return Zippy_Booking_General_Router
+   * @return Zippy_General_Router
    */
 
   public static function get_instance()

@@ -6,13 +6,11 @@
  *
  */
 
-namespace Zippy_Booking\Src\Admin;
+namespace Zippy_Addons\Src\Admin;
 
 defined('ABSPATH') or die();
 
-use Zippy_Booking\Utils\Zippy_Utils_Core;
-use Zippy_Booking\Src\Services\One_Map_Api;
-use  WC_Order_Item_Product;
+use Zippy_Addons\Utils\Zippy_Utils_Core;
 
 class Zippy_Admin_Settings
 {
@@ -39,7 +37,6 @@ class Zippy_Admin_Settings
     /* Register Assets Admin Part */
     add_action('admin_enqueue_scripts', array($this, 'admin_assets'));
 
-
     /* Create Zippy API Token */
     // register_activation_hook(ZIPPY_ADDONS_BASENAME, array($this, 'create_one_map_credentials'));
   }
@@ -48,14 +45,9 @@ class Zippy_Admin_Settings
   {
     $version = time();
     $current_user_id = get_current_user_id();
-    //lib
-    // wp_enqueue_style('admin-jquery-ui-css', ZIPPY_ADDONS_URL . 'assets/libs/jquery-ui/jquery-ui.min.css', [], $version);
     // Pass the user ID to the script
     wp_enqueue_script('admin-booking-js', ZIPPY_ADDONS_URL . '/assets/dist/js/admin.min.js', [], $version, true);
     wp_enqueue_style('booking-css', ZIPPY_ADDONS_URL . '/assets/dist/css/admin.min.css', [], $version);
-
-
-
     wp_localize_script('booking-js-current-id', 'admin_id', array(
       'userID' => $current_user_id,
     ));
@@ -63,7 +55,7 @@ class Zippy_Admin_Settings
 
   public function admin_page()
   {
-    add_menu_page('Zippy Add-ons', 'Zippy Add-ons', 'manage_options', 'zippy-bookings', array($this, 'store_render'), 'dashicons-list-view', 6);
+    add_menu_page('Zippy Add-ons', 'Zippy Add-ons', 'manage_options', 'zippy-addons', array($this, 'dashboard_render'), 'dashicons-list-view', 6);
     // SubPage
     // add_submenu_page('zippy-bookings', 'Settings', 'Settings', 'manage_options', 'settings', array($this, 'settings_render'));
   }
@@ -78,19 +70,15 @@ class Zippy_Admin_Settings
     echo Zippy_Utils_Core::get_template('settings.php', [], dirname(__FILE__), '/templates');
   }
 
-  public function store_render()
+  public function dashboard_render()
   {
-    echo Zippy_Utils_Core::get_template('settings.php', [], dirname(__FILE__), '/templates');
+    echo Zippy_Utils_Core::get_template('index.php', [], dirname(__FILE__), '/templates');
   }
 
   public function remove_default_stylesheets($handle)
   {
     $apply_urls = [
-      'toplevel_page_zippy-bookings',
-      'zippy-bookings_page_bookings',
-      'zippy-bookings_page_calendar',
-      'zippy-bookings_page_products-booking',
-      'zippy-bookings_page_customize'
+      'toplevel_page_zippy-addons',
     ];
 
     if (in_array($handle, $apply_urls)) {
@@ -130,7 +118,4 @@ class Zippy_Admin_Settings
       });
     }
   }
-
-
-
 }
