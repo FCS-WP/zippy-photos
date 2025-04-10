@@ -31,6 +31,7 @@ class Zippy_Booking_Routers
 
   public function __construct()
   {
-    Zippy_General_Router::get_instance();
+    // Zippy_General_Router::get_instance();
+    
   }
 }
