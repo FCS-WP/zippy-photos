@@ -6,11 +6,10 @@
  *
  */
 
-namespace Zippy_Booking\Src\Web;
+namespace Zippy_Addons\Src\Web;
 
 defined('ABSPATH') or die();
 
-use Zippy_Booking\Utils\Zippy_Utils_Core;
 use DateTime;
 
 class Zippy_Booking_Web
@@ -35,32 +34,19 @@ class Zippy_Booking_Web
     date_default_timezone_set('Asia/Singapore');
 
     /* Init Function */
-    // add_action('init', array($this, 'function_init'));
-    add_action('wp_head', array($this, 'zippy_lightbox_flatsome'));
-
-    /* Short Code Take Away Function */
-    add_shortcode('form_take_away', array($this, 'form_take_away'));
-
-    /* Short Code Delivery Function */
-    add_shortcode('form_delivery', array($this, 'form_delivery'));
-
-    add_shortcode('zippy_form', array($this, 'zippy_form'));
-
-    
-    add_shortcode('pickup_date_calander', array($this, 'pickup_date_calander_callback'));
-
-    /* Booking Assets  */
+    add_shortcode('zippy_photo_editor', array($this, 'zippy_photo_editor'));
     add_action('wp_enqueue_scripts', array($this, 'booking_assets'));
   }
 
-  public function function_init(){
+  public function function_init()
+  {
     return;
   }
 
 
   public function booking_assets()
   {
-    // if (!is_archive() && !is_single() && !is_checkout()) return;
+    if (is_admin()) return;
     $version = time();
 
     $current_user_id = get_current_user_id();
@@ -74,8 +60,8 @@ class Zippy_Booking_Web
     ));
   }
 
-  public function zippy_form($atts) 
+  public function zippy_photo_editor($atts)
   {
-    return '<div id="zippy-form"></div>'; 
+    return '<div id="zippy_photo_editor"></div>';
   }
 }

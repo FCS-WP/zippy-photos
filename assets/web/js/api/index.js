@@ -1,4 +1,4 @@
-import { makeOneMapRequest, makeRequest } from "./axios";
+import { makeRequest } from "./axios";
 
 export const webApi = {
   async getConfigs(params) {
