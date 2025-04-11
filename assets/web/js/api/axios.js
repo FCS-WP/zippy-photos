@@ -79,71 +79,43 @@ export const fetchCredentials = async () => {
   }
 };
 
-// Fetch woo
-export const makeLocalRequest = async (
+export const makeMultipartRequest = async (
   endpoint,
-  params = {},
-  method = "GET"
+  formData,
+  method = "GET",
+  token = "FEhI30q7ySHtMfzvSDo6RkxZUDVaQ1BBU3lBcGhYS3BrQStIUT09"
 ) => {
   const baseURL = "/wp-json";
   const api = axios.create({
     baseURL: baseURL,
   });
 
-  const config = {
-    url: endpoint,
-    params: params,
-    method: method,
-  };
-  try {
-    let res = null;
-
-    res = await api.request(config);
-    const data = res.data;
-    return { data };
-  } catch {
-    (error) => {
-      if (!error?.response) {
-        console.error("❗Error", error.message);
-        return { ...error, catchedError: error };
+  const headers = token
+    ? {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
       }
-
-      console.error(error.response.statusText);
-      return error;
-    };
-  }
-};
-
-// Onemap Request 
-export const makeOneMapRequest = async (
-  endpoint,
-  params = {},
-  method = "GET",
-  token = ""
-) => {
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    : {
+        "Content-Type": "multipart/form-data",
+      };
 
   const config = {
-    url: "https://www.onemap.gov.sg/api" + endpoint,
-    params: params,
+    url: "zippy-addons/v1" + endpoint,
+    data: formData,
     method: method,
     headers: headers,
   };
+
   try {
-    let res = null;
+    const res = await api.request(config);
+    return { data: res.data };
+  } catch (error) {
+    if (!error?.response) {
+      console.error("❗Error", error.message);
+      return { ...error, catchedError: error };
+    }
 
-    res = await axios.request(config);
-    const data = res.data;
-    return { data };
-  } catch {
-    (error) => {
-      if (!error?.response) {
-        console.error("❗Error", error.message);
-        return { ...error, catchedError: error };
-      }
-
-      console.error(error.response.statusText);
-      return error;
-    };
+    console.error("❗HTTP Error:", error.response.statusText);
+    return error.response;
   }
 };

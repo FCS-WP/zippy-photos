@@ -1,10 +1,11 @@
 import React from 'react'
-import MainProvider from '../providers/MainProvider'
+import { MainProvider } from '../providers/MainProvider'
+import HomeScreen from '../components/screens/HomeScreen'
 
 const PhotoEditor = () => {
   return (
     <MainProvider>
-      <h2>Init Plugin</h2>
+      <HomeScreen />
     </MainProvider>
   )
 }

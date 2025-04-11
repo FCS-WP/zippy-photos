@@ -59,6 +59,14 @@ if (!defined('ZIPPY_BOOKING_API_NAMESPACE')) {
   define('ZIPPY_BOOKING_API_NAMESPACE', 'zippy-addons/v1');
 }
 
+
+if (!defined('ZIPPY_BOOKING_API_TOKEN_NAME')) {
+  define('ZIPPY_BOOKING_API_TOKEN_NAME', 'zippy_booking_api_token');
+}
+
+if (!defined('ZIPPY_BOOKING_API_TOKEN')) {
+  define('ZIPPY_BOOKING_API_TOKEN', 'FEhI30q7ySHtMfzvSDo6RkxZUDVaQ1BBU3lBcGhYS3BrQStIUT09');
+}
 /* Default Timezone */
 date_default_timezone_set("Asia/Singapore");
 
@@ -83,7 +91,6 @@ use Zippy_Addons\Src\Web\Zippy_Booking_Web;
  */
 
  Zippy_Admin_Settings::get_instance();
-
+ Zippy_Booking_Web::get_instance();
  Zippy_Booking_Routers::get_instance();
 
- Zippy_Booking_Web::get_instance();

@@ -6,12 +6,12 @@
  *
  */
 
-namespace Zippy_Booking\Src\Middleware\Admin;
+namespace Zippy_Addons\Src\Middleware\Admin;
 
 
 defined('ABSPATH') or die();
 
-use Zippy_Booking\Src\App\Zippy_Response_Handler;
+use Zippy_Addons\Src\App\Zippy_Response_Handler;
 
 class Zippy_Booking_Permission
 {
@@ -39,7 +39,7 @@ class Zippy_Booking_Permission
         }
 
         $token = isset($uppercase_headers['Authorization']) ? trim(str_replace('Bearer', '', $uppercase_headers['Authorization'])) : '';
-        $valid_token = get_option(ZIPPY_BOOKING_API_TOKEN_NAME);
+        $valid_token = (ZIPPY_BOOKING_API_TOKEN);
 
         // Valid Token
         return $token === $valid_token;
