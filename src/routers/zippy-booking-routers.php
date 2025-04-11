@@ -10,8 +10,7 @@ namespace Zippy_Addons\Src\Routers;
 
 defined('ABSPATH') or die();
 
-use Zippy_Addons\Src\Routers\General\Zippy_General_Router;
-
+use Zippy_Addons\Src\Routers\Photo\Zippy_Photo_Router;
 
 class Zippy_Booking_Routers
 {
@@ -32,6 +31,6 @@ class Zippy_Booking_Routers
   public function __construct()
   {
     // Zippy_General_Router::get_instance();
-    
+    Zippy_Photo_Router::get_instance();
   }
 }

@@ -25,9 +25,13 @@ const EditPhotoDialog = ({ isOpen, image, onClose }) => {
       </DialogTitle>
       <DialogContent>
         <Box>
-          <Grid2 container spacing={3} justifyContent={'center'}>
+          <Grid2 container spacing={3} justifyContent={"center"}>
             <Grid2 size={4}>
-              <Cropper src={image.preview} onUpdate={onUpdate} className={"cropper"} />
+              <Cropper
+                src={image.preview}
+                onUpdate={onUpdate}
+                className={"cropper"}
+              />
             </Grid2>
             <Grid2 size={4}>
               <CropperPreview ref={previewRef} className="preview" />

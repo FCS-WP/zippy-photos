@@ -31,9 +31,6 @@ export const MainProvider = ({ children }) => {
     unSelectImage
   };
 
-  useEffect(()=>{
-    console.log("Change: ", selectedImages);
-  }, [selectedImages])
   return <MainContext.Provider value={value}>{children}</MainContext.Provider>;
 };
 

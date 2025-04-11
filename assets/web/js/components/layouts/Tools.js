@@ -2,6 +2,7 @@ import { Box, Button } from '@mui/material'
 import React from 'react'
 import { useMainProvider } from '../../providers/MainProvider';
 import { AlertStatus, showAlert } from '../../helpers/showAlert';
+import { webApi } from '../../api';
 
 const Tools = () => {
   const { uploadedImages } = useMainProvider();
@@ -11,6 +12,9 @@ const Tools = () => {
           return
       }
       // handle Api to save
+      const formData = new FormData();
+      uploadedImages.forEach((file) => formData.append("file[]", file.file));
+      const response = await webApi.savePhotos(formData);
       showAlert(AlertStatus.success, "Successfully", "");
   }
   return (  
