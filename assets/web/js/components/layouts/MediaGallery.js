@@ -9,7 +9,7 @@ const MediaGallery = () => {
   return (
     <Box display={'flex'} my={4} gap={3} flexWrap={'wrap'} justifyContent={'space-around'}>
       {uploadedImages.length > 0 && uploadedImages.map((item, index) => (
-        <ImageCard key={index} image={item}/>
+        <ImageCard key={item.preview} image={item}/>
       ))}
     </Box>
   )
