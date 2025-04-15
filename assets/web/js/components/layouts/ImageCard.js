@@ -82,12 +82,15 @@ const ImageCard = ({ image }) => {
     return () => {};
   }, [size, quantity]);
 
+  useEffect(()=>{
+    return () =>{};
+  }, [image])
+
   return (
     <Card sx={{ width: { xs: "100%", md: "330px" }, p: 3 }}>
       <CardActions>
         <Box display={"flex"} gap={1} justifyContent={"end"}>
           <Checkbox
-            checked={isChecked}
             sx={{ minHeight: 0 }}
             onChange={handleChangeCheckbox}
             icon={<RadioButtonUncheckedIcon color="primary" />}
