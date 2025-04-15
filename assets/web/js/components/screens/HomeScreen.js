@@ -15,6 +15,7 @@ const HomeScreen = () => {
       <Tools />
       <Divider />
       <MediaGallery />
+      <Divider />
       <ControlBox />
     </Box>
   );

@@ -5,7 +5,7 @@ import { AlertStatus, showAlert } from "../../helpers/showAlert";
 
 const ImageDownloader = () => {
   const { selectedImages } = useMainProvider();
-  
+
   const handleDownloadImages = async () => {
     if (!selectedImages || selectedImages.length <= 0) {
       showAlert(
@@ -16,10 +16,10 @@ const ImageDownloader = () => {
       return;
     }
     await downloadPreviewImages(selectedImages);
-  }
+  };
 
   const downloadPreviewImages = async (images) => {
-    await images.map((img, index) => { 
+    await images.map((img, index) => {
       const link = document.createElement("a");
       link.href = img.preview;
       link.setAttribute("download", img.file.name || `image-${index + 1}.jpg`);
@@ -31,7 +31,13 @@ const ImageDownloader = () => {
 
   return (
     <Box>
-      <Button onClick={handleDownloadImages}>Download</Button>
+      <Button
+        sx={{ color: "#fff" }}
+        variant="contained"
+        onClick={handleDownloadImages}
+      >
+        Download
+      </Button>
     </Box>
   );
 };
