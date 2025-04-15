@@ -27,7 +27,13 @@ const ImageRemover = () => {
   };
   return (
     <Box>
-      <Button onClick={handleRemoveAllSelected}>Remove</Button>
+      <Button
+        sx={{ color: "#fff" }}
+        variant="contained"
+        onClick={handleRemoveAllSelected}
+      >
+        Remove
+      </Button>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, Grid2, Card, CardMedia, Box } from "@mui/material";
+import React from "react";
+import { Button, Box } from "@mui/material";
 import { useMainProvider } from "../../providers/MainProvider";
 
 const ImageUploader = () => {
@@ -10,6 +10,8 @@ const ImageUploader = () => {
     const imagePreviews = files.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
+      quantity: 1,
+      size: { id: 1, name: `2.17" x 2.95" (2R)`, price: 1.5 },
     }));
     setUploadedImages([...uploadedImages, ...imagePreviews]);
   };
@@ -26,6 +28,7 @@ const ImageUploader = () => {
       />
       <Button
         variant="contained"
+        sx={{ color: "#fff" }}
         onClick={() => document.getElementById("imageUpload").click()}
       >
         Upload
