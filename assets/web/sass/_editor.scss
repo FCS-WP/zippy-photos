@@ -5,9 +5,13 @@ $theme-color: #61DAFB;
 	max-height: 100%;
 	&__cropper {
 		background: #0f0e13;
-		height: 400px;
+		height: 600px;
 		max-height: 100%;
 		position: relative;
+		@media (max-width: 540px) {
+			height: auto;
+			min-height: 400px;
+		}
 	}
 	&__slider {
 		width: 100%;
@@ -218,6 +222,7 @@ $theme-color: #61DAFB;
 		transform: translate(75%, 15%);
 		left: 0;
 		top: auto;
+		display: none !important;
 	}
 }
 .input-quanity  {

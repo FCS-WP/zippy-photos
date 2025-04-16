@@ -51,6 +51,7 @@ class Zippy_Database
         paper_type VARCHAR(20) NOT NULL,
         quantity INT NOT NULL,
         status VARCHAR(20) NULL,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";

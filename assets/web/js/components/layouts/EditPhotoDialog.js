@@ -16,7 +16,7 @@ const EditPhotoDialog = ({ isOpen, image, onClose }) => {
       <DialogTitle fontSize={20} textAlign={"center"}>
         Edit Your Photo
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ p: 0 }}>
         <Box>
           <ImageEditor image={image} onClose={onClose} />
         </Box>

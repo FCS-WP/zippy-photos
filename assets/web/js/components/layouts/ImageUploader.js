@@ -1,6 +1,8 @@
 import React from "react";
 import { Button, Box } from "@mui/material";
 import { useMainProvider } from "../../providers/MainProvider";
+import { photoSizes } from "../../helpers/editorHelper";
+import theme from "../../../theme/customTheme";
 
 const ImageUploader = () => {
   const { uploadedImages, setUploadedImages } = useMainProvider();
@@ -8,10 +10,12 @@ const ImageUploader = () => {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const imagePreviews = files.map((file) => ({
+      id: null,
       file,
       preview: URL.createObjectURL(file),
       quantity: 1,
-      size: { id: 1, name: `2.17" x 2.95" (2R)`, price: 1.5 },
+      paper: 'Matte',
+      size: photoSizes[0],
     }));
     setUploadedImages([...uploadedImages, ...imagePreviews]);
   };
