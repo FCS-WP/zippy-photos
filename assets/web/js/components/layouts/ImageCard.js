@@ -27,8 +27,10 @@ import { photoSizes } from "../../helpers/editorHelper";
 
 const ImageCard = ({ image }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { removeImages, selectImage, unSelectImage, updateDataImage } = useMainProvider();
+  const { removeImages, selectImage, unSelectImage, updateDataImage } =
+    useMainProvider();
   const [size, setSize] = useState(photoSizes[0]);
+  const [paperType, setPaperType] = useState(image?.paper);
   const [quantity, setQuantity] = useState(image?.quantity);
   const [isChecked, setIsChecked] = useState(false);
 
@@ -71,6 +73,7 @@ const ImageCard = ({ image }) => {
         ...image,
         size: size,
         quantity: quantity,
+        paper: paperType,
       };
       updateDataImage(image.preview, newData);
     }
@@ -80,11 +83,11 @@ const ImageCard = ({ image }) => {
       refreshData();
     }
     return () => {};
-  }, [size, quantity]);
+  }, [size, quantity, paperType]);
 
-  useEffect(()=>{
-    return () =>{};
-  }, [image])
+  useEffect(() => {
+    return () => {};
+  }, [image]);
 
   return (
     <Card sx={{ width: { xs: "100%", md: "330px" }, p: 3 }}>
@@ -116,7 +119,7 @@ const ImageCard = ({ image }) => {
       </CardActions>
       <CardMedia
         component="img"
-        sx={{ height: '250px !important', objectFit: 'contain' }}
+        sx={{ height: "250px !important", objectFit: "contain" }}
         image={image.preview ?? ""}
         alt={`Uploaded image`}
       />
@@ -126,26 +129,44 @@ const ImageCard = ({ image }) => {
         onClose={handleCloseDialog}
       />
       <Box mt={3}>
-        <Box display={"flex"} mb={1} gap={3} alignItems={"center"}>
-          <FormControl fullWidth>
+        <Box mb={1} gap={3} alignItems={"center"}>
+          <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel
               sx={{ background: "#fff", px: 1 }}
-              id="demo-simple-select-label"
+              id="label-paper-type"
             >
+              Paper Type
+            </InputLabel>
+            <Select
+              labelId="label-paper-type"
+              id="paper-type"
+              size="small"
+              variant="outlined"
+              value={paperType}
+              sx={{ p: "6px" }}
+              onChange={(e)=>setPaperType(e.target.value)}
+            >
+              <MenuItem value={"Matte"}>Matte</MenuItem>
+              <MenuItem value={"Glossy"}>Glossy</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel sx={{ background: "#fff", px: 1 }} id="label-size">
               Size
             </InputLabel>
             <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId="label-size"
+              id="size"
               size="small"
               variant="outlined"
               value={size}
               sx={{ p: "6px" }}
               onChange={handleChangeSize}
             >
-             
-              {photoSizes.map((size, index)=>(
-                <MenuItem key={index} value={size}>{size.name}</MenuItem>
+              {photoSizes.map((size, index) => (
+                <MenuItem key={index} value={size}>
+                  {size.name}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>

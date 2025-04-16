@@ -5,8 +5,25 @@ import { AlertStatus, showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
 
 const Tools = () => {
-  const { uploadedImages } = useMainProvider();
+  const { uploadedImages, setUploadedImages } = useMainProvider();
   const [isLoading, setIsLoading] = useState(false);
+
+  const updateIdForImage = (newArr = []) => {
+    if (newArr.length <= 0) {
+      return;
+    }
+    const updatedData = uploadedImages.map((image, index) => {
+      const getNewId = newArr.find((item) => item.temp_id === index);
+      if (!getNewId) {
+        return image;
+      }
+      const newData = { ...image, id: getNewId.photo_id };
+      return newData;
+    });
+
+    setUploadedImages(updatedData);
+  };
+
   const handleSaveImages = async () => {
     if (uploadedImages.length <= 0) {
       showAlert(AlertStatus.warning, "Failed", "Images not found!");
@@ -15,21 +32,44 @@ const Tools = () => {
     // handle Api to save
     setIsLoading(true);
     const formData = new FormData();
-    uploadedImages.forEach((file) => formData.append("file[]", file.file));
+
+    uploadedImages.forEach((item, index) => {
+      formData.append(`files[${index}][file]`, item.file);
+      formData.append(`files[${index}][id]`, item.id ?? null);
+      formData.append(`files[${index}][quantity]`, item.quantity);
+      formData.append(`files[${index}][paper]`, item.paper);
+      formData.append(`files[${index}][temp_id]`, index);
+      formData.append(`files[${index}][size]`, JSON.stringify(item.size));
+    });
+
     const response = await webApi.savePhotos(formData);
-    if (!response) { 
+
+    updateIdForImage(response.data);
+    if (!response || response.data.error) {
       showAlert(AlertStatus.warning, "Failed", "Failed to save images");
       setIsLoading(false);
       return;
     }
-    showAlert(AlertStatus.success, "Successfully", "");
+
+    showAlert(
+      AlertStatus.success,
+      "Successfully",
+      "Your images have been saved!"
+    );
+
     setIsLoading(false);
-    return
+    return;
   };
+
   return (
     <Box display={"flex"} justifyContent={"flex-end"} p={2}>
-      <Button loading={isLoading} variant="outlined" onClick={handleSaveImages}>
-        Finish
+      <Button
+        loading={isLoading}
+        variant="contained"
+        sx={{ color: "#fff" }}
+        onClick={handleSaveImages}
+      >
+        Save
       </Button>
     </Box>
   );

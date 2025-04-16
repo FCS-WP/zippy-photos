@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import cn from "classnames";
-import { Cropper, CropperPreview } from "react-advanced-cropper";
+import { Cropper, CropperPreview, ImageRestriction } from "react-advanced-cropper";
 import { Navigation } from "./Navigation";
 import { Slider } from "./Slider";
 import "react-advanced-cropper/dist/style.css";
@@ -9,6 +9,7 @@ import { AdjustableCropperBackground } from "./AdjustableCropperBackground";
 import { AdjustablePreviewBackground } from "./AdjustablePreviewBackground";
 import { useMainProvider } from "../../providers/MainProvider";
 import RestoreIcon from '@mui/icons-material/Restore';
+import { inchToPx } from "../../helpers/editorHelper";
 
 export const ImageEditor = ({ image, onClose }) => {
   const cropperRef = useRef(null);
@@ -16,13 +17,20 @@ export const ImageEditor = ({ image, onClose }) => {
   const { updateImageList } = useMainProvider();
   const [src, setSrc] = useState(image.preview);
   const [mode, setMode] = useState("crop");
+
+  const selectedSize = {
+    width: inchToPx(image.size.widthIn),
+    height: inchToPx(image.size.heightIn),
+  }
+
   const [adjustments, setAdjustments] = useState({
     brightness: 0,
     hue: 0,
     saturation: 0,
     contrast: 0,
+    size: selectedSize
   });
-
+ 
   const onChangeValue = (value) => {
     if (mode in adjustments) {
       setAdjustments((previousValue) => ({
@@ -136,6 +144,7 @@ export const ImageEditor = ({ image, onClose }) => {
         <Cropper
           src={src}
           ref={cropperRef}
+          sizeRestrictions={selectedSize}
           stencilProps={{
             movable: cropperEnabled,
             resizable: cropperEnabled,
