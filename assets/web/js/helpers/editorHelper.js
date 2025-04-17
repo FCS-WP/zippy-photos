@@ -16,7 +16,7 @@ export const photoSizes = [
   { id: 15, name: `16.5" x 11.7" (A3)`, price: 25.0, widthIn: 16.5, heightIn: 11.7 },
 ];
 
-export const DPI = 100;
+export const DPI = 150;
 
 export const inchToPx = (inch) => {
   return inch * DPI;
