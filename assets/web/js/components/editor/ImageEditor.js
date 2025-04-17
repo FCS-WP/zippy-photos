@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import cn from "classnames";
-import { Cropper, CropperPreview, ImageRestriction } from "react-advanced-cropper";
+import {
+  Cropper,
+  CropperPreview,
+  ImageRestriction,
+} from "react-advanced-cropper";
 import { Navigation } from "./Navigation";
 import { Slider } from "./Slider";
 import "react-advanced-cropper/dist/style.css";
@@ -8,7 +12,7 @@ import { Button, IconButton } from "@mui/material";
 import { AdjustableCropperBackground } from "./AdjustableCropperBackground";
 import { AdjustablePreviewBackground } from "./AdjustablePreviewBackground";
 import { useMainProvider } from "../../providers/MainProvider";
-import RestoreIcon from '@mui/icons-material/Restore';
+import RestoreIcon from "@mui/icons-material/Restore";
 import { inchToPx } from "../../helpers/editorHelper";
 
 export const ImageEditor = ({ image, onClose }) => {
@@ -17,20 +21,31 @@ export const ImageEditor = ({ image, onClose }) => {
   const { updateImageList } = useMainProvider();
   const [src, setSrc] = useState(image.preview);
   const [mode, setMode] = useState("crop");
+  const [ratioValue, setRatioValue] = useState(
+    image.size.widthIn / image.size.heightIn
+  );
 
   const selectedSize = {
     width: inchToPx(image.size.widthIn),
     height: inchToPx(image.size.heightIn),
-  }
+  };
+
+  const onChangeOrientation = (type) => {
+    const newRatioValue =
+      type === "portrait"
+        ? image.size.widthIn / image.size.heightIn
+        : image.size.heightIn / image.size.widthIn;
+    setRatioValue(newRatioValue);
+  };
 
   const [adjustments, setAdjustments] = useState({
     brightness: 0,
     hue: 0,
     saturation: 0,
     contrast: 0,
-    size: selectedSize
+    size: selectedSize,
   });
- 
+
   const onChangeValue = (value) => {
     if (mode in adjustments) {
       setAdjustments((previousValue) => ({
@@ -145,9 +160,12 @@ export const ImageEditor = ({ image, onClose }) => {
           src={src}
           ref={cropperRef}
           sizeRestrictions={selectedSize}
+          stencilSize={selectedSize}
           stencilProps={{
+            aspectRatio: ratioValue,
             movable: cropperEnabled,
-            resizable: cropperEnabled,
+            grid: true,
+            resizable: true,
             lines: cropperEnabled,
             handlers: cropperEnabled,
             overlayClassName: cn(
@@ -177,7 +195,11 @@ export const ImageEditor = ({ image, onClose }) => {
           backgroundComponent={AdjustablePreviewBackground}
           backgroundProps={adjustments}
         />
-        <IconButton color="primary" className="image-editor_reset" onClick={onReset}>
+        <IconButton
+          color="primary"
+          className="image-editor_reset"
+          onClick={onReset}
+        >
           <RestoreIcon />
         </IconButton>
       </div>
@@ -189,6 +211,8 @@ export const ImageEditor = ({ image, onClose }) => {
         onUpload={onUpload}
         onDownload={onDownload}
         onSaveFile={onSaveFile}
+        showOrientation={ratioValue !== 1 ? true : false}
+        onChangeOrientation={onChangeOrientation}
         onClose={onClose}
       />
     </div>

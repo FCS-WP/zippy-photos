@@ -9,6 +9,8 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import SaveIcon from "@mui/icons-material/Save";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
+import CropLandscapeIcon from "@mui/icons-material/CropLandscape";
+import CropPortraitIcon from "@mui/icons-material/CropPortrait";
 import FlipIcon from "@mui/icons-material/Flip";
 
 export const Navigation = ({
@@ -18,6 +20,8 @@ export const Navigation = ({
   onDownload,
   mode,
   onSaveFile,
+  onChangeOrientation,
+  showOrientation = true,
   onClose,
 }) => {
   const setMode = (mode) => () => {
@@ -27,6 +31,27 @@ export const Navigation = ({
   return (
     <div className="image-editor-navigation">
       <div className="image-editor-navigation__buttons">
+        {showOrientation && (
+          <>
+            <IconButton
+              sx={{ p: 1.5 }}
+              className={"image-editor-navigation__button"}
+              onClick={() => onChangeOrientation("portrait")}
+              color="primary"
+            >
+              <CropPortraitIcon />
+            </IconButton>
+            <IconButton
+              sx={{ p: 1.5 }}
+              className={"image-editor-navigation__button"}
+              onClick={() => onChangeOrientation("landscape")}
+              color="primary"
+            >
+              <CropLandscapeIcon />
+            </IconButton>
+          </>
+        )}
+
         <IconButton
           sx={{ p: 1.5 }}
           className={"image-editor-navigation__button"}
