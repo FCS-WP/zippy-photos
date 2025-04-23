@@ -7,4 +7,7 @@ export const webApi = {
   async savePhotos(formData) {
     return await makeMultipartRequest("/photos", formData, 'POST');
   },
+  async getSizes(formData) {
+    return await makeMultipartRequest("/photo-sizes", formData);
+  },
 };

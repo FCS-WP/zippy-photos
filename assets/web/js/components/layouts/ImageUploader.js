@@ -1,11 +1,10 @@
 import React from "react";
 import { Button, Box } from "@mui/material";
 import { useMainProvider } from "../../providers/MainProvider";
-import { photoSizes } from "../../helpers/editorHelper";
 import theme from "../../../theme/customTheme";
 
 const ImageUploader = () => {
-  const { uploadedImages, setUploadedImages } = useMainProvider();
+  const { uploadedImages, setUploadedImages, photoSizes } = useMainProvider();
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);

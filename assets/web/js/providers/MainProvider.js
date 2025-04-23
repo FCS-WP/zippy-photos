@@ -1,27 +1,35 @@
 import React, { useContext, useEffect, useState } from "react";
 import MainContext from "../contexts/MainContext";
+import { webApi } from "../api";
 
 export const MainProvider = ({ children }) => {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
+  const [photoSizes, setPhotoSizes] = useState([]);
+  const [croppedFiles, setCroppedFiles] = useState([]);
+
+  const getPhotoSizes = async () => {
+    const res = await webApi.getSizes();
+    if (res.data.status === "success") {
+      setPhotoSizes(res.data.sizes);
+    }
+  };
+
+  const updateCroppedFiles = (preview, file) => {
+    const newArray = croppedFiles.map((item) => {
+      console.log(item.preview !== preview);
+    });
+    newArray.push({
+      preview: preview,
+      file: file,
+    });
+    setCroppedFiles(newArray);
+  };
 
   const removeImages = (imgs) => {
     const newArrayImages = uploadedImages.filter(
       (item) => !imgs.find((img) => img.preview === item.preview)
     );
-    setUploadedImages(newArrayImages);
-  };
-
-  const updateImageList = (image, editedImageFile) => {
-    const newImage = {
-      ...image,
-      file: editedImageFile,
-      preview: URL.createObjectURL(editedImageFile),
-    };
-    const newArrayImages = uploadedImages.filter(
-      (item) => image.preview !== item.preview
-    );
-    newArrayImages.push(newImage);
     setUploadedImages(newArrayImages);
   };
 
@@ -61,15 +69,26 @@ export const MainProvider = ({ children }) => {
     return () => {};
   }, [uploadedImages]);
 
+  useEffect(() => {
+    console.log("croppedFiles", croppedFiles);
+    return () => {};
+  }, [croppedFiles]);
+
+  useEffect(() => {
+    getPhotoSizes();
+    return () => {};
+  }, []);
+
   const value = {
+    photoSizes,
     uploadedImages,
+    selectedImages,
     setUploadedImages,
     removeImages,
-    selectedImages,
     selectImage,
     unSelectImage,
-    updateImageList,
     updateDataImage,
+    updateCroppedFiles,
   };
 
   return <MainContext.Provider value={value}>{children}</MainContext.Provider>;

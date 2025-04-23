@@ -7,14 +7,15 @@ import {
   DialogTitle,
   Grid2,
 } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React from "react";
 import { ImageEditor } from "../editor/ImageEditor";
 
 const EditPhotoDialog = ({ isOpen, image, onClose }) => {
+
   return (
     <Dialog fullWidth={true} maxWidth={"lg"} open={isOpen} onClose={onClose}>
       <DialogTitle fontSize={20} textAlign={"center"}>
-        Edit Your Photo
+        Image Size: {image?.size.name} - Paper: {image.paper}
       </DialogTitle>
       <DialogContent sx={{ p: 0 }}>
         <Box>

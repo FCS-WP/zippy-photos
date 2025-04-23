@@ -39,7 +39,7 @@ const Tools = () => {
       formData.append(`files[${index}][quantity]`, item.quantity);
       formData.append(`files[${index}][paper]`, item.paper);
       formData.append(`files[${index}][temp_id]`, index);
-      formData.append(`files[${index}][size]`, JSON.stringify(item.size));
+      formData.append(`files[${index}][product_id]`, item.size.id);
     });
 
     const response = await webApi.savePhotos(formData);
