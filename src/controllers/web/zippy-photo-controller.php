@@ -40,36 +40,46 @@ class Zippy_Photo_Controller
                     'post_status'    => 'inherit',
                 ];
 
-                $photo_id = intval($_POST['files'][$index]['id'] ?? 0);
+                $photo_id = intval($_POST['files'][$index]['photo_id'] ?? 0);
+                $detail_id = intval($_POST['files'][$index]['detail_id'] ?? 0);
                 $quantity = intval($_POST['files'][$index]['quantity'] ?? 1);
                 $temp_id = intval($_POST['files'][$index]['temp_id'] ?? 0);
                 $product_id = intval($_POST['files'][$index]['product_id']);
                 $paper_type = sanitize_text_field($_POST['files'][$index]['paper'] ?? 'Matte');
                 $attach_id = null;
-                if (empty($photo_id) || $photo_id == 0) {
-                    $attach_id = wp_insert_attachment($attachment, $movefile['file']);
-                    $attach_data = wp_generate_attachment_metadata($attach_id, $movefile['file']);
-                    wp_update_attachment_metadata($attach_id, $attach_data);
+                $attach_id = wp_insert_attachment($attachment, $movefile['file']);
+                $attach_data = wp_generate_attachment_metadata($attach_id, $movefile['file']);
+                wp_update_attachment_metadata($attach_id, $attach_data);
 
+                if (empty($detail_id) || $detail_id == 0) {
                     try {
-                        $wpdb->insert($table_name, [
+                        $result = $wpdb->insert($table_name, [
                             'user_id'     => $current_user_id,
                             'photo_id'    => $attach_id,
-                            'photo_url'         => esc_url_raw(wp_get_attachment_url($attach_id)),
+                            'photo_url'   => esc_url_raw(wp_get_attachment_url($attach_id)),
                             'product_id'  => $product_id,
                             'paper_type'  => $paper_type,
                             'quantity'    => $quantity,
                             'status'      => 'pending',
                             'created_at'  => current_time('mysql'),
                         ]);
+                        if ($result) {
+                            $detail_id = $wpdb->insert_id;
+                        }
                     } catch (\Throwable $th) {
                         throw $th;
                     }
                 } else {
-                    $attach_id = $photo_id;
+                    /* Remove old image */
+                    if (wp_attachment_is_image($photo_id)) {
+                        wp_delete_attachment($photo_id, true);
+                    }
+
+                    /* Update photo details */
                     $wpdb->update(
                         $table_name,
                         [
+                            'photo_id'    => $attach_id,
                             'product_id'  => $product_id,
                             'paper_type'  => $paper_type,
                             'quantity'    => $quantity,
@@ -77,9 +87,10 @@ class Zippy_Photo_Controller
                             'updated_at'  => current_time('mysql'),
                         ],
                         [
-                            'photo_id' => $attach_id,
+                            'id' => $detail_id,
                         ],
                         [
+                            '%d',
                             '%d',
                             '%s',
                             '%d',
@@ -93,9 +104,10 @@ class Zippy_Photo_Controller
                 }
 
                 $results[] = [
+                    'detail_id' => $detail_id,
                     'photo_id'   => $attach_id,
-                    'photo_url'        => wp_get_attachment_url($attach_id),
                     'product_id'       => $product_id,
+                    'photo_url'        => wp_get_attachment_url($attach_id),
                     'paper'      => $paper_type,
                     'quantity'   => $quantity,
                     'temp_id'    => $temp_id,
@@ -169,4 +181,5 @@ class Zippy_Photo_Controller
             return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
         }
     }
+
 }

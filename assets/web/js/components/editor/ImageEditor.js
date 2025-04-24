@@ -13,7 +13,11 @@ import { AdjustableCropperBackground } from "./AdjustableCropperBackground";
 import { AdjustablePreviewBackground } from "./AdjustablePreviewBackground";
 import { useMainProvider } from "../../providers/MainProvider";
 import RestoreIcon from "@mui/icons-material/Restore";
-import { dataURLToFile, downloadPreviewImage, inchToPx } from "../../helpers/editorHelper";
+import {
+  dataURLToFile,
+  downloadPreviewImage,
+  inchToPx,
+} from "../../helpers/editorHelper";
 
 export const ImageEditor = ({ image, onClose }) => {
   const cropperRef = useRef(null);
@@ -21,6 +25,8 @@ export const ImageEditor = ({ image, onClose }) => {
   const { updateDataImage, updateCroppedFiles } = useMainProvider();
   const [src, setSrc] = useState(image.preview);
   const [mode, setMode] = useState("crop");
+  const [orientation, setOrientation] = useState("portrait");
+
   const [ratioValue, setRatioValue] = useState(
     image.size.width_in / image.size.height_in
   );
@@ -31,11 +37,7 @@ export const ImageEditor = ({ image, onClose }) => {
   };
 
   const onChangeOrientation = (type) => {
-    const newRatioValue =
-      type === "portrait"
-        ? image.size.width_in / image.size.height_in
-        : image.size.height_in / image.size.width_in;
-    setRatioValue(newRatioValue);
+    setOrientation(type);
   };
 
   const [adjustments, setAdjustments] = useState({
@@ -130,7 +132,6 @@ export const ImageEditor = ({ image, onClose }) => {
     downloadPreviewImage(dataUrl, "edited-image.jpg");
   };
 
-
   const onSaveFile = () => {
     if (!cropperRef.current) return;
 
@@ -143,15 +144,11 @@ export const ImageEditor = ({ image, onClose }) => {
       ...image,
       file: file,
       preview: URL.createObjectURL(file),
-    }
-    
-    // updateCroppedFiles(image.preview, null, 'remove');
-    // updateCroppedFiles(newData.preview, file, 'add');
-   
+    };
+
     updateDataImage(image.preview, newData);
     onClose();
   };
-
 
   const onUpdate = () => {
     previewRef.current?.refresh();
@@ -161,9 +158,22 @@ export const ImageEditor = ({ image, onClose }) => {
 
   const cropperEnabled = mode === "crop";
 
+  const refreshRatio = () => {
+    const newRatioValue =
+      orientation === "portrait"
+        ? image.size.width_in / image.size.height_in
+        : image.size.height_in / image.size.width_in;
+    setRatioValue(newRatioValue);
+  };
+
   useEffect(() => {
     setSrc(image.preview);
+    refreshRatio();
   }, [image]);
+
+  useEffect(() => {
+    refreshRatio();
+  }, [orientation]);
 
   return (
     <div className={"image-editor"}>

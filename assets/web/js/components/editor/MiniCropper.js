@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Cropper, ImageRestriction } from "react-advanced-cropper";
 import { useMainProvider } from "../../providers/MainProvider";
 import { dataURLToFile } from "../../helpers/editorHelper";
+import { debounce } from "../../helpers/debounce";
 
 const MiniCropper = ({ image, orientation }) => {
   const cropperRef = useRef(null);
@@ -14,7 +15,15 @@ const MiniCropper = ({ image, orientation }) => {
 
   const onUpdate = () => {
     previewRef.current?.refresh();
+    debounceUpdateCroppedPhoto();
   };
+
+  const debounceUpdateCroppedPhoto = useCallback(
+    debounce(() => {
+      handleLoadCroppedImage();
+    }, 1000),
+    []
+  );
 
   const refreshRatio = () => {
     const newRatioValue =
@@ -22,6 +31,7 @@ const MiniCropper = ({ image, orientation }) => {
         ? image.size.width_in / image.size.height_in
         : image.size.height_in / image.size.width_in;
     setRatioValue(newRatioValue);
+    debounceUpdateCroppedPhoto();
   };
 
   const handleImageLoad = () => {

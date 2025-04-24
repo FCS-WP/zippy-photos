@@ -7,11 +7,13 @@ const MediaGallery = () => {
   const { uploadedImages } = useMainProvider();
 
   return (
-    <Box display={'flex'} my={4} gap={3} flexWrap={'wrap'} justifyContent={'space-around'}>
-      {uploadedImages.length > 0 && uploadedImages.map((item, index) => (
-        <ImageCard key={item.preview} image={item}/>
+    <Grid2 container spacing={3}>
+      {uploadedImages.length > 0 && uploadedImages.map((item) => (
+        <Grid2 key={item.preview} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+         <ImageCard image={item}/>
+        </Grid2>
       ))}
-    </Box>
+    </Grid2>
   )
 }
 

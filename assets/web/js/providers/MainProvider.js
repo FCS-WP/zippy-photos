@@ -16,14 +16,16 @@ export const MainProvider = ({ children }) => {
   };
 
   const updateCroppedFiles = (preview, file) => {
-    const newArray = croppedFiles.map((item) => {
-      console.log(item.preview !== preview);
+    setCroppedFiles((prev) => {
+      const newArray = prev.filter((item) => {
+        return item.preview !== preview;
+      });
+      newArray.push({
+        preview: preview,
+        file: file,
+      });
+      return newArray;
     });
-    newArray.push({
-      preview: preview,
-      file: file,
-    });
-    setCroppedFiles(newArray);
   };
 
   const removeImages = (imgs) => {
@@ -55,24 +57,26 @@ export const MainProvider = ({ children }) => {
     setUploadedImages(updatedData);
   };
 
-  const triggerUpdateSelectedList = () => {
+  const triggerUpdateData = () => {
     if (selectedImages.length > 0) {
       const updateList = uploadedImages.filter((item) =>
         selectedImages.find((sItem) => sItem.preview === item.preview)
       );
       setSelectedImages(updateList);
     }
+
+    const newCroppedFiles = croppedFiles.filter((croppedItem) =>
+      uploadedImages.find(
+        (uploadedItem) => uploadedItem.preview === croppedItem.preview
+      )
+    );
+    setCroppedFiles(newCroppedFiles);
   };
 
   useEffect(() => {
-    triggerUpdateSelectedList();
+    triggerUpdateData();
     return () => {};
   }, [uploadedImages]);
-
-  useEffect(() => {
-    console.log("croppedFiles", croppedFiles);
-    return () => {};
-  }, [croppedFiles]);
 
   useEffect(() => {
     getPhotoSizes();
@@ -80,6 +84,7 @@ export const MainProvider = ({ children }) => {
   }, []);
 
   const value = {
+    croppedFiles,
     photoSizes,
     uploadedImages,
     selectedImages,
