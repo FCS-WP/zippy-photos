@@ -5,7 +5,7 @@ import { AlertStatus, showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
 
 const Tools = () => {
-  const { uploadedImages, setUploadedImages } = useMainProvider();
+  const { uploadedImages, setUploadedImages, croppedFiles } = useMainProvider();
   const [isLoading, setIsLoading] = useState(false);
 
   const updateIdForImage = (newArr = []) => {
@@ -17,11 +17,22 @@ const Tools = () => {
       if (!getNewId) {
         return image;
       }
-      const newData = { ...image, id: getNewId.photo_id };
+      const newData = {
+        ...image,
+        id: getNewId.photo_id,
+        detail_id: getNewId.detail_id,
+      };
       return newData;
     });
 
     setUploadedImages(updatedData);
+  };
+
+  const getCroppedFile = (previewUrl) => {
+    const croppedItem = croppedFiles.find(
+      (item) => item.preview === previewUrl
+    );
+    return croppedItem ? croppedItem.file : null;
   };
 
   const handleSaveImages = async () => {
@@ -29,21 +40,21 @@ const Tools = () => {
       showAlert(AlertStatus.warning, "Failed", "Images not found!");
       return;
     }
-    // handle Api to save
+
     setIsLoading(true);
     const formData = new FormData();
 
     uploadedImages.forEach((item, index) => {
-      formData.append(`files[${index}][file]`, item.file);
-      formData.append(`files[${index}][id]`, item.id ?? null);
+      formData.append(`files[${index}][file]`, getCroppedFile(item.preview));
+      formData.append(`files[${index}][photo_id]`, item.id ?? null);
+      formData.append(`files[${index}][detail_id]`, item.detail_id ?? null);
       formData.append(`files[${index}][quantity]`, item.quantity);
       formData.append(`files[${index}][paper]`, item.paper);
       formData.append(`files[${index}][temp_id]`, index);
-      formData.append(`files[${index}][size]`, JSON.stringify(item.size));
+      formData.append(`files[${index}][product_id]`, item.size.id);
     });
 
     const response = await webApi.savePhotos(formData);
-
     updateIdForImage(response.data);
     if (!response || response.data.error) {
       showAlert(AlertStatus.warning, "Failed", "Failed to save images");

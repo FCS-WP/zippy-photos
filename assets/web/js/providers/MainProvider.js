@@ -1,27 +1,37 @@
 import React, { useContext, useEffect, useState } from "react";
 import MainContext from "../contexts/MainContext";
+import { webApi } from "../api";
 
 export const MainProvider = ({ children }) => {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
+  const [photoSizes, setPhotoSizes] = useState([]);
+  const [croppedFiles, setCroppedFiles] = useState([]);
+
+  const getPhotoSizes = async () => {
+    const res = await webApi.getSizes();
+    if (res.data.status === "success") {
+      setPhotoSizes(res.data.sizes);
+    }
+  };
+
+  const updateCroppedFiles = (preview, file) => {
+    setCroppedFiles((prev) => {
+      const newArray = prev.filter((item) => {
+        return item.preview !== preview;
+      });
+      newArray.push({
+        preview: preview,
+        file: file,
+      });
+      return newArray;
+    });
+  };
 
   const removeImages = (imgs) => {
     const newArrayImages = uploadedImages.filter(
       (item) => !imgs.find((img) => img.preview === item.preview)
     );
-    setUploadedImages(newArrayImages);
-  };
-
-  const updateImageList = (image, editedImageFile) => {
-    const newImage = {
-      ...image,
-      file: editedImageFile,
-      preview: URL.createObjectURL(editedImageFile),
-    };
-    const newArrayImages = uploadedImages.filter(
-      (item) => image.preview !== item.preview
-    );
-    newArrayImages.push(newImage);
     setUploadedImages(newArrayImages);
   };
 
@@ -47,29 +57,43 @@ export const MainProvider = ({ children }) => {
     setUploadedImages(updatedData);
   };
 
-  const triggerUpdateSelectedList = () => {
+  const triggerUpdateData = () => {
     if (selectedImages.length > 0) {
       const updateList = uploadedImages.filter((item) =>
         selectedImages.find((sItem) => sItem.preview === item.preview)
       );
       setSelectedImages(updateList);
     }
+
+    const newCroppedFiles = croppedFiles.filter((croppedItem) =>
+      uploadedImages.find(
+        (uploadedItem) => uploadedItem.preview === croppedItem.preview
+      )
+    );
+    setCroppedFiles(newCroppedFiles);
   };
 
   useEffect(() => {
-    triggerUpdateSelectedList();
+    triggerUpdateData();
     return () => {};
   }, [uploadedImages]);
 
+  useEffect(() => {
+    getPhotoSizes();
+    return () => {};
+  }, []);
+
   const value = {
+    croppedFiles,
+    photoSizes,
     uploadedImages,
+    selectedImages,
     setUploadedImages,
     removeImages,
-    selectedImages,
     selectImage,
     unSelectImage,
-    updateImageList,
     updateDataImage,
+    updateCroppedFiles,
   };
 
   return <MainContext.Provider value={value}>{children}</MainContext.Provider>;

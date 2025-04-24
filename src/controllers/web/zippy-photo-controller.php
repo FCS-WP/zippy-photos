@@ -4,6 +4,7 @@ namespace Zippy_Addons\Src\Controllers\Web;
 
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_Query;
 
 defined('ABSPATH') or die();
 
@@ -39,47 +40,58 @@ class Zippy_Photo_Controller
                     'post_status'    => 'inherit',
                 ];
 
-                $photo_id = intval($_POST['files'][$index]['id'] ?? 0);
+                $photo_id = intval($_POST['files'][$index]['photo_id'] ?? 0);
+                $detail_id = intval($_POST['files'][$index]['detail_id'] ?? 0);
                 $quantity = intval($_POST['files'][$index]['quantity'] ?? 1);
                 $temp_id = intval($_POST['files'][$index]['temp_id'] ?? 0);
+                $product_id = intval($_POST['files'][$index]['product_id']);
                 $paper_type = sanitize_text_field($_POST['files'][$index]['paper'] ?? 'Matte');
-                $photo_size = json_encode($_POST['files'][$index]['size'] ?? '{}');
                 $attach_id = null;
-                if (empty($photo_id) || $photo_id == 0) {
-                    $attach_id = wp_insert_attachment($attachment, $movefile['file']);
-                    $attach_data = wp_generate_attachment_metadata($attach_id, $movefile['file']);
-                    wp_update_attachment_metadata($attach_id, $attach_data);
+                $attach_id = wp_insert_attachment($attachment, $movefile['file']);
+                $attach_data = wp_generate_attachment_metadata($attach_id, $movefile['file']);
+                wp_update_attachment_metadata($attach_id, $attach_data);
 
+                if (empty($detail_id) || $detail_id == 0) {
                     try {
-                        $wpdb->insert($table_name, [
+                        $result = $wpdb->insert($table_name, [
                             'user_id'     => $current_user_id,
                             'photo_id'    => $attach_id,
-                            'url'         => esc_url_raw(wp_get_attachment_url($attach_id)),
-                            'photo_size'  => $photo_size,
+                            'photo_url'   => esc_url_raw(wp_get_attachment_url($attach_id)),
+                            'product_id'  => $product_id,
                             'paper_type'  => $paper_type,
                             'quantity'    => $quantity,
                             'status'      => 'pending',
                             'created_at'  => current_time('mysql'),
                         ]);
+                        if ($result) {
+                            $detail_id = $wpdb->insert_id;
+                        }
                     } catch (\Throwable $th) {
                         throw $th;
                     }
                 } else {
-                    $attach_id = $photo_id;
+                    /* Remove old image */
+                    if (wp_attachment_is_image($photo_id)) {
+                        wp_delete_attachment($photo_id, true);
+                    }
+
+                    /* Update photo details */
                     $wpdb->update(
                         $table_name,
                         [
-                            'photo_size'  => $photo_size,
+                            'photo_id'    => $attach_id,
+                            'product_id'  => $product_id,
                             'paper_type'  => $paper_type,
                             'quantity'    => $quantity,
                             'status'      => 'pending',
                             'updated_at'  => current_time('mysql'),
                         ],
                         [
-                            'photo_id' => $attach_id,
+                            'id' => $detail_id,
                         ],
                         [
-                            '%s',
+                            '%d',
+                            '%d',
                             '%s',
                             '%d',
                             '%s',
@@ -92,9 +104,10 @@ class Zippy_Photo_Controller
                 }
 
                 $results[] = [
+                    'detail_id' => $detail_id,
                     'photo_id'   => $attach_id,
-                    'url'        => wp_get_attachment_url($attach_id),
-                    'size'       => $photo_size,
+                    'product_id'       => $product_id,
+                    'photo_url'        => wp_get_attachment_url($attach_id),
                     'paper'      => $paper_type,
                     'quantity'   => $quantity,
                     'temp_id'    => $temp_id,
@@ -125,4 +138,48 @@ class Zippy_Photo_Controller
 
         return $result;
     }
+
+    public static function get_photo_sizes(WP_REST_Request $request)
+    {
+        try {
+            $args = [
+                'post_type' => 'product',
+                'posts_per_page' => -1,
+                'post_status' => 'publish',
+                'tax_query' => [
+                    [
+                        'taxonomy' => 'product_cat',
+                        'field'    => 'slug',
+                        'terms'    => 'photo-sizes',
+                    ],
+                ],
+            ];
+
+            $query = new WP_Query($args);
+            $products = [];
+
+            if ($query->have_posts()) {
+                while ($query->have_posts()) {
+                    $query->the_post();
+                    $product = wc_get_product(get_the_ID());
+                    $width_in = get_field('width_in', $product->get_id()) ?? "";
+                    $heigth_in = get_field('height_in', $product->get_id()) ?? "";
+                    if (!empty($width_in) && !empty($heigth_in)) {
+                        $products[] = [
+                            'id'       => $product->get_id(),
+                            'name'     => $product->get_name(),
+                            'price'    => number_format($product->get_price(), 2) . " " . get_woocommerce_currency(),
+                            'width_in'   => (float)$width_in,
+                            'height_in'  => (float)$heigth_in,
+                        ];
+                    }
+                }
+                wp_reset_postdata();
+            }
+            return new WP_REST_Response(["sizes" => $products, "status" => "success", "message" => "successfully"], 200);
+        } catch (Exception $e) {
+            return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
+        }
+    }
+
 }

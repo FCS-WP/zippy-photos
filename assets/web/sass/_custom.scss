@@ -1,7 +1,15 @@
 .ibtn-custom {
     transition: all 0s ease !important;
+    &.active { 
+        background-color: #f3f3f3;
+    }
 }
 body {
     padding: 0 !important;
     margin: 0 auto;
+}
+.mini-cropper-wrapped {
+    height: 250px;
+    display: flex;
+    align-items: center;
 }
