@@ -14,7 +14,6 @@ class Zippy_Photo_Controller
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'photo_details';
-        $current_user_id = get_current_user_id();
 
         if (empty($_FILES['files'])) {
             return new WP_REST_Response(['error' => 'No files uploaded.'], 400);
@@ -44,6 +43,7 @@ class Zippy_Photo_Controller
                 $detail_id = intval($_POST['files'][$index]['detail_id'] ?? 0);
                 $quantity = intval($_POST['files'][$index]['quantity'] ?? 1);
                 $temp_id = intval($_POST['files'][$index]['temp_id'] ?? 0);
+                $user_id = intval($_POST['files'][$index]['user_id'] ?? 0);
                 $product_id = intval($_POST['files'][$index]['product_id']);
                 $paper_type = sanitize_text_field($_POST['files'][$index]['paper'] ?? 'Matte');
                 $attach_id = null;
@@ -54,7 +54,7 @@ class Zippy_Photo_Controller
                 if (empty($detail_id) || $detail_id == 0) {
                     try {
                         $result = $wpdb->insert($table_name, [
-                            'user_id'     => $current_user_id,
+                            'user_id'     => $user_id,
                             'photo_id'    => $attach_id,
                             'photo_url'   => esc_url_raw(wp_get_attachment_url($attach_id)),
                             'product_id'  => $product_id,
@@ -106,6 +106,7 @@ class Zippy_Photo_Controller
                 $results[] = [
                     'detail_id' => $detail_id,
                     'photo_id'   => $attach_id,
+                    'user_id'     => $user_id,
                     'product_id'       => $product_id,
                     'photo_url'        => wp_get_attachment_url($attach_id),
                     'paper'      => $paper_type,
@@ -181,5 +182,4 @@ class Zippy_Photo_Controller
             return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
         }
     }
-
 }

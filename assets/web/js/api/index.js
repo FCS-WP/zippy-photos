@@ -10,4 +10,10 @@ export const webApi = {
   async getSizes(formData) {
     return await makeMultipartRequest("/photo-sizes", formData);
   },
+  async registerAccount(params) {
+    return await makeRequest('/zippy-register', params, 'POST');
+  },
+  async login(params) {
+    return await makeRequest('/zippy-signin', params, 'POST');
+  },
 };
