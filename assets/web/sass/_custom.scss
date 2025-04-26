@@ -13,3 +13,11 @@ body {
     display: flex;
     align-items: center;
 }
+.custom-login-input {
+    input {
+        background-color: #FFF !important;
+        padding: 8px !important;
+        min-height: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
