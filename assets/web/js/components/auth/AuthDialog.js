@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,16 +18,21 @@ import {
 
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { toast } from "react-toastify";
 import { getForgotPasswordUrl } from "../../helpers/authHelper";
-import { webApi } from "../../api";
 
-const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
+const AuthDialog = ({
+  open,
+  onClose,
+  handleRegister,
+  handleLogin,
+  authError = null,
+}) => {
   const [tab, setTab] = useState(0);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(authError);
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
@@ -50,14 +55,28 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
     if (login) {
       onClose();
     }
-  }
+  };
 
   const onRegister = async () => {
-    const register = await handleRegister(firstName, lastName, email, password, confirmPassword);
+    const register = await handleRegister(
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword
+    );
     if (register) {
       onClose();
     }
-  }
+  };
+
+  useEffect(() => {
+    setError(null);
+  }, [tab]);
+
+  useEffect(() => {
+    setError(authError);
+  }, [authError]);
 
   return (
     <Dialog
@@ -71,7 +90,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
       fullWidth
       className="login-dialog"
     >
-      <DialogContent sx={{ pb: 4 }}>
+      <DialogContent>
         <Tabs
           sx={{ mb: 3 }}
           value={tab}
@@ -205,7 +224,12 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
             >
               <Button
                 variant="contained"
-                sx={{ width: 200, color: "#fff", fontWeight: 600, minHeight: 0 }}
+                sx={{
+                  width: 200,
+                  color: "#fff",
+                  fontWeight: 600,
+                  minHeight: 0,
+                }}
                 onClick={onRegister}
               >
                 PROCEED
@@ -274,7 +298,12 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
               >
                 <Button
                   variant="contained"
-                  sx={{ width: 200, color: "#fff", fontWeight: 600, minHeight: 0 }}
+                  sx={{
+                    width: 200,
+                    color: "#fff",
+                    fontWeight: 600,
+                    minHeight: 0,
+                  }}
                   onClick={onLogin}
                 >
                   LOGIN
@@ -284,6 +313,11 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
           </>
         )}
       </DialogContent>
+      {error && (
+        <Box className="error-box" px={3} pb={4} sx={{ color: "red" }}>
+          <div dangerouslySetInnerHTML={{ __html: error }} />
+        </Box>
+      )}
     </Dialog>
   );
 };

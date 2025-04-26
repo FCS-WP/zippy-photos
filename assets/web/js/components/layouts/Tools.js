@@ -4,12 +4,12 @@ import { useMainProvider } from "../../providers/MainProvider";
 import { AlertStatus, showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
 import AuthDialog from "../auth/AuthDialog";
-import { toast } from "react-toastify";
 
 const Tools = () => {
   const { uploadedImages, setUploadedImages, croppedFiles } = useMainProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [authError, setAuthError] = useState(null);
 
   const updateIdForImage = (newArr = []) => {
     if (newArr.length <= 0) {
@@ -45,18 +45,19 @@ const Tools = () => {
     password,
     confirmPassword
   ) => {
+    setAuthError(null);
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      toast.error("Missing Information");
+      setAuthError("Missing Information");
       return false;
     }
 
     if (password.length < 6) {
-      toast.error("Password must > 6 characters");
+      setAuthError("Password must > 6 characters");
       return false;
     }
 
     if (password !== confirmPassword) {
-      toast.error("Confirm password not match with password!");
+      setAuthError("Confirm password not match with password!");
       return false;
     }
 
@@ -67,26 +68,28 @@ const Tools = () => {
       password,
       confirm_password: confirmPassword,
     };
-    const response = await webApi.registerAccount(registerData);
-    if (!response || response?.data.status !== "success") {
-      toast.error(
-        response?.data.message ??
+    const { data: response } = await webApi.registerAccount(registerData);
+    if (!response || response?.status !== "success") {
+      setAuthError(
+        response?.message ??
           "Can not rigister account now. Please try again later!"
       );
       return false;
     }
-    setTab(0);
     window.admin_data = {
-      userId: response.data.id,
+      userID: response.data.id,
       email: response.data.email,
     };
     await handleSubmitForm();
+    setAuthError(null);
+    setOpen(false);
     return true;
   };
 
   const handleLogin = async (email, password) => {
+    setAuthError(null);
     if (!email || !password) {
-      toast.error("Missing Information");
+      setAuthError("Missing Information");
       return false;
     }
 
@@ -95,22 +98,25 @@ const Tools = () => {
       password,
     };
 
-    const response = await webApi.login(loginData);
-    if (!response || response?.data?.status !== "success") {
-      toast.error(response?.data.message ?? "Failed to login");
+    const { data: response } = await webApi.login(loginData);
+    if (!response || response?.status !== "success") {
+      setAuthError(response?.message ?? "Failed to login");
       return false;
     }
     window.admin_data = {
-      userId: response.data.id,
+      userID: response.data.id,
       email: response.data.email,
     };
     await handleSubmitForm();
+    setAuthError(null);
+    setOpen(false);
     return true;
   };
 
   const handleSubmitForm = async () => {
     setIsLoading(true);
     const formData = new FormData();
+    const userID = window.admin_data ? window.admin_data.userID : 0;
 
     uploadedImages.forEach((item, index) => {
       formData.append(`files[${index}][file]`, getCroppedFile(item.preview));
@@ -123,9 +129,10 @@ const Tools = () => {
       formData.append(`files[${index}][product_id]`, item.size.id);
     });
 
-    const response = await webApi.savePhotos(formData);
+    const { data: response } = await webApi.savePhotos(formData);
     updateIdForImage(response.data);
-    if (!response || response.data.error) {
+
+    if (!response || response.status !== "success") {
       showAlert(AlertStatus.warning, "Failed", "Failed to save images");
       setIsLoading(false);
       return;
@@ -137,6 +144,10 @@ const Tools = () => {
       "Your images have been saved!"
     );
 
+    if (response.payment_url) {
+      window.location.href = response.payment_url;
+    }
+
     setIsLoading(false);
     return;
   };
@@ -147,7 +158,6 @@ const Tools = () => {
       return;
     }
     const userID = window.admin_data ? window.admin_data.userID : 0;
-
     if (!userID || userID == 0) {
       setOpen(true);
       return;
@@ -164,13 +174,14 @@ const Tools = () => {
         sx={{ color: "#fff" }}
         onClick={handleSaveImages}
       >
-        Save
+        Order now
       </Button>
       <AuthDialog
         open={open}
         handleLogin={handleLogin}
         handleRegister={handleRegister}
         onClose={() => setOpen(false)}
+        authError={authError}
       />
     </Box>
   );

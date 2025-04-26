@@ -45,7 +45,7 @@ class Zippy_Database
     $sql = "CREATE TABLE $table_name (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id BIGINT(20) NOT NULL,
-        photo_id BIGINT(20) NOT NULL,
+        order_id BIGINT(20) NOT NULL,
         product_id VARCHAR(20) NOT NULL,
         photo_url TEXT NOT NULL,
         paper_type VARCHAR(20) NOT NULL,

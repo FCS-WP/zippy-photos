@@ -26,6 +26,9 @@ class Zippy_Photo_Controller
         $uploaded_files = self::restructure_nested_files_array($_FILES['files']);
 
         $results = [];
+
+        $created_order = self::create_photo_order($_POST['files']);
+        $payment_url = $created_order->get_checkout_payment_url();
         foreach ($uploaded_files as $index => $file) {
             $upload_overrides = ['test_form' => false];
             $movefile = wp_handle_upload($file, $upload_overrides);
@@ -39,7 +42,7 @@ class Zippy_Photo_Controller
                     'post_status'    => 'inherit',
                 ];
 
-                $photo_id = intval($_POST['files'][$index]['photo_id'] ?? 0);
+                $order_id = $created_order->get_id();
                 $detail_id = intval($_POST['files'][$index]['detail_id'] ?? 0);
                 $quantity = intval($_POST['files'][$index]['quantity'] ?? 1);
                 $temp_id = intval($_POST['files'][$index]['temp_id'] ?? 0);
@@ -55,7 +58,7 @@ class Zippy_Photo_Controller
                     try {
                         $result = $wpdb->insert($table_name, [
                             'user_id'     => $user_id,
-                            'photo_id'    => $attach_id,
+                            'order_id'    => $order_id,
                             'photo_url'   => esc_url_raw(wp_get_attachment_url($attach_id)),
                             'product_id'  => $product_id,
                             'paper_type'  => $paper_type,
@@ -79,7 +82,7 @@ class Zippy_Photo_Controller
                     $wpdb->update(
                         $table_name,
                         [
-                            'photo_id'    => $attach_id,
+                            'order_id'    => $order_id,
                             'product_id'  => $product_id,
                             'paper_type'  => $paper_type,
                             'quantity'    => $quantity,
@@ -104,21 +107,20 @@ class Zippy_Photo_Controller
                 }
 
                 $results[] = [
-                    'detail_id' => $detail_id,
-                    'photo_id'   => $attach_id,
-                    'user_id'     => $user_id,
-                    'product_id'       => $product_id,
-                    'photo_url'        => wp_get_attachment_url($attach_id),
-                    'paper'      => $paper_type,
-                    'quantity'   => $quantity,
-                    'temp_id'    => $temp_id,
+                    'user_id'       => $user_id,
+                    'order_id'      => $created_order->get_id(),
+                    'product_id'    => $product_id,
+                    'photo_url'     => wp_get_attachment_url($attach_id),
+                    'paper'         => $paper_type,
+                    'quantity'      => $quantity,
+                    'temp_id'       => $temp_id,
                 ];
             } else {
                 $results[] = ['error' => $movefile['error'] ?? 'Unknown error'];
             }
         }
 
-        return new WP_REST_Response($results, 200);
+        return new WP_REST_Response(['data' => $results, 'payment_url' => $payment_url, 'status' => 'success', 'message' => 'Save data successfully'], 200);
     }
 
     public static function restructure_nested_files_array($files)
@@ -181,5 +183,31 @@ class Zippy_Photo_Controller
         } catch (Exception $e) {
             return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
         }
+    }
+
+    public static function create_photo_order($data = [])
+    {
+        if (! class_exists('WC_Order')) {
+            return new WP_Error('woocommerce_missing', 'WooCommerce not available');
+        }
+
+        $order = wc_create_order();
+
+        foreach ($data as $item) {
+            $product_id = intval($item['product_id']);
+            $quantity   = intval($item['quantity']);
+
+            $product = wc_get_product($product_id);
+            if ($product && $quantity > 0) {
+                $order->add_product($product, $quantity);
+            }
+            $order->set_customer_id(intval($item['user_id']));
+            $order->calculate_totals();
+            $order->save();
+        }
+
+        $order->calculate_totals();
+        $order->save();
+        return $order;
     }
 }

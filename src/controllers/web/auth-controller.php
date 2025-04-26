@@ -44,18 +44,15 @@ class Auth_Controller
                 'data'   => $user->get_error_message()
             ];
 
-            return new WP_REST_Response([$response, "status" => "error", "message" => "successfully"], 200);
+            return new WP_REST_Response(["status" => "error", "message" => $user->get_error_message()], 200);
         }
 
         $response = [
-            'status' => $status,
-            'data'   => [
-                'ID'        => $user->ID,
-                'email'     => $user->user_email,
-            ]
+            'id'        => $user->ID,
+            'email'     => $user->user_email
         ];
 
-        return new WP_REST_Response([$response, "status" => "success", "message" => "successfully"], 200);
+        return new WP_REST_Response(['data' => $response, "status" => "success", "message" => "login successfully"], 200);
     }
 
     public static function register(WP_REST_Request $request)
@@ -67,19 +64,19 @@ class Auth_Controller
         $last_name  = sanitize_text_field($request['last_name']);
 
         if (empty($user_email) || empty($user_password)) {
-            return new WP_REST_Response(["status" => "error", "message" => "Email or password cannot be blank"], 400);
+            return new WP_REST_Response(["status" => "error", "message" => "Email or password cannot be blank"], 200);
         }
 
         if ($confirm_password !== $user_password) {
-            return new WP_REST_Response(["status" => "error", "message" => "Confirm password does not match!"], 400);
+            return new WP_REST_Response(["status" => "error", "message" => "Confirm password does not match!"], 200);
         }
 
         if (!is_email($user_email)) {
-            return new WP_REST_Response(["status" => "error", "message" => "Invalid email."], 400);
+            return new WP_REST_Response(["status" => "error", "message" => "Invalid email."], 200);
         }
 
         if (email_exists($user_email)) {
-            return new WP_REST_Response(["status" => "error", "message" => "Email already exists"], 400);
+            return new WP_REST_Response(["status" => "error", "message" => "Email already exists"], 200);
         }
 
         try {
@@ -88,26 +85,33 @@ class Auth_Controller
             $user_id = wp_create_user($user_login, $user_password, $user_email);
 
             if (is_wp_error($user_id)) {
-                return new WP_REST_Response(["status" => "error", "message" => $user_id->get_error_message()], 400);
+                return new WP_REST_Response(["status" => "error", "message" => $user_id->get_error_message()], 200);
             }
+
             $update = wp_update_user([
                 'ID'         => $user_id,
                 'first_name' => $first_name,
                 'last_name'  => $last_name,
             ]);
+
             $user = get_userdata($user_id);
 
             $response = [
-                'status' => true,
-                'data'   => [
-                    'email' => $user->user_email,
-                    'id'    => $user->ID,
-                ],
+                'email' => $user->user_email,
+                'id'    => $user->ID,
             ];
+            /** Login */
+            $creds = array(
+                'user_login'    => $user_email,
+                'user_password' => $user_password,
+                'remember'      => true,
+            );
 
-            return new WP_REST_Response([$response, "status" => "success", "message" => "successfully"], 200);
+            $user = wp_signon($creds, false);
+
+            return new WP_REST_Response(['data' => $response, "status" => "success", "message" => "successfully"], 200);
         } catch (Exception $e) {
-            return new WP_REST_Response(["status" => "error", "message" => $e->getMessage()], 400);
+            return new WP_REST_Response(["status" => "error", "message" => $e->getMessage()], 200);
         }
     }
 }
