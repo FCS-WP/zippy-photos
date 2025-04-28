@@ -203,6 +203,7 @@ class Zippy_Photo_Controller
             }
             $order->set_customer_id(intval($item['user_id']));
             $order->calculate_totals();
+            $order->update_meta_data('_order_type', 'photo');
             $order->save();
         }
 

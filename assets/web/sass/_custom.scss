@@ -1,18 +1,22 @@
 .ibtn-custom {
     transition: all 0s ease !important;
-    &.active { 
+
+    &.active {
         background-color: #f3f3f3;
     }
 }
+
 body {
     padding: 0 !important;
     margin: 0 auto;
 }
+
 .mini-cropper-wrapped {
     height: 250px;
     display: flex;
     align-items: center;
 }
+
 .custom-login-input {
     input {
         background-color: #FFF !important;
@@ -20,4 +24,30 @@ body {
         min-height: 0 !important;
         margin-bottom: 0 !important;
     }
+}
+
+.custom-box-checkout {
+    display: flex;
+    gap: 1rem;
+
+    .image-box {
+        width: 120px;
+        height: 120px;
+
+        img {
+            width: 100%;
+            object-fit: contain;
+            height: 100%;
+        }
+    }
+
+    .data-box {
+        p {
+            margin: 10px;
+            font-size: 14px;
+            font-family: 'Quicksand';
+        }
+    }
+
+    align-items: center;
 }
