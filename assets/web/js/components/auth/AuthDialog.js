@@ -20,19 +20,13 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { getForgotPasswordUrl } from "../../helpers/authHelper";
 
-const AuthDialog = ({
-  open,
-  onClose,
-  handleRegister,
-  handleLogin,
-  authError = null,
-}) => {
+const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
   const [tab, setTab] = useState(0);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(authError);
+  const [authError, setAuthError] = useState(null);
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
@@ -51,32 +45,34 @@ const AuthDialog = ({
   };
 
   const onLogin = async () => {
-    const login = await handleLogin(email, password);
-    if (login) {
+    const { status, error } = await handleLogin(email, password);
+    if (status) {
+      setAuthError(null);
       onClose();
+    } else {
+      setAuthError(error);
     }
   };
 
   const onRegister = async () => {
-    const register = await handleRegister(
+    const { status, error } = await handleRegister(
       firstName,
       lastName,
       email,
       password,
       confirmPassword
     );
-    if (register) {
+    if (status) {
+      setAuthError(null);
       onClose();
+    } else {
+      setAuthError(error);
     }
   };
 
   useEffect(() => {
-    setError(null);
+    setAuthError(null);
   }, [tab]);
-
-  useEffect(() => {
-    setError(authError);
-  }, [authError]);
 
   return (
     <Dialog
@@ -91,155 +87,44 @@ const AuthDialog = ({
       className="login-dialog"
     >
       <DialogContent>
-        <Tabs
-          sx={{ mb: 3 }}
-          value={tab}
-          variant="fullWidth"
-          onChange={(e, newValue) => setTab(newValue)}
-          centered
-        >
-          <Tab label="Login" />
-          <Tab label="Register" />
-        </Tabs>
-        {tab === 1 ? (
-          <>
-            <Grid2 container spacing={3}>
-              <Grid2 size={6}>
-                <TextField
-                  className="custom-login-input"
-                  required
-                  size="small"
-                  fullWidth
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  label="First Name"
-                  variant="outlined"
-                />
-              </Grid2>
-              <Grid2 size={6}>
-                <TextField
-                  className="custom-login-input"
-                  size="small"
-                  required
-                  fullWidth
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  label="Last Name"
-                  variant="outlined"
-                />
-              </Grid2>
-              <Grid2 size={12}>
-                <TextField
-                  className="custom-login-input"
-                  size="small"
-                  required
-                  fullWidth
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  label="Email"
-                  variant="outlined"
-                />
-              </Grid2>
-              <Grid2 size={12}>
-                <FormControl size="small" fullWidth variant="outlined">
-                  <InputLabel htmlFor="outlined-adornment-password-register">
-                    Password
-                  </InputLabel>
-                  <OutlinedInput
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    id="outlined-adornment-password-register"
-                    type={showPassword ? "text" : "password"}
-                    className="custom-login-input"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          sx={{ m: 0, fontSize: 16 }}
-                          aria-label={
-                            showPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    label="Password"
-                  />
-                </FormControl>
-              </Grid2>
-              <Grid2 size={12}>
-                <FormControl size="small" fullWidth variant="outlined">
-                  <InputLabel
-                    htmlFor="outlined-adornment-password"
-                    sx={{ background: "#fff", pr: 1 }}
-                  >
-                    Confirm Password
-                  </InputLabel>
-                  <OutlinedInput
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    id="outlined-adornment-password"
-                    className="custom-login-input"
-                    type={showConfirmPassword ? "text" : "password"}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          sx={{ m: 0, fontSize: 16 }}
-                          aria-label={
-                            showConfirmPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowConfirmPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showConfirmPassword ? (
-                            <VisibilityOff />
-                          ) : (
-                            <Visibility />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    label="Password"
-                  />
-                </FormControl>
-              </Grid2>
-            </Grid2>
-            <Box
-              display={"flex"}
-              alignItems={"center"}
-              flexDirection={"column"}
-              gap={1}
-              mt={3}
-            >
-              <Button
-                variant="contained"
-                sx={{
-                  width: 200,
-                  color: "#fff",
-                  fontWeight: 600,
-                  minHeight: 0,
-                }}
-                onClick={onRegister}
-              >
-                PROCEED
-              </Button>
-            </Box>
-          </>
-        ) : (
-          <>
+        <form>
+          <Tabs
+            sx={{ mb: 3 }}
+            value={tab}
+            variant="fullWidth"
+            onChange={(e, newValue) => setTab(newValue)}
+            centered
+          >
+            <Tab label="Login" />
+            <Tab label="Register" />
+          </Tabs>
+          {tab === 1 ? (
             <>
               <Grid2 container spacing={3}>
+                <Grid2 size={6}>
+                  <TextField
+                    className="custom-login-input"
+                    required
+                    size="small"
+                    fullWidth
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    label="First Name"
+                    variant="outlined"
+                  />
+                </Grid2>
+                <Grid2 size={6}>
+                  <TextField
+                    className="custom-login-input"
+                    size="small"
+                    required
+                    fullWidth
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    label="Last Name"
+                    variant="outlined"
+                  />
+                </Grid2>
                 <Grid2 size={12}>
                   <TextField
                     className="custom-login-input"
@@ -255,13 +140,14 @@ const AuthDialog = ({
                 </Grid2>
                 <Grid2 size={12}>
                   <FormControl size="small" fullWidth variant="outlined">
-                    <InputLabel htmlFor="outlined-adornment-password">
+                    <InputLabel htmlFor="outlined-adornment-password-register">
                       Password
                     </InputLabel>
                     <OutlinedInput
+                      autoComplete="off"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      id="outlined-adornment-password"
+                      id="outlined-adornment-password-register"
                       type={showPassword ? "text" : "password"}
                       className="custom-login-input"
                       endAdornment={
@@ -286,15 +172,54 @@ const AuthDialog = ({
                     />
                   </FormControl>
                 </Grid2>
+                <Grid2 size={12}>
+                  <FormControl size="small" fullWidth variant="outlined">
+                    <InputLabel
+                      htmlFor="outlined-adornment-password"
+                      sx={{ background: "#fff", pr: 1 }}
+                    >
+                      Confirm Password
+                    </InputLabel>
+                    <OutlinedInput
+                      autoComplete="off"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      id="outlined-adornment-password"
+                      className="custom-login-input"
+                      type={showConfirmPassword ? "text" : "password"}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            sx={{ m: 0, fontSize: 16 }}
+                            aria-label={
+                              showConfirmPassword
+                                ? "hide the password"
+                                : "display the password"
+                            }
+                            onClick={handleClickShowConfirmPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            onMouseUp={handleMouseUpPassword}
+                            edge="end"
+                          >
+                            {showConfirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password"
+                    />
+                  </FormControl>
+                </Grid2>
               </Grid2>
-              <Typography my={3} fullWidth textAlign={"end"}>
-                <a href={getForgotPasswordUrl()}>Forgotten Passowrd?</a>
-              </Typography>
               <Box
                 display={"flex"}
                 alignItems={"center"}
                 flexDirection={"column"}
                 gap={1}
+                mt={3}
               >
                 <Button
                   variant="contained"
@@ -304,18 +229,126 @@ const AuthDialog = ({
                     fontWeight: 600,
                     minHeight: 0,
                   }}
-                  onClick={onLogin}
+                  onClick={onRegister}
                 >
-                  LOGIN
+                  PROCEED
+                </Button>
+                <span>Or</span>
+                <Button
+                  variant="contained"
+                  color="info"
+                  sx={{
+                    width: 200,
+                    color: "#fff",
+                    fontWeight: 600,
+                    minHeight: 0,
+                  }}
+                  onClick={onClose}
+                >
+                  Continue Edit
                 </Button>
               </Box>
             </>
-          </>
-        )}
+          ) : (
+            <>
+              <>
+                <Grid2 container spacing={3}>
+                  <Grid2 size={12}>
+                    <TextField
+                      className="custom-login-input"
+                      size="small"
+                      required
+                      fullWidth
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      type="email"
+                      label="Email"
+                      variant="outlined"
+                    />
+                  </Grid2>
+                  <Grid2 size={12}>
+                    <FormControl size="small" fullWidth variant="outlined">
+                      <InputLabel htmlFor="outlined-adornment-password">
+                        Password
+                      </InputLabel>
+                      <OutlinedInput
+                        autoComplete="off"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        id="outlined-adornment-password"
+                        type={showPassword ? "text" : "password"}
+                        className="custom-login-input"
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              sx={{ m: 0, fontSize: 16 }}
+                              aria-label={
+                                showPassword
+                                  ? "hide the password"
+                                  : "display the password"
+                              }
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                              onMouseUp={handleMouseUpPassword}
+                              edge="end"
+                            >
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        label="Password"
+                      />
+                    </FormControl>
+                  </Grid2>
+                </Grid2>
+                <Typography my={3} fullWidth textAlign={"end"}>
+                  <a href={getForgotPasswordUrl()}>Forgotten Passowrd?</a>
+                </Typography>
+                <Box
+                  display={"flex"}
+                  alignItems={"center"}
+                  flexDirection={"column"}
+                  gap={1}
+                >
+                  <Button
+                    variant="contained"
+                    sx={{
+                      width: 200,
+                      color: "#fff",
+                      fontWeight: 600,
+                      minHeight: 0,
+                    }}
+                    onClick={onLogin}
+                  >
+                    LOGIN
+                  </Button>
+                  <span>Or</span>
+                  <Button
+                    variant="contained"
+                    color="info"
+                    sx={{
+                      width: 200,
+                      color: "#fff",
+                      fontWeight: 600,
+                      minHeight: 0,
+                    }}
+                    onClick={onClose}
+                  >
+                    Continue Edit
+                  </Button>
+                </Box>
+              </>
+            </>
+          )}
+        </form>
       </DialogContent>
-      {error && (
+      {authError && (
         <Box className="error-box" px={3} pb={4} sx={{ color: "red" }}>
-          <div dangerouslySetInnerHTML={{ __html: error }} />
+          <div dangerouslySetInnerHTML={{ __html: authError }} />
         </Box>
       )}
     </Dialog>

@@ -6,18 +6,17 @@
  *
  */
 
-namespace Zippy_Booking\Src\Woocommerce;
+namespace Zippy_Addons\Src\Woocommerce;
 
 defined('ABSPATH') or die();
 
-use Zippy_Booking\Utils\Zippy_Utils_Core;
 
-class Zippy_Woo_Booking
+class Zippy_Woo_Photo
 {
   protected static $_instance = null;
 
   /**
-   * @return Zippy_Woo_Booking
+   * @return Zippy_Woo_Photo
    */
 
   public static function get_instance()
@@ -52,8 +51,8 @@ class Zippy_Woo_Booking
 
   protected function set_hooks()
   {
-    add_filter('wc_get_template_part', array($this, 'override_woocommerce_template_part'), 1, 3);
-    add_filter('woocommerce_locate_template', array($this, 'override_woocommerce_template'), 1, 3);
+    add_filter('wc_get_template_part', array($this, 'override_woocommerce_template_part'), 99, 3);
+    add_filter('woocommerce_locate_template', array($this, 'override_woocommerce_template'), 99, 3);
   }
 
   /**
