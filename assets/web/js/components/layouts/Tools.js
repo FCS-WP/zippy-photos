@@ -9,7 +9,6 @@ const Tools = () => {
   const { uploadedImages, setUploadedImages, croppedFiles } = useMainProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [authError, setAuthError] = useState(null);
 
   const updateIdForImage = (newArr = []) => {
     if (newArr.length <= 0) {
@@ -45,20 +44,19 @@ const Tools = () => {
     password,
     confirmPassword
   ) => {
-    setAuthError(null);
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setAuthError("Missing Information");
-      return false;
+      const error = "Please fill in all the required information.";
+      return { status: false, error: error };
     }
 
     if (password.length < 6) {
-      setAuthError("Password must > 6 characters");
-      return false;
+      const error = "Password must > 6 characters";
+      return { status: false, error: error };
     }
 
     if (password !== confirmPassword) {
-      setAuthError("Confirm password not match with password!");
-      return false;
+      const error = "Confirm password not match with password!";
+      return { status: false, error: error };
     }
 
     const registerData = {
@@ -70,27 +68,25 @@ const Tools = () => {
     };
     const { data: response } = await webApi.registerAccount(registerData);
     if (!response || response?.status !== "success") {
-      setAuthError(
+      const error = (
         response?.message ??
           "Can not rigister account now. Please try again later!"
       );
-      return false;
+      return  { status: false, error: error };
     }
     window.admin_data = {
       userID: response.data.id,
       email: response.data.email,
     };
     await handleSubmitForm();
-    setAuthError(null);
     setOpen(false);
-    return true;
+    return { status: true, error: null };
   };
 
   const handleLogin = async (email, password) => {
-    setAuthError(null);
     if (!email || !password) {
-      setAuthError("Missing Information");
-      return false;
+      const error = "Email and Password are required!";
+      return { status: false, error: error };
     }
 
     const loginData = {
@@ -100,17 +96,16 @@ const Tools = () => {
 
     const { data: response } = await webApi.login(loginData);
     if (!response || response?.status !== "success") {
-      setAuthError(response?.message ?? "Failed to login");
-      return false;
+      const error = (response?.message ?? "Failed to login");
+      return { status: false, error: error };;
     }
     window.admin_data = {
       userID: response.data.id,
       email: response.data.email,
     };
     await handleSubmitForm();
-    setAuthError(null);
     setOpen(false);
-    return true;
+    return  { status: true, error: null };
   };
 
   const handleSubmitForm = async () => {
@@ -137,12 +132,6 @@ const Tools = () => {
       setIsLoading(false);
       return;
     }
-
-    showAlert(
-      AlertStatus.success,
-      "Successfully",
-      "Your images have been saved!"
-    );
 
     if (response.payment_url) {
       window.location.href = response.payment_url;
@@ -181,7 +170,6 @@ const Tools = () => {
         handleLogin={handleLogin}
         handleRegister={handleRegister}
         onClose={() => setOpen(false)}
-        authError={authError}
       />
     </Box>
   );
