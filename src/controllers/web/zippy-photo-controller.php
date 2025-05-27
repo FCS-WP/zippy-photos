@@ -171,7 +171,8 @@ class Zippy_Photo_Controller
                         $products[] = [
                             'id'       => $product->get_id(),
                             'name'     => $product->get_name(),
-                            'price'    => number_format($product->get_price(), 2) . " " . get_woocommerce_currency(),
+                            'price'    => (float)$product->get_price(),
+                            'display_price' => number_format($product->get_price(), 2) . " " . get_woocommerce_currency(),
                             'width_in'   => (float)$width_in,
                             'height_in'  => (float)$heigth_in,
                         ];
@@ -179,7 +180,9 @@ class Zippy_Photo_Controller
                 }
                 wp_reset_postdata();
             }
-            return new WP_REST_Response(["sizes" => $products, "status" => "success", "message" => "successfully"], 200);
+            $minimum_order = get_option('custom_order_min_value', 0);
+            
+            return new WP_REST_Response(["sizes" => $products, "status" => "success", "message" => "successfully", "min_order" => floatval($minimum_order)], 200);
         } catch (Exception $e) {
             return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
         }

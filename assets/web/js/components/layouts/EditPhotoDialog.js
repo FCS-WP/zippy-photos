@@ -5,7 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid2,
+  Grid,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { ImageEditor } from "../editor/ImageEditor";

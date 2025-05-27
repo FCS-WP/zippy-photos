@@ -55,11 +55,16 @@ class Zippy_Admin_Settings
 
   public function admin_page()
   {
-    add_menu_page('Zippy Add-ons', 'Zippy Add-ons', 'manage_options', 'zippy-addons', array($this, 'dashboard_render'), 'dashicons-list-view', 6);
+    add_menu_page('Zippy Add-ons', 'Zippy Add-ons', 'manage_options', 'zippy-photos', array($this, 'dashboard_render'), 'dashicons-list-view', 6);
     // SubPage
     // add_submenu_page('zippy-bookings', 'Settings', 'Settings', 'manage_options', 'settings', array($this, 'settings_render'));
+    add_submenu_page('zippy-photos', 'Menus', 'Menus', 'manage_options', 'menus', array($this, 'menus_render'));
   }
 
+  public function menus_render()
+  {
+    echo Zippy_Utils_Core::get_template('menus.php', [], dirname(__FILE__), '/templates');
+  }
 
   public function render()
   {
@@ -79,6 +84,7 @@ class Zippy_Admin_Settings
   {
     $apply_urls = [
       'toplevel_page_zippy-addons',
+      'zippy-add-ons_page_menus'
     ];
 
     if (in_array($handle, $apply_urls)) {

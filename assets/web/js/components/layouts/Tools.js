@@ -6,7 +6,7 @@ import { webApi } from "../../api";
 import AuthDialog from "../auth/AuthDialog";
 
 const Tools = () => {
-  const { uploadedImages, setUploadedImages, croppedFiles } = useMainProvider();
+  const { uploadedImages, setUploadedImages, croppedFiles, minimumOrder } = useMainProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -68,11 +68,10 @@ const Tools = () => {
     };
     const { data: response } = await webApi.registerAccount(registerData);
     if (!response || response?.status !== "success") {
-      const error = (
+      const error =
         response?.message ??
-          "Can not rigister account now. Please try again later!"
-      );
-      return  { status: false, error: error };
+        "Can not rigister account now. Please try again later!";
+      return { status: false, error: error };
     }
     window.admin_data = {
       userID: response.data.id,
@@ -96,8 +95,8 @@ const Tools = () => {
 
     const { data: response } = await webApi.login(loginData);
     if (!response || response?.status !== "success") {
-      const error = (response?.message ?? "Failed to login");
-      return { status: false, error: error };;
+      const error = response?.message ?? "Failed to login";
+      return { status: false, error: error };
     }
     window.admin_data = {
       userID: response.data.id,
@@ -105,10 +104,24 @@ const Tools = () => {
     };
     await handleSubmitForm();
     setOpen(false);
-    return  { status: true, error: null };
+    return { status: true, error: null };
+  };
+
+  const calcPhotoPrice = (items) => {
+    return items.reduce((total, item) => {
+      const price = item.size?.price || 0;
+      return total + (parseFloat(price) * item.quantity);
+    }, 0);
   };
 
   const handleSubmitForm = async () => {
+    const totalPrice = calcPhotoPrice(uploadedImages);
+
+    if (totalPrice < minimumOrder) {
+      showAlert(AlertStatus.warning, "Below the minimum order value.", `The minimum order value is $${minimumOrder}. Current value: $${totalPrice}`);
+      return;
+    }
+
     setIsLoading(true);
     const formData = new FormData();
     const userID = window.admin_data ? window.admin_data.userID : 0;
@@ -128,7 +141,7 @@ const Tools = () => {
     updateIdForImage(response.data);
 
     if (!response || response.status !== "success") {
-      showAlert(AlertStatus.warning, "Failed", "Failed to save images");
+      showAlert(AlertStatus.error, "Failed", "Failed to order. Please try again!");
       setIsLoading(false);
       return;
     }

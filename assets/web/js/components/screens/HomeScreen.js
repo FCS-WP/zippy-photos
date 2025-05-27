@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Divider, Grid2 } from "@mui/material";
+import { Box, Button, Divider, Grid } from "@mui/material";
 import "react-advanced-cropper/dist/style.css";
 import Tools from "../layouts/Tools";
 import MediaGallery from "../layouts/MediaGallery";
