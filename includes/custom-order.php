@@ -83,3 +83,26 @@ function zippy_show_minimum_order_notice_cart() {
         ), 'notice');
     }
 }
+// Hide photo-sizes category
+add_action('pre_get_posts', 'hide_photo_sizes_in_shop_page');
+
+function hide_photo_sizes_in_shop_page($query)
+{
+    if (is_admin() || !$query->is_main_query()) {
+        return;
+    }
+
+    // Only on the main WooCommerce Shop page
+    if (is_shop()) {
+        $tax_query = $query->get('tax_query') ?: [];
+
+        $tax_query[] = [
+            'taxonomy' => 'product_cat',
+            'field'    => 'slug',
+            'terms'    => ['photo-sizes'],
+            'operator' => 'NOT IN',
+        ];
+
+        $query->set('tax_query', $tax_query);
+    }
+}

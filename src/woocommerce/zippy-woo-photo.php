@@ -51,8 +51,8 @@ class Zippy_Woo_Photo
 
   protected function set_hooks()
   {
-    add_filter('wc_get_template_part', array($this, 'override_woocommerce_template_part'), 99, 3);
-    add_filter('woocommerce_locate_template', array($this, 'override_woocommerce_template'), 99, 3);
+    add_filter('wc_get_template_part', array($this, 'override_woocommerce_template_part'), 1000, 3);
+    add_filter('woocommerce_locate_template', array($this, 'override_woocommerce_template'), 1000, 3);
   }
 
   /**

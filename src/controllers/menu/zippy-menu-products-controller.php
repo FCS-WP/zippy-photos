@@ -55,8 +55,6 @@ class Zippy_Menu_Products_Controller
   public static function get_products_in_menu(WP_REST_Request $request)
   {
     global $wpdb;
-    $product_menu_table = $wpdb->prefix . 'zippy_menu_products';
-
     $params = $request->get_params();
 
     $rules = [
