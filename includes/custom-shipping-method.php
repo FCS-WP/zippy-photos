@@ -18,6 +18,9 @@ function zippy_conditionally_hide_billing_fields($fields)
             $fields['billing'][$field_key]['class'][] = 'zippy-hide-when-pickup';
         }
     }
+    
+    $fields['billing']['billing_address_1']['required'] = false;
+    $fields['billing']['billing_postcode']['required'] = false;
 
     return $fields;
 }
