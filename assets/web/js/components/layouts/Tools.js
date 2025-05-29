@@ -4,9 +4,11 @@ import { useMainProvider } from "../../providers/MainProvider";
 import { AlertStatus, showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
 import AuthDialog from "../auth/AuthDialog";
+import { toast } from "react-toastify";
 
 const Tools = () => {
-  const { uploadedImages, setUploadedImages, croppedFiles, minimumOrder } = useMainProvider();
+  const { uploadedImages, setUploadedImages, croppedFiles, minimumOrder } =
+    useMainProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -110,47 +112,68 @@ const Tools = () => {
   const calcPhotoPrice = (items) => {
     return items.reduce((total, item) => {
       const price = item.size?.price || 0;
-      return total + (parseFloat(price) * item.quantity);
+      return total + parseFloat(price) * item.quantity;
     }, 0);
   };
 
-  const handleSubmitForm = async () => {
-    const totalPrice = calcPhotoPrice(uploadedImages);
+  const handleAddPhotosToCart = async (savedPhotos) => {
+    const mappedData = mappingData(savedPhotos);
 
-    if (totalPrice < minimumOrder) {
-      showAlert(AlertStatus.warning, "Below the minimum order value.", `The minimum order value is $${minimumOrder}. Current value: $${totalPrice}`);
-      return;
+    const requestData = {
+      action: "custom_add_to_cart",
+      items: mappedData,
+    };
+
+    const { data: responseAddToCart } = await webApi.addToCartAjax(requestData);
+
+    if (responseAddToCart) {
+      const event = new CustomEvent("wc_fragment_refresh");
+      document.body.dispatchEvent(event);
+      return true;
+    } else {
+      return false;
     }
+  };
 
+  const mappingData = (savedPhotos) => {
+    const userID = window.admin_data ? window.admin_data.userID : 0;
+    const results = uploadedImages.map((item, index) => {
+      const responseItem = savedPhotos.find((item) => item.temp_id === index);
+      return {
+        ...responseItem,
+        quantity: item.quantity,
+        paper_type: item.paper,
+        user_id: userID,
+      };
+    });
+
+    return results;
+  };
+
+  const handleSubmitForm = async () => {
     setIsLoading(true);
     const formData = new FormData();
-    const userID = window.admin_data ? window.admin_data.userID : 0;
 
     uploadedImages.forEach((item, index) => {
       formData.append(`files[${index}][file]`, getCroppedFile(item.preview));
-      formData.append(`files[${index}][user_id]`, userID);
       formData.append(`files[${index}][photo_id]`, item.id ?? null);
-      formData.append(`files[${index}][detail_id]`, item.detail_id ?? null);
-      formData.append(`files[${index}][quantity]`, item.quantity);
-      formData.append(`files[${index}][paper]`, item.paper);
       formData.append(`files[${index}][temp_id]`, index);
       formData.append(`files[${index}][product_id]`, item.size.id);
     });
+    const { data: savedPhotos } = await webApi.savePhotos(formData);
 
-    const { data: response } = await webApi.savePhotos(formData);
-    updateIdForImage(response.data);
-
-    if (!response || response.status !== "success") {
-      showAlert(AlertStatus.error, "Failed", "Failed to order. Please try again!");
-      setIsLoading(false);
-      return;
+    if (savedPhotos.success !== true) {
+      console.log("Failed to save photos");
     }
 
-    if (response.payment_url) {
-      window.location.href = response.payment_url;
+    const actionAddToCart = await handleAddPhotosToCart(savedPhotos.results);
+    if (!actionAddToCart) {
+      toast.error("Failed to handle photo");
+      return false;
     }
 
     setIsLoading(false);
+    window.location.href = "/cart";
     return;
   };
 

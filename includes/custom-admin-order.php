@@ -3,8 +3,7 @@
 use Zippy_Addons\Utils\Zippy_DB_Helper;
 
 add_action('woocommerce_admin_order_item_headers', function () {
-    echo '<th class="paper-type">Image</th>';
-    echo '<th class="paper-type">Paper Type</th>';
+    echo '<th class="paper-type">Customer Photo</th>';
 }, 100);
 
 
@@ -17,15 +16,4 @@ add_action('woocommerce_admin_order_item_values', function ($product, $item, $it
     } else {
         echo '-';
     }
-
-    echo '</td>';
-    echo '<td class="paper-type">';
-
-    if ($photo_detail) {
-        echo esc_html($photo_detail->paper_type);
-    } else {
-        echo '-';
-    }
-
-    echo '</td>';
 }, 100, 3);

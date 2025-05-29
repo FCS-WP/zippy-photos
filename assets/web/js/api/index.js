@@ -1,4 +1,4 @@
-import { makeMultipartRequest, makeRequest } from "./axios";
+import { makeAdminAjaxRequest, makeMultipartRequest, makeRequest } from "./axios";
 
 export const webApi = {
   async getConfigs(params) {
@@ -16,4 +16,7 @@ export const webApi = {
   async login(params) {
     return await makeRequest('/zippy-signin', params, 'POST');
   },
+  async addToCartAjax(params) {
+    return await makeAdminAjaxRequest(params, 'POST');
+  }
 };

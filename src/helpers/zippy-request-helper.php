@@ -2,6 +2,7 @@
 
 namespace Zippy_Addons\Src\Helpers;
 
+use Exception;
 use WP_Error;
 
 class Zippy_Request_Helper
@@ -100,5 +101,31 @@ class Zippy_Request_Helper
         }
 
         return empty($errors) ? true : new WP_Error('invalid_request', implode('; ', $errors), ['status' => 400]);
+    }
+
+    public static function add_to_cart_photos($data = [])
+    {
+        if (!WC()->cart) {
+            wc_load_cart();
+        }
+
+        try {
+            foreach ($data as $item) {
+                $product_id = intval($item['product_id']);
+                $quantity   = intval($item['quantity']);
+
+                $cart_item_data = [
+                    'photo_url' => esc_url_raw($item['photo_url']),
+                    'paper_type' => $item['paper_type'],
+                    'user_id' => intval($item['user_id']),
+                    'unique_key' => md5(uniqid(rand(), true)),
+                ];
+
+                WC()->cart->add_to_cart($product_id, $quantity, 0, [], $cart_item_data);
+            }
+            return true;
+        } catch (Exception $e) {
+            return new WP_Error($e, 400);
+        }
     }
 }

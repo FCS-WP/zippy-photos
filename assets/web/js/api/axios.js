@@ -1,4 +1,5 @@
 import axios from "axios";
+import { data } from "react-router";
 
 export const makeRequest = async (
   endpoint,
@@ -119,3 +120,37 @@ export const makeMultipartRequest = async (
     return error.response;
   }
 };
+
+export const makeAdminAjaxRequest = async (
+  params,
+  method = "GET",
+) => {
+  const config = {
+    method: method,
+    url: '/wp-admin/admin-ajax.php',
+    data: params,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
+
+  try {
+    let res = null;
+
+    res = await axios(config);
+    const data = res.data;
+    return { data };
+  } catch {
+    (error) => {
+      if (!error?.response) {
+        console.error("❗Error", error.message);
+        return { ...error, catchedError: error };
+      }
+
+      console.error(error.response.statusText);
+      return error;
+    };
+  }
+};
+

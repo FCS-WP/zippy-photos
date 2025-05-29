@@ -22,26 +22,6 @@ function zippy_conditionally_hide_billing_fields($fields)
     return $fields;
 }
 
-// Custom display shipping method: 
-// add_filter('woocommerce_cart_shipping_method_full_label', 'custom_shipping_method_label', 10, 2);
-// add_filter('woocommerce_shipping_method_full_label', 'custom_shipping_method_label', 10, 2);
-
-// function custom_shipping_method_label($label, $method)
-// {
-
-//     if ($method->method_id === 'flat_rate') {
-//         $label = 'Delivery (' . wc_price($method->get_cost()) . ')';
-//     }
-
-//     if ($method->method_id === 'local_pickup') {
-//         $label = 'Self-collect (2 days)';
-//     }
-
-//     return $label;
-// }
-
-
-
 
 add_filter('woocommerce_package_rates', 'inspect_shipping_rates', 10, 2);
 
@@ -63,15 +43,15 @@ function inspect_shipping_rates($rates, $package)
         if ($shipping_class === 'bags') $has_bag = true;
     }
 
-        foreach ($rates as $rate) {
-            if ($rate->get_method_id() === 'local_pickup') {
-                $rate->set_label('Self-collection (2 days)');
-            } 
-            if ($rate->get_method_id() === 'flat_rate') {
-                $rate->set_label('Delivery');
-            }  
+    foreach ($rates as $rate) {
+        if ($rate->get_method_id() === 'local_pickup') {
+            $rate->set_label('Self-collection (2 days)');
         }
-   
+        if ($rate->get_method_id() === 'flat_rate') {
+            $rate->set_label('Delivery');
+        }
+    }
+
 
     return $rates;
 }
@@ -90,7 +70,6 @@ function custom_local_pickup_select_outlet($method, $index)
     foreach ($cart_items as $cart_item) {
         $product_ids[] = $cart_item['product_id'];
     }
-
 
     if ($method->method_id === 'local_pickup') {
         $available_outlets = Zippy_Menu_Products_Helper::get_outlets_with_all_products_with_info($product_ids);
@@ -114,17 +93,17 @@ function custom_local_pickup_select_outlet($method, $index)
                 function togglePickupOutlet() {
                     var isLocalPickup = $('input[name^="shipping_method"]:checked').val().includes('local_pickup');
                     $('.pickup-outlet-select-wrapper').toggle(isLocalPickup);
-                    $('.zippy-hide-when-pickup').each(function () {
-                    var $fieldRow = $(this).closest('.form-row');
+                    $('.zippy-hide-when-pickup').each(function() {
+                        var $fieldRow = $(this).closest('.form-row');
 
-                    if (isLocalPickup) {
-                        $fieldRow.hide();
-                        $(this).prop('required', false).removeClass('validate-required');
-                    } else {
-                        $fieldRow.show();
-                        $(this).prop('required', true).addClass('validate-required');
-                    }
-                });
+                        if (isLocalPickup) {
+                            $fieldRow.hide();
+                            $(this).prop('required', false).removeClass('validate-required');
+                        } else {
+                            $fieldRow.show();
+                            $(this).prop('required', true).addClass('validate-required');
+                        }
+                    });
                 }
 
 
@@ -154,11 +133,22 @@ add_action('woocommerce_checkout_create_order', 'save_pickup_outlet_to_order', 1
 
 function save_pickup_outlet_to_order($order, $data)
 {
-    $collection_point = WC()->session->get('collection_point');
+    $is_local_pickup = false;
 
-    if ($collection_point) {
-        $order->update_meta_data('_collection_point', $collection_point);
-        WC()->session->__unset('collection_point');
+    foreach ($order->get_shipping_methods() as $shipping_item) {
+        if (strpos($shipping_item->get_method_id(), 'local_pickup') !== false) {
+            $is_local_pickup = true;
+            break;
+        }
+    }
+
+    if ($is_local_pickup) {
+        $collection_point = WC()->session->get('collection_point');
+
+        if ($collection_point) {
+            $order->update_meta_data('_collection_point', $collection_point);
+            WC()->session->__unset('collection_point');
+        }
     }
 }
 

@@ -28,6 +28,8 @@ if (! $order) {
 	return;
 }
 
+$order_type = $order->get_meta('_order_type', "");
+
 $order_items        = $order->get_items(apply_filters('woocommerce_purchase_order_item_types', 'line_item'));
 $show_purchase_note = $order->has_status(apply_filters('woocommerce_purchase_note_order_statuses', array('completed', 'processing')));
 $downloads          = $order->get_downloadable_items();
@@ -55,6 +57,9 @@ if ($show_downloads) {
 		<thead>
 			<tr>
 				<th class="woocommerce-table__product-name product-name"><?php esc_html_e('Products', 'woocommerce'); ?> </th>
+				<?php if ($order_type):?>
+					<th class="woocommerce-table__product-table "><?php esc_html_e('Photo detail', 'woocommerce'); ?></th>
+				<?php endif; ?>
 				<th class="woocommerce-table__product-table product-total"><?php esc_html_e('Total', 'woocommerce'); ?></th>
 			</tr>
 		</thead>
@@ -86,10 +91,12 @@ if ($show_downloads) {
 		<tfoot>
 			<?php
 			foreach ($order->get_order_item_totals() as $key => $total) {
-				echo $total['label'];
 			?>
 				<tr>
 					<th scope="row"><?php echo esc_html($total['label']); ?></th>
+					<?php if ($order_type):?>
+						<td></td>
+					<?php endif; ?>
 					<?php if ($total['label'] == "Shipping:" && $order->get_meta('_collection_point')) : ?>
 						<td>
 							<?php echo esc_html($total['value']) ?>
