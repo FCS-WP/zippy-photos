@@ -9,7 +9,7 @@ if (! defined('ABSPATH')) {
 if (! apply_filters('woocommerce_order_item_visible', true, $item)) {
 	return;
 }
-
+$order_type = $order->get_meta('_order_type', "");
 $photo_detail = Zippy_DB_Helper::get_photo_data($order->get_id(), $item->get_product_id());
 ?>
 <tr class="<?php echo esc_attr(apply_filters('woocommerce_order_item_class', 'woocommerce-table__line-item order_item', $item, $order)); ?>">
@@ -21,24 +21,7 @@ $photo_detail = Zippy_DB_Helper::get_photo_data($order->get_id(), $item->get_pro
 						<img src="<?php echo esc_url($photo_detail->photo_url) ?>" alt="product-image">
 					</a>
 				</div>
-				<div class="data-box">
-					<p> Size:
-						<strong>
-							<?php
-							echo wp_kses_post(apply_filters('woocommerce_order_item_name', $item->get_name(), $item, false));
-
-							do_action('woocommerce_order_item_meta_start', $item_id, $item, $order, false);
-
-							wc_display_item_meta($item);
-
-							do_action('woocommerce_order_item_meta_end', $item_id, $item, $order, false);
-							?>
-						</strong>
-					</p>
-					<p>
-						Paper: <strong> <?php echo $photo_detail->paper_type ?></strong>
-					</p>
-				</div>
+				<strong>x <?php echo $item->get_quantity() ?></strong>
 			</div>
 		</td>
 	<?php else: ?>
@@ -68,7 +51,27 @@ $photo_detail = Zippy_DB_Helper::get_photo_data($order->get_id(), $item->get_pro
 			?>
 		</td>
 	<?php endif ?>
-
+	<?php if ($order_type && $photo_detail): ?>
+		<td class="woocommerce-table__product-table ">
+			<div class="data-box">
+				<p>
+					Paper: <strong> <?php echo $photo_detail->paper_type ?></strong>
+				</p>
+				<p> Size:
+					<strong>
+						<?php
+						echo wp_kses_post(apply_filters('woocommerce_order_item_name', $item->get_name(), $item, false));
+						?>
+					</strong>
+				</p>
+				<p>
+					Photo: <a style="color: blue; text-decoration: underline;" href="<?php echo esc_url($photo_detail->photo_url) ?>">View</a> 
+				</p>
+			</div>
+		</td>
+	<?php else: ?>
+		<td></td>
+	<?php endif; ?>
 	<td class="woocommerce-table__product-total product-total">
 		<?php echo $order->get_formatted_line_subtotal($item); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
 		?>

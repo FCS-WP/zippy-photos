@@ -81,6 +81,8 @@ date_default_timezone_set("Asia/Singapore");
  --------------------------- --------------------------------------------- */
 require ZIPPY_ADDONS_DIR_PATH . '/includes/autoload.php';
 require ZIPPY_ADDONS_DIR_PATH . '/includes/custom-admin-order.php';
+require ZIPPY_ADDONS_DIR_PATH . '/includes/custom-order.php';
+require ZIPPY_ADDONS_DIR_PATH . '/includes/custom-shipping-method.php';
 
 use Zippy_Addons\Src\Admin\Zippy_Admin_Settings;
 use Zippy_Addons\Src\Database\Zippy_Database;
@@ -98,3 +100,4 @@ Zippy_Booking_Web::get_instance();
 Zippy_Database::get_instance();
 Zippy_Booking_Routers::get_instance();
 Zippy_Woo_Photo::get_instance();
+

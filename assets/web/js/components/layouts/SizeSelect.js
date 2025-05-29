@@ -30,7 +30,7 @@ const SizeSelect = ({ onChange, image }) => {
       >
         {photoSizes.map((photoSize) => (
           <MenuItem key={photoSize.id} value={photoSize}>
-            {photoSize.name + " . " + photoSize.price} 
+            {photoSize.name + " . " + photoSize.display_price} 
           </MenuItem>
         ))}
       </Select>

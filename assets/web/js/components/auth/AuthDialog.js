@@ -11,7 +11,7 @@ import {
   Typography,
   OutlinedInput,
   FormControl,
-  Grid2,
+  Grid,
   InputAdornment,
   InputLabel,
 } from "@mui/material";
@@ -28,6 +28,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState(null);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -45,6 +46,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
   };
 
   const onLogin = async () => {
+    setIsLoading(true);
     const { status, error } = await handleLogin(email, password);
     if (status) {
       setAuthError(null);
@@ -52,9 +54,11 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
     } else {
       setAuthError(error);
     }
+    setIsLoading(false);
   };
 
   const onRegister = async () => {
+    setIsLoading(true);
     const { status, error } = await handleRegister(
       firstName,
       lastName,
@@ -68,6 +72,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
     } else {
       setAuthError(error);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -100,8 +105,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
           </Tabs>
           {tab === 1 ? (
             <>
-              <Grid2 container spacing={3}>
-                <Grid2 size={6}>
+              <Grid container spacing={3}>
+                <Grid size={6}>
                   <TextField
                     className="custom-login-input"
                     required
@@ -112,8 +117,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                     label="First Name"
                     variant="outlined"
                   />
-                </Grid2>
-                <Grid2 size={6}>
+                </Grid>
+                <Grid size={6}>
                   <TextField
                     className="custom-login-input"
                     size="small"
@@ -124,8 +129,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                     label="Last Name"
                     variant="outlined"
                   />
-                </Grid2>
-                <Grid2 size={12}>
+                </Grid>
+                <Grid size={12}>
                   <TextField
                     className="custom-login-input"
                     size="small"
@@ -137,8 +142,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                     label="Email"
                     variant="outlined"
                   />
-                </Grid2>
-                <Grid2 size={12}>
+                </Grid>
+                <Grid size={12}>
                   <FormControl size="small" fullWidth variant="outlined">
                     <InputLabel htmlFor="outlined-adornment-password-register">
                       Password
@@ -171,8 +176,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                       label="Password"
                     />
                   </FormControl>
-                </Grid2>
-                <Grid2 size={12}>
+                </Grid>
+                <Grid size={12}>
                   <FormControl size="small" fullWidth variant="outlined">
                     <InputLabel
                       htmlFor="outlined-adornment-password"
@@ -212,8 +217,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                       label="Password"
                     />
                   </FormControl>
-                </Grid2>
-              </Grid2>
+                </Grid>
+              </Grid>
               <Box
                 display={"flex"}
                 alignItems={"center"}
@@ -223,6 +228,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
               >
                 <Button
                   variant="contained"
+                  loading={isLoading}
                   sx={{
                     width: 200,
                     color: "#fff",
@@ -235,6 +241,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                 </Button>
                 <span>Or</span>
                 <Button
+                  disabled={isLoading}
                   variant="contained"
                   color="info"
                   sx={{
@@ -252,8 +259,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
           ) : (
             <>
               <>
-                <Grid2 container spacing={3}>
-                  <Grid2 size={12}>
+                <Grid container spacing={3}>
+                  <Grid size={12}>
                     <TextField
                       className="custom-login-input"
                       size="small"
@@ -265,8 +272,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                       label="Email"
                       variant="outlined"
                     />
-                  </Grid2>
-                  <Grid2 size={12}>
+                  </Grid>
+                  <Grid size={12}>
                     <FormControl size="small" fullWidth variant="outlined">
                       <InputLabel htmlFor="outlined-adornment-password">
                         Password
@@ -303,8 +310,8 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                         label="Password"
                       />
                     </FormControl>
-                  </Grid2>
-                </Grid2>
+                  </Grid>
+                </Grid>
                 <Typography my={3} fullWidth textAlign={"end"}>
                   <a href={getForgotPasswordUrl()}>Forgotten Passowrd?</a>
                 </Typography>
@@ -316,6 +323,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                 >
                   <Button
                     variant="contained"
+                    loading={isLoading}
                     sx={{
                       width: 200,
                       color: "#fff",
@@ -328,6 +336,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                   </Button>
                   <span>Or</span>
                   <Button
+                    disabled={isLoading}
                     variant="contained"
                     color="info"
                     sx={{

@@ -10,7 +10,7 @@ defined('ABSPATH') or die();
 
 class Zippy_Photo_Controller
 {
-    public static function save_photos(WP_REST_Request $request)
+    public static function save_photos_s(WP_REST_Request $request)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'photo_details';
@@ -123,6 +123,53 @@ class Zippy_Photo_Controller
         return new WP_REST_Response(['data' => $results, 'payment_url' => $payment_url, 'status' => 'success', 'message' => 'Save data successfully'], 200);
     }
 
+    public static function save_photos(WP_REST_Request $request)
+    {
+        if (empty($_FILES['files'])) {
+            return new WP_REST_Response(['error' => 'No files uploaded.'], 400);
+        }
+
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+
+        $uploaded_files = self::restructure_nested_files_array($_FILES['files']);
+        $results = [];
+        foreach ($uploaded_files as $index => $file) {
+            $upload_overrides = ['test_form' => false];
+            $movefile = wp_handle_upload($file, $upload_overrides);
+
+            if ($movefile && !isset($movefile['error'])) {
+                $wp_filetype = wp_check_filetype($movefile['file'], null);
+                $attachment = [
+                    'post_mime_type' => $wp_filetype['type'],
+                    'post_title'     => sanitize_file_name($file['name']),
+                    'post_content'   => '',
+                    'post_status'    => 'inherit',
+                ];
+
+                $temp_id = intval($_POST['files'][$index]['temp_id'] ?? 0);
+                $product_id = intval($_POST['files'][$index]['product_id']);
+                $attach_id = wp_insert_attachment($attachment, $movefile['file']);
+                $attach_data = wp_generate_attachment_metadata($attach_id, $movefile['file']);
+                wp_update_attachment_metadata($attach_id, $attach_data);
+
+                $results[] = [
+                    'product_id'  => $product_id,
+                    'temp_id'  => $temp_id,
+                    'photo_url'  => esc_url_raw(wp_get_attachment_url($attach_id)),
+                ];
+            } else {
+                $results[] = ['error' => $movefile['error'] ?? 'Unknown error'];
+            }
+        }
+        return rest_ensure_response([
+            'success' => true,
+            'results' => $results,
+            'message' => "Save photos successfully.",
+        ]);
+    }
+
     public static function restructure_nested_files_array($files)
     {
         $result = [];
@@ -171,7 +218,8 @@ class Zippy_Photo_Controller
                         $products[] = [
                             'id'       => $product->get_id(),
                             'name'     => $product->get_name(),
-                            'price'    => number_format($product->get_price(), 2) . " " . get_woocommerce_currency(),
+                            'price'    => (float)$product->get_price(),
+                            'display_price' => number_format($product->get_price(), 2) . " " . get_woocommerce_currency(),
                             'width_in'   => (float)$width_in,
                             'height_in'  => (float)$heigth_in,
                         ];
@@ -179,7 +227,9 @@ class Zippy_Photo_Controller
                 }
                 wp_reset_postdata();
             }
-            return new WP_REST_Response(["sizes" => $products, "status" => "success", "message" => "successfully"], 200);
+            $minimum_order = get_option('custom_order_min_value', 0);
+
+            return new WP_REST_Response(["sizes" => $products, "status" => "success", "message" => "successfully", "min_order" => floatval($minimum_order)], 200);
         } catch (Exception $e) {
             return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
         }

@@ -7,11 +7,13 @@ export const MainProvider = ({ children }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [photoSizes, setPhotoSizes] = useState([]);
   const [croppedFiles, setCroppedFiles] = useState([]);
+  const [minimumOrder, setMinimumOrder] = useState(0);
 
   const getPhotoSizes = async () => {
     const res = await webApi.getSizes();
     if (res.data.status === "success") {
       setPhotoSizes(res.data.sizes);
+      setMinimumOrder(res.data?.min_order || 0);
     }
   };
 
@@ -88,6 +90,7 @@ export const MainProvider = ({ children }) => {
     photoSizes,
     uploadedImages,
     selectedImages,
+    minimumOrder,
     setUploadedImages,
     removeImages,
     selectImage,
