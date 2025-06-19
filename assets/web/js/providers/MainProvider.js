@@ -8,6 +8,7 @@ export const MainProvider = ({ children }) => {
   const [photoSizes, setPhotoSizes] = useState([]);
   const [croppedFiles, setCroppedFiles] = useState([]);
   const [minimumOrder, setMinimumOrder] = useState(0);
+  const [isAppLoading, setIsAppLoading] = useState(false);
 
   const getPhotoSizes = async () => {
     const res = await webApi.getSizes();
@@ -91,12 +92,14 @@ export const MainProvider = ({ children }) => {
     uploadedImages,
     selectedImages,
     minimumOrder,
+    isAppLoading,
     setUploadedImages,
     removeImages,
     selectImage,
     unSelectImage,
     updateDataImage,
     updateCroppedFiles,
+    setIsAppLoading, 
   };
 
   return <MainContext.Provider value={value}>{children}</MainContext.Provider>;

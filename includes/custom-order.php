@@ -164,6 +164,7 @@ function save_photo_details_to_custom_table($order)
                 $wpdb->prefix . 'photo_details',
                 [
                     'order_id'    => $order_id,
+                    'item_id'    => $item->get_id(),
                     'product_id'  => $product_id,
                     'user_id'     => $user_id,
                     'quantity'    => $quantity,

@@ -10,15 +10,18 @@ if (! apply_filters('woocommerce_order_item_visible', true, $item)) {
 	return;
 }
 $order_type = $order->get_meta('_order_type', "");
-$photo_detail = Zippy_DB_Helper::get_photo_data($order->get_id(), $item->get_product_id());
+$photo_url = $item->get_meta('photo_url') ?? null;
+$photo_paper_type = $item->get_meta('paper_type') ?? null;
+
 ?>
 <tr class="<?php echo esc_attr(apply_filters('woocommerce_order_item_class', 'woocommerce-table__line-item order_item', $item, $order)); ?>">
-	<?php if ($photo_detail) : ?>
+	<?php if ($photo_url) : ?>
+		
 		<td class="woocommerce-table__product-name product-name">
 			<div class="custom-box-checkout">
 				<div class="image-box">
-					<a href="<?php echo esc_url($photo_detail->photo_url) ?>">
-						<img src="<?php echo esc_url($photo_detail->photo_url) ?>" alt="product-image">
+					<a href="<?php echo esc_url($photo_url) ?>">
+						<img src="<?php echo esc_url($photo_url) ?>" alt="product-image">
 					</a>
 				</div>
 				<strong>x <?php echo $item->get_quantity() ?></strong>
@@ -51,11 +54,11 @@ $photo_detail = Zippy_DB_Helper::get_photo_data($order->get_id(), $item->get_pro
 			?>
 		</td>
 	<?php endif ?>
-	<?php if ($order_type && $photo_detail): ?>
+	<?php if ($order_type && $photo_paper_type): ?>
 		<td class="woocommerce-table__product-table ">
 			<div class="data-box">
 				<p>
-					Paper: <strong> <?php echo $photo_detail->paper_type ?></strong>
+					Paper: <strong> <?php echo $photo_paper_type ?></strong>
 				</p>
 				<p> Size:
 					<strong>
@@ -65,7 +68,7 @@ $photo_detail = Zippy_DB_Helper::get_photo_data($order->get_id(), $item->get_pro
 					</strong>
 				</p>
 				<p>
-					Photo: <a style="color: blue; text-decoration: underline;" href="<?php echo esc_url($photo_detail->photo_url) ?>">View</a> 
+					Photo: <a style="color: blue; text-decoration: underline;" href="<?php echo esc_url($photo_url) ?>">View</a> 
 				</p>
 			</div>
 		</td>

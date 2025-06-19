@@ -34,7 +34,7 @@ const ImageUploader = () => {
         sx={{ color: "#fff" }}
         onClick={() => document.getElementById("imageUpload").click()}
       >
-        Upload
+        Upload from device
       </Button>
     </Box>
   );

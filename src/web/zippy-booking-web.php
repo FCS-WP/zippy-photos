@@ -54,6 +54,10 @@ class Zippy_Booking_Web
     // Form Assets
     wp_enqueue_script('booking-js', ZIPPY_ADDONS_URL . '/assets/dist/js/web.min.js', [], $version, true);
     wp_enqueue_style('booking-css', ZIPPY_ADDONS_URL . '/assets/dist/css/web.min.css', [], $version);
+    // Enqueue external Google APIs
+    wp_enqueue_script('google-api', 'https://apis.google.com/js/api.js', [], null, true);
+    wp_enqueue_script('google-identity', 'https://accounts.google.com/gsi/client', [], null, true);
+
     wp_localize_script('booking-js', 'admin_data', array(
       'userID' => $current_user_id,
       'user_email' => $user_info->user_email
