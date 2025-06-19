@@ -12,6 +12,7 @@ defined('ABSPATH') or die();
 
 use Zippy_Addons\Src\Middleware\Admin\Zippy_Booking_Permission;
 use Zippy_Addons\Src\Controllers\Web\Auth_Controller;
+use Zippy_Addons\Src\Controllers\Web\Google_Drive_Controller;
 
 class Zippy_General_Router
 {
@@ -48,7 +49,16 @@ class Zippy_General_Router
       'methods' => 'POST',
       'callback' => [Auth_Controller::class, 'register'],
       'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
+    ));
 
+    register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/get-google-token', array(
+      'methods' => 'GET',
+      'callback' => [Google_Drive_Controller::class, 'get_google_token'],
+    ));
+
+    register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/oauth/callback', array(
+      'methods' => 'GET',
+      'callback' => [Google_Drive_Controller::class, 'handle_google_callback'],
     ));
   }
 }

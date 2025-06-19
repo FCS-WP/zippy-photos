@@ -67,10 +67,18 @@ if (!defined('ZIPPY_BOOKING_API_TOKEN_NAME')) {
 if (!defined('ZIPPY_BOOKING_API_TOKEN')) {
   define('ZIPPY_BOOKING_API_TOKEN', 'FEhI30q7ySHtMfzvSDo6RkxZUDVaQ1BBU3lBcGhYS3BrQStIUT09');
 }
+
+
+/** Google Services */
+if (!defined('ZIPPY_OAUTH_CLIENT_ID')) {
+  define('ZIPPY_OAUTH_CLIENT_ID', '');
+}
+
+if (!defined('ZIPPY_OAUTH_CLIENT_SECRET')) {
+  define('ZIPPY_OAUTH_CLIENT_SECRET', '');
+}
 /* Default Timezone */
 date_default_timezone_set("Asia/Singapore");
-
-
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
@@ -83,6 +91,11 @@ require ZIPPY_ADDONS_DIR_PATH . '/includes/autoload.php';
 require ZIPPY_ADDONS_DIR_PATH . '/includes/custom-admin-order.php';
 require ZIPPY_ADDONS_DIR_PATH . '/includes/custom-order.php';
 require ZIPPY_ADDONS_DIR_PATH . '/includes/custom-shipping-method.php';
+$composerAutoload = ZIPPY_ADDONS_DIR_PATH . '/vendor/autoload.php';
+
+if (file_exists($composerAutoload)) {
+    require_once $composerAutoload;
+}
 
 use Zippy_Addons\Src\Admin\Zippy_Admin_Settings;
 use Zippy_Addons\Src\Database\Zippy_Database;
@@ -100,4 +113,3 @@ Zippy_Booking_Web::get_instance();
 Zippy_Database::get_instance();
 Zippy_Booking_Routers::get_instance();
 Zippy_Woo_Photo::get_instance();
-

@@ -38,18 +38,18 @@ $order_id = $order->get_id();
             <?php if (count($order->get_items()) > 0) : ?>
                 <?php foreach ($order->get_items() as $item_id => $item) : ?>
                     <?php
-                    $photo_detail = Zippy_DB_Helper::get_photo_data($order_id, $item->get_product_id());
+                    $photo_url = $item->get_meta('photo_url');
                     if (! apply_filters('woocommerce_order_item_visible', true, $item)) {
                         continue;
                     }
                     ?>
                     <tr class="<?php echo esc_attr(apply_filters('woocommerce_order_item_class', 'order_item', $item, $order)); ?>">
                         <td class="product-name">
-                            <?php if ($photo_detail) : ?>
+                            <?php if ($photo_url) : ?>
                                 <div class="custom-box-checkout">
                                     <div class="image-box">
-                                        <a href="<?php echo esc_html($photo_detail->photo_url) ?>">
-                                            <img src="<?php echo esc_html($photo_detail->photo_url) ?>" alt="product-image">
+                                        <a href="<?php echo esc_html($photo_url) ?>">
+                                            <img src="<?php echo esc_html($photo_url) ?>" alt="product-image">
                                         </a>
                                     </div>
                                     <div class="data-box">
@@ -67,7 +67,7 @@ $order_id = $order->get_id();
                                             </strong>
                                         </p>
                                         <p>
-                                            Paper: <strong> <?php echo $photo_detail->paper_type ?></strong>
+                                            Paper: <strong> <?php echo $item->get_meta('paper_type') ?></strong>
                                         </p>
                                     </div>
                                 </div>

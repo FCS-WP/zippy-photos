@@ -8,11 +8,11 @@ add_action('woocommerce_admin_order_item_headers', function () {
 
 
 add_action('woocommerce_admin_order_item_values', function ($product, $item, $item_id) {
-    $photo_detail = Zippy_DB_Helper::get_photo_data($item->get_order_id(), $item->get_product_id());
+    $photo_url = $item->get_meta('photo_url');
     echo '<td class="paper-type">';
 
-    if ($photo_detail) {
-        echo '<div class="custom-img-col"><a target="_blank" href="' . esc_url($photo_detail->photo_url) . '"><img class="ordered-img" src="' . esc_url($photo_detail->photo_url) . '" alt="ordered-img"/></a></div>';
+    if ($photo_url) {
+        echo '<div class="custom-img-col"><a target="_blank" href="' . esc_url($photo_url) . '"><img class="ordered-img" src="' . esc_url($photo_url) . '" alt="ordered-img"/></a></div>';
     } else {
         echo '-';
     }
