@@ -28,7 +28,7 @@ const ImageRemover = () => {
   return (
     <Box>
       <Button
-        sx={{ color: "#fff" }}
+        sx={{ color: "#fff", width: "200px" }}
         variant="contained"
         onClick={handleRemoveAllSelected}
       >

@@ -128,8 +128,8 @@ export const ImageEditor = ({ image, onClose }) => {
     const canvas = cropperRef.current.getCanvas();
     if (!canvas) return;
 
-    const dataUrl = canvas.toDataURL("image/jpeg");
-    downloadPreviewImage(dataUrl, "edited-image.jpg");
+    const dataUrl = canvas.toDataURL("image/png");
+    downloadPreviewImage(dataUrl, "edited-image.png");
   };
 
   const onSaveFile = () => {
@@ -138,8 +138,8 @@ export const ImageEditor = ({ image, onClose }) => {
     const canvas = cropperRef.current.getCanvas();
     if (!canvas) return;
 
-    const dataUrl = canvas.toDataURL("image/jpeg");
-    const file = dataURLToFile(dataUrl, `edited-${Date.now()}.jpg`);
+    const dataUrl = canvas.toDataURL("image/png");
+    const file = dataURLToFile(dataUrl, `edited-${Date.now()}.png`);
     const newData = {
       ...image,
       file: file,

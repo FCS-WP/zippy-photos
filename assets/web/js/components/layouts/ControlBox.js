@@ -9,7 +9,9 @@ const ControlBox = () => {
   return (
     <Box
       display={"flex"}
+      flexDirection={{ xs: 'column', md: 'row' }}
       gap={2}
+      alignItems={"center"}
       justifyContent={"center"}
       my={3}
       flexWrap={"wrap"}
