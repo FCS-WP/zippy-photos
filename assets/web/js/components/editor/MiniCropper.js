@@ -26,11 +26,25 @@ const MiniCropper = ({ image, orientation }) => {
   );
 
   const refreshRatio = () => {
-    const newRatioValue =
-      orientation === "portrait"
-        ? image.size.width_in / image.size.height_in
-        : image.size.height_in / image.size.width_in;
+    let newRatioValue;
+    switch (orientation) {
+      case "portrait":
+        newRatioValue =
+          image.size.width_in < image.size.height_in
+            ? image.size.width_in / image.size.height_in
+            : image.size.height_in / image.size.width_in;
+        break;
+      case "landscape":
+        newRatioValue =
+          image.size.width_in > image.size.height_in
+            ? image.size.width_in / image.size.height_in
+            : image.size.height_in / image.size.width_in;
+        break;
+      default:
+        break;
+    }
     setRatioValue(newRatioValue);
+
     debounceUpdateCroppedPhoto();
   };
 
