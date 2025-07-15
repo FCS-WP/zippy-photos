@@ -8,6 +8,9 @@
 
 namespace Zippy_Addons\Src\Woocommerce;
 
+use WC_AJAX;
+use Zippy_Addons\Src\Helpers\Zippy_Request_Helper;
+
 defined('ABSPATH') or die();
 
 
@@ -39,9 +42,26 @@ class Zippy_Woo_Photo
 
     /* Update Checkout After Applied Coupon */
     add_action('woocommerce_applied_coupon', array($this, 'after_apply_coupon_action'));
+    add_action('woocommerce_before_add_to_cart_button', array($this, 'custom_div_before_add_to_cart'));
     add_action('woocommerce_product_options_pricing', array($this, 'add_custom_price_field_to_product'));
+    add_action('woocommerce_variation_options', array($this, 'add_custom_photo_limits_fields'), 10, 3);
+    add_action('woocommerce_save_product_variation', array($this, 'save_custom_photo_limits_fields'), 10, 2);
+    add_action('wp_ajax_nopriv_photobook', array($this, 'wc_photobook'));
+    add_action('wp_ajax_photobook', array($this, 'wc_photobook'));
+    add_filter('woocommerce_add_cart_item_data', array($this, 'add_unique_cart_item_key'), 10, 3);
+  }
 
-    
+  function custom_div_before_add_to_cart()
+  {
+    if (!is_product()) {
+      return;
+    }
+    global $product;
+    $isPhotobook = Zippy_Request_Helper::check_is_photobook_category($product);
+    if ($isPhotobook) {
+      $type = $product->get_type();
+      echo '<div id="zippy_photobook" data-product_type="' . $type . '"></div>';
+    }
   }
 
   function after_apply_coupon_action($coupon_code)
@@ -92,6 +112,7 @@ class Zippy_Woo_Photo
 
     return file_exists($path) ? $path : $template;
   }
+
   public function add_custom_price_field_to_product()
   {
     woocommerce_wp_text_input(array(
@@ -105,5 +126,88 @@ class Zippy_Woo_Photo
         'min' => '0'
       )
     ));
+  }
+
+  function add_custom_photo_limits_fields($loop, $variation_data, $variation)
+  {
+    echo '<div class="custom-variation-section">';
+    echo '<h4 style="margin:15px 0 5px;">📷 Photo Upload Limits</h4>';
+
+    // Min field
+    woocommerce_wp_text_input(array(
+      'id'    => '_photo_min[' . $loop . ']',
+      'label' => __('Min Photos', 'woocommerce'),
+      'type'  => 'number',
+      'wrapper_class' => 'form-row form-row-first',
+      'value' => get_post_meta($variation->ID, '_photo_min', true),
+      'custom_attributes' => array(
+        'min'  => '0',
+        'step' => '1',
+      ),
+    ));
+
+    // Max field
+    woocommerce_wp_text_input(array(
+      'id'    => '_photo_max[' . $loop . ']',
+      'label' => __('Max Photos', 'woocommerce'),
+      'type'  => 'number',
+      'wrapper_class' => 'form-row form-row-last',
+      'value' => get_post_meta($variation->ID, '_photo_max', true),
+      'custom_attributes' => array(
+        'min'  => '0',
+        'step' => '1',
+      ),
+    ));
+
+    echo '</div>';
+  }
+
+  function save_custom_photo_limits_fields($variation_id, $i)
+  {
+    if (isset($_POST['_photo_min'][$i])) {
+      update_post_meta($variation_id, '_photo_min', absint($_POST['_photo_min'][$i]));
+    }
+
+    if (isset($_POST['_photo_max'][$i])) {
+      update_post_meta($variation_id, '_photo_max', absint($_POST['_photo_max'][$i]));
+    }
+  }
+
+  function wc_photobook()
+  {
+    $product_id = absint($_POST['product_id']);
+    $quantity = absint($_POST['quantity']);
+
+    $variation_id = absint($_POST['variation_id']);
+    $variation = [];
+
+    foreach ($_POST as $key => $value) {
+      if (strpos($key, 'attribute_') === 0) {
+        $variation[$key] = sanitize_text_field($value);
+      }
+    }
+
+    $result = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation);
+
+    if ($result) {
+      $message = wc_add_to_cart_message($product_id, true);
+      wc_add_notice($message, 'success');
+      wp_send_json_success(['message' => 'Added to cart!', 'product_url' => get_permalink($product_id)]);
+    } else {
+      wc_add_notice('Failed to add product to cart. Please try again later!', 'error');
+      wp_send_json_error(['message' => 'Failed to add product to cart']);
+    }
+
+    wp_die();
+  }
+
+
+  function add_unique_cart_item_key($cart_item_data, $product_id, $variation_id)
+  {
+    if (!empty($_POST['force_new_item']) && $_POST['force_new_item'] === 'yes') {
+      // Add unique key so WC treats it as a unique cart item
+      $cart_item_data['unique_key'] = md5(microtime() . rand());
+    }
+    return $cart_item_data;
   }
 }

@@ -4,7 +4,9 @@ namespace Zippy_Addons\Src\Controllers\Web;
 
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_Error;
 use WP_Query;
+use Zippy_Addons\Src\Helpers\Zippy_Request_Helper;
 
 defined('ABSPATH') or die();
 
@@ -260,5 +262,51 @@ class Zippy_Photo_Controller
         $order->calculate_totals();
         $order->save();
         return $order;
+    }
+
+    public static function get_photobook_configs(WP_REST_Request $request)
+    {
+        try {
+            $rules = [
+                'product_id' =>  ['type' => 'int', 'required' => true],
+                'variation_id' =>  ['type' => 'int', 'required' => false],
+                'product_type' =>  ['type' => 'string', 'required' => true],
+            ];
+
+            $validation = Zippy_Request_Helper::validate_request($request->get_params(), $rules);
+
+            if (is_wp_error($validation)) {
+                return $validation;
+            }
+
+            $main_product_id = $request->get_param('product_id');
+            $product_type = $request->get_param('product_type');
+            $product = !empty($variation_id) ? wc_get_product($variation_id) : wc_get_product($main_product_id);
+            if (!$product) {
+                return new WP_Error('wc_product_error', 'Invalid Product', ['status' => 500]);
+            }
+
+            $is_photobook = Zippy_Request_Helper::check_is_photobook_category($product);
+
+            if (!$is_photobook) {
+                return new WP_REST_Response(["status" => "invalid", "message" => "Product is not photobook."], 200);
+            }
+
+            $result = Zippy_Request_Helper::get_data_photobook($product, $request->get_param('variation_id'));
+            if (!$result) {
+                return new WP_REST_Response(["status" => "failed", "message" => "Missing photobook config."], 200);
+            }
+            return new WP_REST_Response(["result" => $result, "status" => "success", "message" => "Get data successfully!"], 200);
+        } catch (Exception $e) {
+            return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
+        }
+    }
+
+    public static function save_photobook_images(WP_REST_Request $request)
+    {
+        try {
+        } catch (Exception $e) {
+            return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
+        }
     }
 }

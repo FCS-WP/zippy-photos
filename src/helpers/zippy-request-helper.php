@@ -128,4 +128,48 @@ class Zippy_Request_Helper
             return new WP_Error($e, 400);
         }
     }
+
+    public static function check_is_photobook_category($product)
+    {
+        $categories = get_the_terms($product->get_id(), 'product_cat');
+        $result = false;
+        if (!empty($categories) && !is_wp_error($categories)) {
+            $slugs = wp_list_pluck($categories, 'slug');
+            if (in_array('photobook', $slugs)) {
+                $result = true;
+            }
+        }
+        return $result;
+    }
+
+    public static function get_data_photobook($product, $variation_id = null)
+    {
+        $product_id = $product->get_id();
+        if ($product->get_type() == 'variable') {
+            $minPhotos = get_post_meta($variation_id, '_photo_min', true);
+            $maxPhotos = get_post_meta($variation_id, '_photo_max', true);
+            if (!$minPhotos || !$maxPhotos) {
+                return false;
+            }
+            $result = [
+                'product_id' => $variation_id,
+                'min_photos' => $minPhotos,
+                'max_photos' => $maxPhotos,
+            ];
+            return $result;
+        }
+
+        $min_photos = get_field('min_no_photobook', $product_id);
+        $max_photos = get_field('max_no_photobook', $product_id);
+
+        if (!$min_photos || !$max_photos) {
+            return false;
+        }
+
+        $result = [
+            'product_id' => $product_id,
+            'min_photos' => $min_photos,
+            'max_photos' => $max_photos,
+        ];
+    }
 }

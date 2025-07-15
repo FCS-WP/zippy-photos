@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import MainContext from "../contexts/MainContext";
+import { MainContext } from "../contexts/MainContext";
 import { webApi } from "../api";
 
 export const MainProvider = ({ children }) => {
@@ -99,7 +99,7 @@ export const MainProvider = ({ children }) => {
     unSelectImage,
     updateDataImage,
     updateCroppedFiles,
-    setIsAppLoading, 
+    setIsAppLoading,
   };
 
   return <MainContext.Provider value={value}>{children}</MainContext.Provider>;

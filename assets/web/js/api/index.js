@@ -26,4 +26,7 @@ export const webApi = {
   async getGoogleToken(params) {
     return await makeRequest("/google-drive-token", params, "GET");
   },
+  async getPhotobookConfig(params) {
+    return await makeRequest("/photobook", params);
+  },
 };

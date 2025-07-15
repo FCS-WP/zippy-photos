@@ -74,3 +74,22 @@ export const alertConfirmDelete = async () => {
    });
    return confirmed;
  }
+
+export const alertConfirm = (title, desc, confirmText, showCancelBtn = false) => {
+  const confirmed = Swal.fire({
+     title: title,
+     text: desc,
+     icon: "warning",
+     showCancelButton: showCancelBtn,
+     confirmButtonColor: "#3085d6",
+     cancelButtonColor: "#d33",
+     confirmButtonText: confirmText
+   }).then((result) => {
+     if (result.isConfirmed) {
+       return true;
+     } else{
+       return false;
+     }
+   });
+   return confirmed;
+}
