@@ -9,7 +9,6 @@ const ControlBox = () => {
   return (
     <Box
       display={"flex"}
-      flexDirection={{ xs: 'column', md: 'row' }}
       gap={2}
       alignItems={"center"}
       justifyContent={"center"}
@@ -18,8 +17,8 @@ const ControlBox = () => {
     > 
       <GoogleDrivePicker />
       <ImageUploader />
-      <ImageRemover />
       <ImageDownloader />
+      <ImageRemover />
     </Box>
   );
 };

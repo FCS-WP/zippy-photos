@@ -136,6 +136,9 @@ const ImageCard = ({ image }) => {
   }, [size, quantity, paperType]);
 
   useEffect(() => {
+    if (image) {
+      setPaperType(image.paper);
+    }
     return () => {};
   }, [image]);
 
@@ -151,17 +154,40 @@ const ImageCard = ({ image }) => {
           <Box display={"flex"} justifyContent={"space-between"} width={"100%"}>
             <Checkbox
               sx={{ minHeight: 0 }}
+              size="small"
               onChange={handleChangeCheckbox}
-              icon={<RadioButtonUncheckedIcon color="primary" />}
-              checkedIcon={<CheckCircleOutlineIcon color="primary" />}
+              icon={
+                <RadioButtonUncheckedIcon
+                  color="primary"
+                  sx={{
+                    ":hover": { backgroundColor: "#222" },
+                    minHeight: "auto !important",
+                    color: "#222",
+                  }}
+                />
+              }
+              checkedIcon={
+                <CheckCircleOutlineIcon
+                  color="primary"
+                  sx={{
+                    ":hover": { backgroundColor: "#222" },
+                    minHeight: "auto !important",
+                    color: "#222",
+                  }}
+                />
+              }
             />
             <IconButton
               className="ibtn-custom"
-              sx={{ minHeight: 0 }}
+              sx={{
+                ":hover": { color: "#222" },
+                minHeight: "auto !important",
+                color: "#222",
+              }}
               aria-label="delete"
               onClick={handleDelete}
             >
-              <ClearIcon color="primary" />
+              <ClearIcon fontSize="small" />
             </IconButton>
           </Box>
           <Divider />
@@ -173,33 +199,44 @@ const ImageCard = ({ image }) => {
             flexWrap={"wrap"}
           >
             <IconButton
-              sx={{ minHeight: 0 }}
+              sx={{
+                ":hover": { color: "#222" },
+                minHeight: "auto !important",
+                color: "#222",
+              }}
               className={`ibtn-custom ${
                 orientation == "portrait" ? "active" : ""
               }`}
               onClick={() => setOrientation("portrait")}
             >
-              <CropPortraitIcon color="primary" />
+              <CropPortraitIcon fontSize="small" />
             </IconButton>
             <IconButton
-              sx={{ minHeight: 0 }}
+              sx={{
+                ":hover": { color: "#222" },
+                minHeight: "auto !important",
+                color: "#222",
+              }}
               className={`ibtn-custom ${
                 orientation == "landscape" ? "active" : ""
               }`}
               onClick={() => setOrientation("landscape")}
             >
-              <CropLandscapeIcon color="primary" />
+              <CropLandscapeIcon fontSize="small" />
             </IconButton>
             <IconButton
               className="ibtn-custom"
               aria-label="crop"
-              sx={{ minHeight: 0 }}
+              sx={{
+                ":hover": { color: "#222" },
+                minHeight: "auto !important",
+                color: "#222",
+              }}
               onClick={handleOpenCropper}
             >
-              <CropRotateIcon color="primary" />
+              <CropRotateIcon fontSize="small" />
             </IconButton>
           </Box>
-          <Divider />
         </Stack>
       </CardActions>
       <MiniCropper image={image} orientation={orientation} />

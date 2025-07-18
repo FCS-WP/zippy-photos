@@ -1,7 +1,8 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import React from "react";
 import { useMainProvider } from "../../providers/MainProvider";
 import { AlertStatus, showAlert } from "../../helpers/showAlert";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const ImageDownloader = () => {
   const { selectedImages } = useMainProvider();
@@ -31,13 +32,19 @@ const ImageDownloader = () => {
 
   return (
     <Box>
-      <Button
-        sx={{ color: "#fff", width: "200px" }}
-        variant="contained"
-        onClick={handleDownloadImages}
-      >
-        Download
-      </Button>
+      <Tooltip title="Download selected photos" placement="right">
+        <IconButton
+          className="custom-iconbtn"
+          onClick={handleDownloadImages}
+          sx={{
+            ":hover": { backgroundColor: "#222" },
+            minHeight: "auto !important",
+            color: "#222",
+          }}
+        >
+          <FileDownloadIcon />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };

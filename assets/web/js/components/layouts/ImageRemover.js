@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import React from "react";
 import { useMainProvider } from "../../providers/MainProvider";
 import {
@@ -6,7 +6,7 @@ import {
   AlertStatus,
   showAlert,
 } from "../../helpers/showAlert";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 const ImageRemover = () => {
   const { removeImages, selectedImages } = useMainProvider();
   const handleRemoveAllSelected = async () => {
@@ -27,13 +27,16 @@ const ImageRemover = () => {
   };
   return (
     <Box>
-      <Button
-        sx={{ color: "#fff", width: "200px" }}
-        variant="contained"
-        onClick={handleRemoveAllSelected}
-      >
-        Remove
-      </Button>
+      <Tooltip title="Delete selected photos"  placement="right">
+        <IconButton
+          className="custom-iconbtn"
+          color="success"
+          onClick={handleRemoveAllSelected}
+          sx={{ ":hover": {backgroundColor: '#222'}, minHeight: 'auto !important', color: '#222'}}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };

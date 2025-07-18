@@ -1,6 +1,7 @@
 import React from "react";
-import { Button, Box } from "@mui/material";
+import { Button, Box, IconButton, Tooltip } from "@mui/material";
 import { useMainProvider } from "../../providers/MainProvider";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 
 const ImageUploader = () => {
   const { uploadedImages, setUploadedImages, photoSizes } = useMainProvider();
@@ -39,13 +40,19 @@ const ImageUploader = () => {
         id="imageUpload"
         style={{ display: "none" }}
       />
-      <Button
-        variant="contained"
-        sx={{ color: "#fff", width: "200px" }}
-        onClick={() => document.getElementById("imageUpload").click()}
-      >
-        Upload from device
-      </Button>
+      <Tooltip title="Upload photos" placement="right">
+        <IconButton
+          className="custom-iconbtn"
+          onClick={() => document.getElementById("imageUpload").click()}
+          sx={{
+            ":hover": { backgroundColor: "#222" },
+            minHeight: "auto !important",
+            color: "#222",
+          }}
+        >
+          <UploadFileIcon />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };

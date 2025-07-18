@@ -1,9 +1,21 @@
 .custom-img-col {
     width: 100px;
     height: 100px;
+
     .ordered-img {
         width: 100%;
         height: 100%;
         object-fit: contain;
     }
+}
+
+#zippy_photo_editor {
+    button.custom-iconbtn {
+        min-height: auto !important;
+
+        &:hover {
+            background-color: $black !important;
+        }
+    }
+
 }
