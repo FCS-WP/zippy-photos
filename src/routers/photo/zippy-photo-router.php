@@ -3,6 +3,7 @@
 namespace Zippy_Addons\Src\Routers\Photo;
 
 use Zippy_Addons\Src\Controllers\Web\Zippy_Photo_Controller;
+use Zippy_Addons\Src\Controllers\Web\Zippy_Photobook_Controller;
 use Zippy_Addons\Src\Middleware\Admin\Zippy_Booking_Permission;
 
 /**
@@ -45,13 +46,19 @@ class Zippy_Photo_Router
 
         register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/photobook', array(
             'methods' => 'GET',
-            'callback' => [Zippy_Photo_Controller::class, 'get_photobook_configs'],
+            'callback' => [Zippy_Photobook_Controller::class, 'get_photobook_configs'],
             'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
         ));
 
         register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/photobook', array(
             'methods' => 'POST',
             'callback' => [Zippy_Photo_Controller::class, 'save_photobook_images'],
+            'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
+        ));
+
+        register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/photobook-uploader', array(
+            'methods' => 'POST',
+            'callback' => [Zippy_Photobook_Controller::class, 'handle_uploaded_photo'],
             'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
         ));
     }

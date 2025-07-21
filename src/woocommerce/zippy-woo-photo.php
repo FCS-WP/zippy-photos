@@ -9,7 +9,7 @@
 namespace Zippy_Addons\Src\Woocommerce;
 
 use WC_AJAX;
-use Zippy_Addons\Src\Helpers\Zippy_Request_Helper;
+use Zippy_Addons\Src\Controllers\Web\Zippy_Photobook_Controller;
 
 defined('ABSPATH') or die();
 
@@ -57,7 +57,7 @@ class Zippy_Woo_Photo
       return;
     }
     global $product;
-    $isPhotobook = Zippy_Request_Helper::check_is_photobook_category($product);
+    $isPhotobook = Zippy_Photobook_Controller::check_is_photobook_category($product);
     if ($isPhotobook) {
       $type = $product->get_type();
       echo '<div id="zippy_photobook" data-product_type="' . $type . '"></div>';
@@ -187,12 +187,33 @@ class Zippy_Woo_Photo
       }
     }
 
-    $result = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation);
+    // I want to handle save files to google drive here
+    $session_cart_id = WC()->session->get('custom_cart_id');
+    if (! $session_cart_id) {
+      $session_cart_id = wp_generate_uuid4();
+      WC()->session->set('custom_cart_id', $session_cart_id);
+    }
 
-    if ($result) {
+    // Add item to cart
+    $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation);
+    // Create folder
+    $drive_folder = Zippy_Photobook_Controller::create_folder_with_path(sanitize_text_field($session_cart_id . '/' . $cart_item_key));
+    if (!$drive_folder) {
+      return wp_send_json_error(['message' => 'Upload to drive failed!']);
+    }
+    if ($cart_item_key) {
+      self::add_custom_photobook_metadata($cart_item_key, $drive_folder);
       $message = wc_add_to_cart_message($product_id, true);
       wc_add_notice($message, 'success');
-      wp_send_json_success(['message' => 'Added to cart!', 'product_url' => get_permalink($product_id)]);
+
+      $response = [
+        'message' => 'Added to cart',
+        'folder' => $drive_folder,
+        'cart_item_key' => $cart_item_key,
+        'product_url' => get_permalink($product_id),
+      ];
+
+      wp_send_json_success($response);
     } else {
       wc_add_notice('Failed to add product to cart. Please try again later!', 'error');
       wp_send_json_error(['message' => 'Failed to add product to cart']);
@@ -201,13 +222,20 @@ class Zippy_Woo_Photo
     wp_die();
   }
 
-
   function add_unique_cart_item_key($cart_item_data, $product_id, $variation_id)
   {
     if (!empty($_POST['force_new_item']) && $_POST['force_new_item'] === 'yes') {
-      // Add unique key so WC treats it as a unique cart item
       $cart_item_data['unique_key'] = md5(microtime() . rand());
     }
     return $cart_item_data;
+  }
+
+  public static function add_custom_photobook_metadata($cart_item_key, $data)
+  {
+    $cart = WC()->cart->get_cart();
+    $cart[$cart_item_key]['folder_id'] = $data['folder_id'];
+    $cart[$cart_item_key]['folder_link'] = $data['folder_link'];
+    WC()->cart->set_cart_contents($cart);
+    WC()->cart->calculate_totals();
   }
 }

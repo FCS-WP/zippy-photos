@@ -8,12 +8,13 @@
  * @version 7.0.1
  */
 
+use Zippy_Addons\Src\Controllers\Web\Zippy_Photobook_Controller;
 use Zippy_Addons\Src\Helpers\Zippy_Request_Helper;
 
 defined('ABSPATH') || exit;
 
 global $product;
-$isPhotobook = Zippy_Request_Helper::check_is_photobook_category($product);
+$isPhotobook = Zippy_Photobook_Controller::check_is_photobook_category($product);
 ?>
 <div class="woocommerce-variation-add-to-cart variations_button">
 

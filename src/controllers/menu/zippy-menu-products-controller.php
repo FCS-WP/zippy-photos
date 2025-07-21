@@ -166,6 +166,78 @@ class Zippy_Menu_Products_Controller
       ]);
   }
 
+  /**
+   * ADD PRODUCTS By Category
+   */
+
+  public static function add_products_by_categories(WP_REST_Request $request)
+  {
+    global $wpdb;
+    $product_menu_table = $wpdb->prefix . 'zippy_menu_products';
+
+    $rules = [
+      "menu_id" => ["type" => "int", "required" => true],
+      "category_ids" => ["type" => "array", "required" => true],
+    ];
+
+    $validation = Zippy_Request_Helper::validate_request($request->get_params(), $rules);
+
+    if (is_wp_error($validation)) {
+      return $validation;
+    }
+
+    $menu_id = (int) $request['menu_id'];
+    $category_ids = array_map('intval', $request['category_ids']);
+
+    if (!self::check_menu_exists($menu_id)) {
+      return Zippy_Response_Handler::error("Menu not found.", 404);
+    }
+
+    // Get products by category
+    $args = [
+      'post_type' => 'product',
+      'post_status' => 'publish',
+      'posts_per_page' => -1,
+      'fields' => 'ids',
+      'tax_query' => [
+        [
+          'taxonomy' => 'product_cat',
+          'field' => 'term_id',
+          'terms' => $category_ids,
+        ],
+      ],
+    ];
+    $product_ids = get_posts($args);
+    if (empty($product_ids)) {
+      return Zippy_Response_Handler::error("No products found in the selected categories.", 404);
+    }
+    $result = self::execute_db_transaction(function () use ($wpdb, $product_menu_table, $menu_id, $product_ids) {
+      $values = [];
+      $placeholders = [];
+
+      foreach ($product_ids as $product_id) {
+        $placeholders[] = "(%d, %d, %s)";
+        $values[] = $menu_id;
+        $values[] = $product_id;
+        $values[] = current_time('mysql');
+      }
+
+      if (empty($values)) {
+        return false;
+      }
+
+      $query = "INSERT IGNORE INTO $product_menu_table (id_menu, id_product, created_at) VALUES " . implode(',', $placeholders);
+      return $wpdb->query($wpdb->prepare($query, ...$values));
+    });
+
+    return is_string($result)
+      ? new WP_Error($result, 500)
+      : rest_ensure_response([
+        'success' => true,
+        'results' => count($product_ids) . " products added to the menu successfully.",
+      ]);
+  }
+
 
   /**
    * REMOVE PRODUCTS FROM MENU

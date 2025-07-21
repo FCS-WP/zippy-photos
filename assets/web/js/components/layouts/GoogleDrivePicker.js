@@ -1,15 +1,16 @@
-import { Button } from "@mui/material";
+import { Button, IconButton, Tooltip } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useMainProvider } from "../../providers/MainProvider";
 import { toast } from "react-toastify";
-const API_KEY = 'AIzaSyAmgQJ5j3cF_K3gSz4V82q5bnU22jy7zDc';
+import AddToDriveIcon from '@mui/icons-material/AddToDrive';
+const API_KEY = "";
 
 const GoogleDrivePicker = () => {
   const { uploadedImages, setUploadedImages, photoSizes } = useMainProvider();
   const [pickerReady, setPickerReady] = useState(false);
   const accessTokenRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  
+
   // Load Google Picker API
   useEffect(() => {
     const apiScript = document.createElement("script");
@@ -161,9 +162,15 @@ const GoogleDrivePicker = () => {
 
   return (
     <div>
-      <Button variant="contained" sx={{ color: "#fff" }} disabled={!pickerReady} onClick={openOAuthPopup}>
-        Upload From Drive
-      </Button>
+      <Tooltip title="Upload photos from Drive" placement="right" >
+        <IconButton 
+          onClick={openOAuthPopup}
+          sx={{ ":hover": {backgroundColor: '#222'}, minHeight: 'auto !important', color: '#222'}}
+          className="custom-iconbtn" 
+        >
+          <AddToDriveIcon color="black"/>
+        </IconButton>
+      </Tooltip>
     </div>
   );
 };

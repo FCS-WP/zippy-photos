@@ -7,22 +7,22 @@ import PhotoEditor from "./pages/PhotoEditor";
 import PhotobookSingle from "./pages/PhotobookSingle";
 import "./helpers/photobookHelper";
 import "./helpers/add_to_cart_variable";
+
+document.addEventListener("DOMContentLoaded", function () {
+  const zippyMain = document.getElementById("zippy_photo_editor");
+  if (typeof zippyMain != "undefined" && zippyMain != null) {
+    const root = ReactDOM.createRoot(zippyMain);
+    root.render(
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <PhotoEditor />
+        <ToastContainer />
+      </ThemeProvider>
+    );
+  }
+});
+
 $(function () {
-  document.addEventListener("DOMContentLoaded", function () {
-    const zippyMain = document.getElementById("zippy_photo_editor");
-
-    if (typeof zippyMain != "undefined" && zippyMain != null) {
-      const root = ReactDOM.createRoot(zippyMain);
-      root.render(
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <PhotoEditor />
-          <ToastContainer />
-        </ThemeProvider>
-      );
-    }
-  });
-
   function renderPhotobook(variation_id) {
     const productIdInput = $('input[name="product_id"]');
     const productType = $("#zippy_photobook").data("product_type");
@@ -47,7 +47,7 @@ $(function () {
           </ThemeProvider>
         );
       } else {
-        console.log(3333) - root.render(<></>);
+        root.render(<></>);
       }
     }
   }

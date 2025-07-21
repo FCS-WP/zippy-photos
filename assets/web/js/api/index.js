@@ -29,4 +29,7 @@ export const webApi = {
   async getPhotobookConfig(params) {
     return await makeRequest("/photobook", params);
   },
+   async savePhotobookPhotos(formData) {
+    return await makeMultipartRequest("/photobook-uploader", formData, "POST");
+  },
 };

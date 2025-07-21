@@ -30,8 +30,6 @@ const BulkSidebar = () => {
     const updatedArr = uploadedImages.map(item=>{
       return {...item, paper: bulkPaper};
     })
-    console.log(updatedArr)
-
     setUploadedImages(updatedArr);
   };
   

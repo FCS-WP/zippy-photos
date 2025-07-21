@@ -67,7 +67,7 @@ do_action('woocommerce_before_cart'); ?>
                                         $cart_item_key
                                     ));
                                 }
-
+                             
                                 do_action('woocommerce_after_cart_item_name', $cart_item, $cart_item_key);
 
                                 // Meta data.
@@ -77,6 +77,12 @@ do_action('woocommerce_before_cart'); ?>
                                 if ($_product->backorders_require_notification() && $_product->is_on_backorder($cart_item['quantity'])) {
                                     echo wp_filter_kses(apply_filters('woocommerce_cart_item_backorder_notification', '<p class="backorder_notification">' . esc_html__('Available on backorder', 'emerce') . '</p>', $product_id));
                                 }
+                                ?>
+                                <?php 
+                                    if ($cart_item['folder_link']) {
+                                        echo '<div><a class="custom-view-folder" href="'.$cart_item['folder_link'] .'" target="_blank">View Photobook Folder</a></div>';
+                                    }
+
                                 ?>
                                 <p class="product-price pivoo-cart-unit-price"
                                    data-title="<?php esc_attr_e('Price', 'emerce'); ?>">

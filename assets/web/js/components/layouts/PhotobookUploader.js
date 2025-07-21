@@ -75,6 +75,7 @@ const PhotobookUploader = ({ limitPhotos }) => {
       />
       <Button
         variant="contained"
+        color="secondary"
         sx={{ color: "#fff", borderRadius: 0 }}
         onClick={() => document.getElementById("imageUpload").click()}
       >

@@ -10,6 +10,7 @@ namespace Zippy_Addons\Src\Controllers\Web;
 
 use Exception;
 use Google\Client;
+use Google\Service\Drive;
 use WP_REST_Response;
 use WP_REST_Request;
 
@@ -76,6 +77,44 @@ class Google_Drive_Controller
         $access_token = $client->getAccessToken();
 
         $redirectToApp = $home_url . '/google-auth-complete?token=' . urlencode(json_encode($access_token));
+
+        wp_redirect($redirectToApp);
+        exit;
+    }
+
+    public static function get_photobook_token()
+    {
+        $redirect_uri = home_url('/wp-json/zippy-addons/v1/oauth/callback2');
+        $client = new Client();
+        $client->setClientId(ZIPPY_OAUTH_CLIENT_ID);
+        $client->setClientSecret(ZIPPY_OAUTH_CLIENT_SECRET);
+        $client->setRedirectUri($redirect_uri);
+        $client->addScope(Drive::DRIVE);
+        $client->setAccessType('offline');
+        $client->setPrompt('consent');
+
+        $authUrl = $client->createAuthUrl();
+        header('Location: ' . filter_var($authUrl, FILTER_SANITIZE_URL));
+        exit;
+    }
+
+    public static function handle_photobook_callback()
+    {
+        $client = new Client();
+        $client->setClientId(ZIPPY_OAUTH_CLIENT_ID);
+        $client->setClientSecret(ZIPPY_OAUTH_CLIENT_SECRET);
+        $client->setRedirectUri(home_url('/wp-json/zippy-addons/v1/oauth/callback2'));
+        $client->addScope('https://www.googleapis.com/auth/drive.file');
+
+        if (isset($_GET['code'])) {
+            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+            if (isset($token['refresh_token'])) {
+                update_option('zippy_photobook_drive_refresh_token', $token['refresh_token']);
+            }
+            update_option('zippy_photobook_drive_access_token', $token);
+        }
+
+        $redirectToApp = home_url('/wp-admin');
 
         wp_redirect($redirectToApp);
         exit;
