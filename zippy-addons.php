@@ -77,8 +77,6 @@ if (!defined('ZIPPY_OAUTH_CLIENT_ID')) {
 if (!defined('ZIPPY_OAUTH_CLIENT_SECRET')) {
   define('ZIPPY_OAUTH_CLIENT_SECRET', '');
 }
-/* Default Timezone */
-date_default_timezone_set("Asia/Singapore");
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
