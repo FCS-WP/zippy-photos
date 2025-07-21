@@ -2,9 +2,12 @@
 
 namespace Zippy_Addons\Src\Controllers\Web;
 
+use Exception;
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_Error;
 use WP_Query;
+use Zippy_Addons\Src\Helpers\Zippy_Request_Helper;
 
 defined('ABSPATH') or die();
 
@@ -203,6 +206,9 @@ class Zippy_Photo_Controller
                         'terms'    => 'photo-sizes',
                     ],
                 ],
+                'meta_key' => 'no',
+                'orderby' => 'meta_value',
+                'order' => 'ASC',
             ];
 
             $query = new WP_Query($args);
@@ -214,6 +220,7 @@ class Zippy_Photo_Controller
                     $product = wc_get_product(get_the_ID());
                     $width_in = get_field('width_in', $product->get_id()) ?? "";
                     $heigth_in = get_field('height_in', $product->get_id()) ?? "";
+                    $number_order = get_field('no', $product->get_id()) ?? "";
                     if (!empty($width_in) && !empty($heigth_in)) {
                         $products[] = [
                             'id'       => $product->get_id(),

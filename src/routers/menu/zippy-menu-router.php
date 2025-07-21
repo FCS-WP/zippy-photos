@@ -66,7 +66,11 @@ class Zippy_Menu_Router
     register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/products-menu', array(
       'methods' => 'POST',
       'callback' => [Zippy_Menu_Products_Controller::class, 'add_products_to_menu'],
+    ));
 
+     register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/products-by-categories', array(
+      'methods' => 'POST',
+      'callback' => [Zippy_Menu_Products_Controller::class, 'add_products_by_categories'],
     ));
 
     register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/products-menu', array(

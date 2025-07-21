@@ -202,3 +202,12 @@ function custom_cart_item_name_photo_label($product_name, $cart_item, $cart_item
     }
     return $product_name;
 }
+
+add_action('woocommerce_checkout_create_order_line_item', function($item, $cart_item_key, $values, $order){
+    if (!empty($values['folder_id'])) {
+        $item->add_meta_data('Photobook Folder ID', $values['folder_id'], true);
+    }
+    if (!empty($values['folder_link'])) {
+        $item->add_meta_data('Photobook Folder Link', $values['folder_link'], true);
+    }
+}, 10, 4);

@@ -174,7 +174,7 @@ class Zippy_Products_Controller
       ", '%' . $wpdb->esc_like($data['keyword']) . '%', $data['limit'])
       );
     });
-    
+
     // Return Response
     return is_string($result)
       ? new Error($result, 500)
@@ -183,6 +183,63 @@ class Zippy_Products_Controller
         'results' => $result,
         'message' => "Product retrive successfully!",
       ]);
+  }
+
+  /**
+   * Search Categories
+   */
+
+  public static function search_categories(WP_REST_Request $request)
+  {
+    global $wpdb;
+
+    $rules = [
+      'keyword' =>  ['type' => 'string', 'required' => false],
+    ];
+
+    $validation = Zippy_Request_Helper::validate_request($request->get_params(), $rules);
+
+    if (is_wp_error($validation)) {
+      return $validation;
+    }
+
+    // Sanitize Input
+    $data = self::sanitize_key_word($request);
+    $keyword = isset($data['keyword']) ? sanitize_text_field($data['keyword']) : '';
+    $args = [
+      'taxonomy'   => 'product_cat',
+      'hide_empty' => false,
+    ];
+
+    if (!empty($keyword)) {
+      $args['search'] = $keyword;
+    }
+
+    $terms = get_terms($args);
+
+    if (is_wp_error($terms)) {
+      return rest_ensure_response([
+        'success' => false,
+        'message' => 'Error fetching categories.',
+      ]);
+    }
+
+    $result = [];
+
+    foreach ($terms as $term) {
+      $result[] = [
+        'id' => $term->term_id,
+        'name' => $term->name,
+        'slug' => $term->slug,
+      ];
+    }
+
+    // Return Response
+    return rest_ensure_response([
+      'success' => true,
+      'results' => $result,
+      'message' => "Categories retrieved successfully!",
+    ]);
   }
 
   /**

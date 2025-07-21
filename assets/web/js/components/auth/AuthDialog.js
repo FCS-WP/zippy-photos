@@ -158,7 +158,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
-                            sx={{ m: 0, fontSize: 16 }}
+                            sx={{ m: 0, fontSize: 16, minHeight: 'auto !important' }}
                             aria-label={
                               showPassword
                                 ? "hide the password"
@@ -195,7 +195,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
-                            sx={{ m: 0, fontSize: 16 }}
+                            sx={{ m: 0, fontSize: 16, minHeight: 'auto !important' }}
                             aria-label={
                               showConfirmPassword
                                 ? "hide the password"
@@ -229,6 +229,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                 <Button
                   variant="contained"
                   loading={isLoading}
+                  color="red"
                   sx={{
                     width: 200,
                     color: "#fff",
@@ -288,7 +289,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton
-                              sx={{ m: 0, fontSize: 16 }}
+                              sx={{ m: 0, fontSize: 16, minHeight: 'auto !important' }}
                               aria-label={
                                 showPassword
                                   ? "hide the password"
@@ -324,6 +325,7 @@ const AuthDialog = ({ open, onClose, handleRegister, handleLogin }) => {
                   <Button
                     variant="contained"
                     loading={isLoading}
+                    color="red"
                     sx={{
                       width: 200,
                       color: "#fff",

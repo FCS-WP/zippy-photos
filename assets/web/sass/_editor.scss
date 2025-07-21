@@ -245,3 +245,11 @@ $theme-color: #61DAFB;
 .advanced-cropper__background-wrapper {
 	background-color: white;
 }
+.object-fit-cover {
+	object-fit: cover;
+	object-position: center center;
+}
+
+.object-fit-contain {
+	object-fit: contain;
+}

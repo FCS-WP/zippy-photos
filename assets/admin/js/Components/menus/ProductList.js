@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { productListColumns } from "../../utils/tableHelper";
 import TableView from "../TableView";
@@ -8,6 +8,7 @@ import ButtonDelete from "./actions/ButtonDelete";
 import { alertConfirmDelete } from "../../utils/alertHelper";
 import { Api } from "../../api";
 import { toast } from "react-toastify";
+import BoxAddCategories from "./layouts/BoxAddCategories";
 
 const ProductList = ({ refetchProducts, products, menuId }) => {
   const columns = productListColumns;
@@ -90,10 +91,22 @@ const ProductList = ({ refetchProducts, products, menuId }) => {
       <>
         <TableView
           headerElement={
-            <BoxAddProducts
-              selectedMenu={menuId}
-              refetchProducts={refetchProducts}
-            />
+            <Box>
+              <Grid container spacing={3}>
+                <Grid size={{xs: 12, md: 6}} >
+                  <BoxAddProducts
+                    selectedMenu={menuId}
+                    refetchProducts={refetchProducts}
+                  />
+                </Grid>
+                <Grid size={{xs: 12, md: 6}} >
+                  <BoxAddCategories
+                    selectedMenu={menuId}
+                    refetchProducts={refetchProducts}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
           }
           cols={columns}
           columnWidths={columnWidths}

@@ -5,6 +5,8 @@ namespace Zippy_Addons\Src\Helpers;
 use Exception;
 use WP_Error;
 
+use Zippy_Addons\Src\Controllers\Web\Google_Drive_Controller;
+
 class Zippy_Request_Helper
 {
     /**

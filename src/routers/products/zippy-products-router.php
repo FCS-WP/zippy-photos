@@ -43,10 +43,14 @@ class Zippy_Products_Router
       'callback' => [Zippy_Products_Controller::class, 'search_products'],
     ));
 
+    register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/search-categories', array(
+      'methods' => 'GET',
+      'callback' => [Zippy_Products_Controller::class, 'search_categories'],
+    ));
+
     register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/product-checking', array(
       'methods' => 'GET',
       'callback' => [Zippy_Products_Controller::class, 'product_checking'],
     ));
-
   }
 }

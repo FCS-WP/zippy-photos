@@ -1,10 +1,11 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import { useMainProvider } from "../../providers/MainProvider";
 import { AlertStatus, showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
 import AuthDialog from "../auth/AuthDialog";
 import { toast } from "react-toastify";
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 
 const Tools = () => {
   const { uploadedImages, setUploadedImages, croppedFiles, minimumOrder } =
@@ -193,14 +194,16 @@ const Tools = () => {
 
   return (
     <Box display={"flex"} justifyContent={"flex-end"} p={2}>
-      <Button
-        loading={isLoading}
-        variant="contained"
-        sx={{ color: "#fff" }}
-        onClick={handleSaveImages}
-      >
-        Order now
-      </Button>
+      <Tooltip title="Order now" placement="right"> 
+        <IconButton
+          loading={isLoading}
+          className="custom-iconbtn"
+          onClick={handleSaveImages}
+          sx={{ ":hover": { backgroundColor: '#c51414'}, backgroundColor: '#222', minHeight: 'auto !important', color: '#fff'}}
+        >
+          <ShoppingCartCheckoutIcon />
+        </IconButton>
+      </Tooltip>
       <AuthDialog
         open={open}
         handleLogin={handleLogin}

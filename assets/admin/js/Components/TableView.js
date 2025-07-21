@@ -83,8 +83,8 @@ const TableView = (props) => {
   return (
     <TableContainer component={Paper}>
       <Grid container mb={2}>
-        <Grid size={{ xs: 12, md: 6 }}>{headerElement ?? ""}</Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={11}>{headerElement ?? ""}</Grid>
+        <Grid size={1}>
           {canBeDeleted ? renderDeleteButton() : ""}
         </Grid>
       </Grid>

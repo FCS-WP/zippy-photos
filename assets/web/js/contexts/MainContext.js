@@ -1,5 +1,4 @@
 import { createContext } from "react";
 
-const MainContext = createContext();
-
-export default MainContext;
+export const MainContext = createContext();
+export const PhotobookContext = createContext();

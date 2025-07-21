@@ -10,6 +10,7 @@ namespace Zippy_Addons\Src\Admin;
 
 defined('ABSPATH') or die();
 
+use Zippy_Addons\Src\Controllers\Web\Google_Drive_Controller;
 use Zippy_Addons\Utils\Zippy_Utils_Core;
 
 class Zippy_Admin_Settings
@@ -36,7 +37,7 @@ class Zippy_Admin_Settings
     add_action('admin_enqueue_scripts', array($this, 'remove_default_stylesheets'));
     /* Register Assets Admin Part */
     add_action('admin_enqueue_scripts', array($this, 'admin_assets'));
-
+    add_action('admin_init', array($this, 'handle_photobook_get_token'));
     /* Create Zippy API Token */
     // register_activation_hook(ZIPPY_ADDONS_BASENAME, array($this, 'create_one_map_credentials'));
   }
@@ -53,9 +54,17 @@ class Zippy_Admin_Settings
     ));
   }
 
+  public function handle_photobook_get_token () 
+  {
+    if (isset($_GET['get-photobook-token'])) {
+        Google_Drive_Controller::get_photobook_token();
+        exit;
+    }
+  }
+
   public function admin_page()
   {
-    add_menu_page('Zippy Add-ons', 'Zippy Add-ons', 'manage_options', 'zippy-photos', array($this, 'dashboard_render'), 'dashicons-list-view', 6);
+    add_menu_page('Zippy Photos', 'Zippy Photos', 'manage_options', 'zippy-photos', array($this, 'dashboard_render'), 'dashicons-list-view', 6);
     // SubPage
     // add_submenu_page('zippy-bookings', 'Settings', 'Settings', 'manage_options', 'settings', array($this, 'settings_render'));
     add_submenu_page('zippy-photos', 'Menus', 'Menus', 'manage_options', 'menus', array($this, 'menus_render'));
