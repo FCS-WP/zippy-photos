@@ -277,7 +277,7 @@ class Zippy_Photobook_Controller
             $folderLink = 'https://drive.google.com/drive/folders/' . $folderId;
             $permission = new \Google\Service\Drive\Permission([
                 'type' => 'anyone',
-                'role' => 'writer',
+                'role' => 'reader',
             ]);
             $service->permissions->create($folderId, $permission, ['fields' => 'id']);
 
