@@ -20,7 +20,7 @@ class Zippy_Photobook_Controller
     // BE
 
     public static function get_admin_config(WP_REST_Request $request)
-    { 
+    {
         $folder_id = get_option('zippy_root_folder_id', '');
         $refresh_token = get_option('zippy_photobook_drive_refresh_token', '');
         $is_has_token = $refresh_token ? true : false;
@@ -29,7 +29,7 @@ class Zippy_Photobook_Controller
             'is_has_token' => $is_has_token,
         ];
 
-        return new WP_REST_Response(["result" => $result ,"status" => "success", "message" => "Get Data Successfully"], 200);
+        return new WP_REST_Response(["result" => $result, "status" => "success", "message" => "Get Data Successfully"], 200);
     }
 
     public static function update_root_folder(WP_REST_Request $request)
@@ -238,7 +238,7 @@ class Zippy_Photobook_Controller
     {
         $service = self::get_drive_service_with_service_account();
         $folderNames = explode('/', trim($folderPath, '/'));
-        $rootID = '1rawMUoQoCM8OJOg44Vcj3ZUfrifbbQKJ';
+        $rootID = get_option('zippy_root_folder_id', null);
         $folderData = [];
         try {
             foreach ($folderNames as $key => $folderName) {
