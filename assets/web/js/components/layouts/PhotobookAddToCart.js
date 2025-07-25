@@ -1,17 +1,22 @@
 import { Box, Button, Input } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePhotobookProvider } from "../../providers/PhotobookProvider";
 import axios from "axios";
 import { showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
+import PhotobookProcessBar from "./PhotobookProcessBar";
 
 const PhotobookAddToCart = () => {
   const { isATCDisabled, uploadedImages } = usePhotobookProvider();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [totalUploadPhoto, setTotalUploadPhoto] = useState(
+    uploadedImages.length ?? 1
+  );
+  const [currentUploaded, setCurrentUploaded] = useState(0);
 
   const get_isolate_imgs = () => {
-    let step = 5;
+    let step = 2;
 
     let result = [];
     let temp_array = [];
@@ -69,11 +74,15 @@ const PhotobookAddToCart = () => {
     });
 
     const { data: response } = await webApi.savePhotobookPhotos(formData);
+    if (response) {
+      setCurrentUploaded((prev) => prev + imgs.length);
+    }
     return true;
   };
 
   const handleSubmitAddtoCart = async (e) => {
     setIsLoading(true);
+
     let variationId = $('input[name="variation_id"]').val();
     let productId = $('input[name="product_id"]').val();
 
@@ -131,8 +140,22 @@ const PhotobookAddToCart = () => {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    if (uploadedImages.length) {
+      setTotalUploadPhoto(uploadedImages.length);
+    }
+  }, [uploadedImages]);
+
   return (
-    <Box display={"flex"} gap={2}>
+    <Box display={"flex"} gap={2} flexWrap={"wrap"}>
+      {isLoading && (
+        <Box sx={{ width: "100%" }}>
+          <PhotobookProcessBar
+            totalItem={totalUploadPhoto}
+            currentValue={currentUploaded}
+          />
+        </Box>
+      )}
       <Box width={"100px"}>
         <input
           type="number"
