@@ -30,8 +30,9 @@ const PhotobookUploader = ({ limitPhotos }) => {
       );
     }
 
-    const imagePreviews = validFiles.map((file) => ({
+    const imagePreviews = validFiles.map((file, index) => ({
       id: null,
+      index: index+1,
       file,
       preview: URL.createObjectURL(file),
     }));

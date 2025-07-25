@@ -6,7 +6,7 @@ import { showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
 import PhotobookProcessBar from "./PhotobookProcessBar";
 
-const PhotobookAddToCart = () => {
+const PhotobookAddToCart = ({ note }) => {
   const { isATCDisabled, uploadedImages } = usePhotobookProvider();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +91,7 @@ const PhotobookAddToCart = () => {
     formData.append("product_id", productId);
     formData.append("variation_id", variationId);
     formData.append("quantity", quantity);
+    formData.append("note", note);
 
     $('select[name^="attribute_"], input[name^="attribute_"]').each(
       function () {

@@ -5,6 +5,8 @@ import PhotobookGallery from "../components/layouts/PhotobookGallery";
 import { webApi } from "../api";
 import PhotobookAddToCart from "../components/layouts/PhotobookAddToCart";
 import DefaultWPButton from "../components/layouts/DefaultWPButton";
+import PhotobookNote from "../components/layouts/PhotobookNote";
+import { Box, TextareaAutosize, TextField } from "@mui/material";
 
 const PhotobookSingle = ({
   productId,
@@ -14,6 +16,7 @@ const PhotobookSingle = ({
   const [showUploadButton, setShowUploadButton] = useState(false);
   const [limitPhotos, setLimitPhotos] = useState();
   const [isShowDefaultBtn, setIsShowDefaultBtn] = useState(false);
+  const [note, setNote] = useState('');
 
   useEffect(() => {
     const getDataPhotobook = async () => {
@@ -28,16 +31,16 @@ const PhotobookSingle = ({
           product_type: productType,
         });
         const response = getPhotobookConfig.data;
-        if (response.status === 'success' && response.result) {
+        if (response.status === "success" && response.result) {
           setLimitPhotos({
             min: response.result.min_photos,
             max: response.result.max_photos,
-          })
+          });
           setShowUploadButton(true);
           return;
         }
 
-        if (response.status === 'failed') {
+        if (response.status === "failed") {
           setIsShowDefaultBtn(true);
         }
       }
@@ -54,8 +57,18 @@ const PhotobookSingle = ({
       {showUploadButton ? (
         <>
           <PhotobookGallery />
-          <PhotobookUploader limitPhotos={limitPhotos}/>
-          <PhotobookAddToCart />
+          
+          <PhotobookUploader limitPhotos={limitPhotos} />
+          <Box>
+            <TextareaAutosize
+              value={note}
+              aria-label="minimum height"
+              placeholder="Note: ( Photo no.10 - add some text... )"
+              style={{ width: '100%', minHeight: 100 }}
+              onChange={e=>setNote(e.target.value)}
+            />
+          </Box>
+          <PhotobookAddToCart note={note}/>
         </>
       ) : (
         <>

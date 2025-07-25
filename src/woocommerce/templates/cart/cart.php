@@ -82,7 +82,9 @@ do_action('woocommerce_before_cart'); ?>
                                     if ($cart_item['folder_link']) {
                                         echo '<div><a class="custom-view-folder" href="'.$cart_item['folder_link'] .'" target="_blank">View Photobook Folder</a></div>';
                                     }
-
+                                    if ($cart_item['note']) {
+                                        echo '<div> <strong>Note: </strong>'.$cart_item['note'].'</div>';
+                                    }
                                 ?>
                                 <p class="product-price pivoo-cart-unit-price"
                                    data-title="<?php esc_attr_e('Price', 'emerce'); ?>">
