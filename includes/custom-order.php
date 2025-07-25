@@ -210,4 +210,7 @@ add_action('woocommerce_checkout_create_order_line_item', function($item, $cart_
     if (!empty($values['folder_link'])) {
         $item->add_meta_data('Photobook Folder Link', $values['folder_link'], true);
     }
+    if (!empty($values['note'])) {
+        $item->add_meta_data('Photobook Note', $values['note'], true);
+    }
 }, 10, 4);

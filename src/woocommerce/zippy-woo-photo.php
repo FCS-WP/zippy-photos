@@ -177,6 +177,7 @@ class Zippy_Woo_Photo
   {
     $product_id = absint($_POST['product_id']);
     $quantity = absint($_POST['quantity']);
+    $photobook_note = $_POST['note'];
 
     $variation_id = absint($_POST['variation_id']);
     $variation = [];
@@ -202,7 +203,7 @@ class Zippy_Woo_Photo
       return wp_send_json_error(['message' => 'Upload to drive failed!']);
     }
     if ($cart_item_key) {
-      self::add_custom_photobook_metadata($cart_item_key, $drive_folder);
+      self::add_custom_photobook_metadata($cart_item_key, $drive_folder, $photobook_note);
       $message = wc_add_to_cart_message($product_id, true);
       wc_add_notice($message, 'success');
 
@@ -230,11 +231,12 @@ class Zippy_Woo_Photo
     return $cart_item_data;
   }
 
-  public static function add_custom_photobook_metadata($cart_item_key, $data)
+  public static function add_custom_photobook_metadata($cart_item_key, $data, $note)
   {
     $cart = WC()->cart->get_cart();
     $cart[$cart_item_key]['folder_id'] = $data['folder_id'];
     $cart[$cart_item_key]['folder_link'] = $data['folder_link'];
+    $cart[$cart_item_key]['note'] = $note;
     WC()->cart->set_cart_contents($cart);
     WC()->cart->calculate_totals();
   }

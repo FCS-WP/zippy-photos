@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Box, Typography } from "@mui/material";
 import { usePhotobookProvider } from "../../providers/PhotobookProvider";
-import { setDisabledAddToCart } from "../../helpers/photobookHelper";
-import { alertConfirm, showAlert } from "../../helpers/showAlert";
+import { alertConfirm } from "../../helpers/showAlert";
 
 const PhotobookUploader = ({ limitPhotos }) => {
   const { uploadedImages, setUploadedImages, setIsATCDisabled } =
     usePhotobookProvider();
   const [errorMessage, setErrorMessage] = useState("");
-  const MAX_FILE_SIZE_MB = 2;
+  const MAX_FILE_SIZE_MB = 20;
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -25,14 +24,15 @@ const PhotobookUploader = ({ limitPhotos }) => {
       alertConfirm(
         "Warning",
         `Max size is ${MAX_FILE_SIZE_MB}MB.
-        Failed files: ${inValidImages.join(", ")}`,
+        Failed to upload files: ${inValidImages.join(", ")}`,
         "Okay",
         false
       );
     }
 
-    const imagePreviews = validFiles.map((file) => ({
+    const imagePreviews = validFiles.map((file, index) => ({
       id: null,
+      index: index+1,
       file,
       preview: URL.createObjectURL(file),
     }));

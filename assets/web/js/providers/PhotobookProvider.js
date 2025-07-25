@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import { PhotobookContext } from "../contexts/MainContext";
-import { webApi } from "../api";
 
 export const PhotobookProvider = ({ children }) => {
   const [uploadedImages, setUploadedImages] = useState([]);
@@ -17,6 +16,17 @@ export const PhotobookProvider = ({ children }) => {
 
   const selectImage = (image) => {
     setSelectedImages([...selectedImages, image]);
+  };
+
+  const updatePhotobookDataImage = (previewUrl, newImageData) => {
+    const updatedData = uploadedImages.map((item) => {
+      if (item.preview === previewUrl) {
+        return newImageData;
+      }
+      return item;
+    });
+
+    setUploadedImages(updatedData);
   };
 
   const triggerUpdateData = () => {
@@ -45,6 +55,7 @@ export const PhotobookProvider = ({ children }) => {
     removeImages,
     setIsAppLoading,
     setUploadedImages,
+    updatePhotobookDataImage
   };
 
   return (

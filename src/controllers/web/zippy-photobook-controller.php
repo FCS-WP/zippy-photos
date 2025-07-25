@@ -96,7 +96,6 @@ class Zippy_Photobook_Controller
             $rules = [
                 'folder_id' =>  ['type' => 'string', 'required' => true],
                 'product_id' =>  ['type' => 'int', 'required' => true],
-                'cart_item_key' =>  ['type' => 'string', 'required' => true],
                 'last_photos' =>  ['type' => 'boolean', 'required' => true],
             ];
 
@@ -108,12 +107,10 @@ class Zippy_Photobook_Controller
 
             // Handle here 
             $folderId = $request->get_param('folder_id');
-            $productId = $request->get_param('product_id');
-            $requestNo = $request->get_param('request_no', '');
-            $cartItemKey = $request->get_param('cart_item_key');
+            $requestNo = $request->get_param('request_no', 0);
             $folderUrl = 'https://drive.google.com/drive/folders/' . $folderId;
             $isLastUpload = boolval($request->get_param('last_photos'));
-            $uploadPhotoToDrive = self::upload_photo_to_drive($_FILES, $folderId);
+            $uploadPhotoToDrive = self::upload_photo_to_drive($_FILES, $folderId, $requestNo);
 
             if (!$uploadPhotoToDrive || $uploadPhotoToDrive['status'] == 'error') {
                 wp_send_json_error(['message' => 'Failed to save photos']);
@@ -307,7 +304,7 @@ class Zippy_Photobook_Controller
         return $service;
     }
 
-    public static function upload_photo_to_drive($files, $parent_folder_id)
+    public static function upload_photo_to_drive($files, $parent_folder_id, $requestNo)
     {
         try {
             $access_token = get_option('zippy_photobook_drive_access_token', null);
@@ -342,8 +339,9 @@ class Zippy_Photobook_Controller
                 foreach ($fileGroup as $key => $fileTmpPath) {
                     if (!empty($fileTmpPath) && file_exists($fileTmpPath)) {
                         // You can access all details like this:
+                        $image_slot = ($requestNo * 2)-1 + $index;
                         $tmp_name = $files['tmp_name'][$index][$key];
-                        $file_name = $files['name'][$index][$key];
+                        $file_name = 'slot_'. $image_slot . '-' . $files['name'][$index][$key];
                         $file_type = $files['type'][$index][$key];
 
                         // Process upload
