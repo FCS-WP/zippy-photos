@@ -10,6 +10,7 @@ namespace Zippy_Addons\Src\Woocommerce;
 
 use WC_AJAX;
 use Zippy_Addons\Src\Controllers\Web\Zippy_Photobook_Controller;
+use Zippy_Addons\Src\Helpers\Zippy_Request_Helper;
 
 defined('ABSPATH') or die();
 
@@ -49,6 +50,7 @@ class Zippy_Woo_Photo
     add_action('wp_ajax_nopriv_photobook', array($this, 'wc_photobook'));
     add_action('wp_ajax_photobook', array($this, 'wc_photobook'));
     add_filter('woocommerce_add_cart_item_data', array($this, 'add_unique_cart_item_key'), 10, 3);
+    add_action('woocommerce_checkout_order_processed', array($this, 'handle_when_place_order'), 10, 1);
   }
 
   function custom_div_before_add_to_cart()
@@ -197,8 +199,10 @@ class Zippy_Woo_Photo
 
     // Add item to cart
     $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation);
+    $folder_name = Zippy_Request_Helper::get_full_product_variation_name($product_id, $variation_id) .'-'. time();
+
     // Create folder
-    $drive_folder = Zippy_Photobook_Controller::create_folder_with_path(sanitize_text_field($session_cart_id . '/' . $cart_item_key));
+    $drive_folder = Zippy_Photobook_Controller::create_folder_with_path(sanitize_text_field($session_cart_id . '/' . $folder_name));
     if (!$drive_folder) {
       return wp_send_json_error(['message' => 'Upload to drive failed!']);
     }
@@ -239,5 +243,14 @@ class Zippy_Woo_Photo
     $cart[$cart_item_key]['note'] = $note;
     WC()->cart->set_cart_contents($cart);
     WC()->cart->calculate_totals();
+  }
+
+  function handle_when_place_order($order_id)
+  {
+    $new_folder_name = 'Order #' . $order_id;
+    $top_folder_id = WC()->session->get('top_folder_id', '');
+    if ($top_folder_id) {
+      $change_drive_name = Zippy_Photobook_Controller::change_name_and_remove_session_id($top_folder_id, $new_folder_name);
+    }
   }
 }

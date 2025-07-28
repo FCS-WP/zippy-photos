@@ -130,4 +130,34 @@ class Zippy_Request_Helper
             return new WP_Error($e, 400);
         }
     }
+
+    public static function get_full_product_variation_name($product_id, $variation_id)
+    {
+        $product = wc_get_product($product_id);
+        $variation = wc_get_product($variation_id);
+
+        if (!$product || !$variation || !$variation->is_type('variation')) {
+            return '';
+        }
+
+        $product_name = $product->get_name();
+        $attributes = $variation->get_attributes();
+        $variation_parts = [];
+
+        foreach ($attributes as $taxonomy => $term_slug) {
+            if (taxonomy_exists($taxonomy)) {
+                $term = get_term_by('slug', $term_slug, $taxonomy);
+                $label = wc_attribute_label($taxonomy);
+                $value = $term ? $term->name : $term_slug;
+                $variation_parts[] = "{$label}: {$value}";
+            } else {
+                // Custom attribute (e.g., text input)
+                $label = wc_attribute_label($taxonomy);
+                $variation_parts[] = "{$label}: {$term_slug}";
+            }
+        }
+
+        $variation_string = implode(', ', $variation_parts);
+        return $product_name . ' - ' . $variation_string;
+    }
 }
