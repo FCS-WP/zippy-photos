@@ -1,14 +1,21 @@
 <?php
 
-use Zippy_Addons\Utils\Zippy_DB_Helper;
+add_action('woocommerce_admin_order_item_headers', 'custom_order_item_headers', 100);
 
-add_action('woocommerce_admin_order_item_headers', function () {
+function custom_order_item_headers()
+{
     echo '<th class="paper-type">Customer Photo</th>';
-}, 100);
+    echo '<th class="custom-action">Custom Action</th>';
+}
 
+add_action('woocommerce_admin_order_item_values', 'custom_order_item_values', 100, 3);
 
-add_action('woocommerce_admin_order_item_values', function ($product, $item, $item_id) {
+function custom_order_item_values($product, $item, $item_id)
+{
+    // Render Image Photo Editor Item: 
     $photo_url = $item->get_meta('photo_url');
+    $folder_id = $item->get_meta('Photobook Folder ID');
+
     echo '<td class="paper-type">';
 
     if ($photo_url) {
@@ -16,4 +23,26 @@ add_action('woocommerce_admin_order_item_values', function ($product, $item, $it
     } else {
         echo '-';
     }
-}, 100, 3);
+
+    //  Render Action Upload PDF 
+    echo '<td class="custom-action">';
+    if ($folder_id) {
+        echo render_custom_upload_button($item_id, $folder_id);
+    } else {
+        echo '-';
+    }
+
+    echo '</td>';
+}
+
+function render_custom_upload_button($item_id, $folder_id)
+{
+    ob_start();
+?>
+    <div class="upload-pdf-wrapper" data-item-id="<?php echo esc_attr($item_id); ?>" data-folder-id="<?php echo esc_attr($folder_id); ?>">
+        <input type="file" class="custom-upload-input" accept="application/pdf" style="display:none;" />
+        <button type="button" class="button custom-upload-btn">Upload Template PDF</button>
+    </div>
+<?php
+    return ob_get_clean();
+}

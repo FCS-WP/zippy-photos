@@ -67,5 +67,11 @@ class Zippy_Photo_Router
             'callback' => [Zippy_Photobook_Controller::class, 'handle_delete_files_and_folders'],
             'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
         ));
+
+        register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/photobook-template', array(
+            'methods' => 'POST',
+            'callback' => [Zippy_Photobook_Controller::class, 'handle_upload_template'],
+            'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
+        ));
     }
 }

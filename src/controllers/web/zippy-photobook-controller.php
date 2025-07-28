@@ -8,9 +8,12 @@ use WP_REST_Response;
 use WP_Error;
 use WP_Query;
 use Google\Client;
+use Google\Service\BeyondCorp\Resource\V;
 use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
 use Zippy_Addons\Src\Helpers\Zippy_Request_Helper;
+use WC_Order_Item_Product;
+use WC_Admin_Meta_Boxes;
 
 defined('ABSPATH') or die();
 
@@ -173,33 +176,6 @@ class Zippy_Photobook_Controller
         ];
     }
 
-    // public static function upload_photobook_data_to_drive($files)
-    // {
-    //     try {
-    //         $refresh_token = get_option('zippy_server_drive_refresh_token', '');
-
-    //         $client = new Client();
-    //         $client->useApplicationDefaultCredentials();
-    //         $client->addScope(Drive::DRIVE);
-    //         $driveService = new Drive($client);
-    //         $fileMetadata = new Drive\DriveFile(array(
-    //             'name' => 'photo.jpg'
-    //         ));
-
-    //         $content = file_get_contents($files[0]);
-    //         $file = $driveService->files->create($fileMetadata, array(
-    //             'data' => $content,
-    //             'mimeType' => 'image/jpeg',
-    //             'uploadType' => 'multipart',
-    //             'fields' => 'id'
-    //         ));
-
-    //         return $file->id;
-    //     } catch (Exception $e) {
-    //         echo "Error Message: " . $e;
-    //     }
-    // }
-
     public static function check_folder_exists($service, $parentId, $folderName)
     {
         $query = sprintf(
@@ -310,31 +286,7 @@ class Zippy_Photobook_Controller
     public static function upload_photo_to_drive($files, $parent_folder_id, $requestNo)
     {
         try {
-            $access_token = get_option('zippy_photobook_drive_access_token', null);
-            if (!$access_token) {
-                Google_Drive_Controller::get_photobook_token();
-                $access_token = get_option('zippy_photobook_drive_access_token', null);
-                if (!$access_token) {
-                    var_dump("Error when fetch token");
-                    return false;
-                }
-            }
-
-            $client = new Client();
-            $client->setClientId(ZIPPY_OAUTH_CLIENT_ID);
-            $client->setClientSecret(ZIPPY_OAUTH_CLIENT_SECRET);
-            $client->setAccessToken($access_token);
-
-            if ($client->isAccessTokenExpired()) {
-                $refresh_token = get_option('zippy_photobook_drive_refresh_token');
-                if ($refresh_token) {
-                    $client->fetchAccessTokenWithRefreshToken($refresh_token);
-                    update_option('zippy_photobook_drive_access_token', $client->getAccessToken());
-                }
-            }
-            $client->addScope(Drive::DRIVE_FILE);
-            $drive_service = new Drive($client);
-
+            $drive_service = self::get_storage_drive_service();
             $uploaded_files = [];
             $failed_files = [];
             $files = $_FILES['files'];
@@ -385,9 +337,14 @@ class Zippy_Photobook_Controller
                 'fields' => 'id',
             ]);
 
+            $file_info = $service->files->get($file->id, [
+                'fields' => 'id, name, webViewLink, webContentLink'
+            ]);
+
             return [
                 'file_id' => $file->id,
-                'web_link' => $file->webViewLink,
+                'web_link' => $file_info->webViewLink,
+                "webContentLink" => $file_info->webContentLink,
                 'file_name' => $filename
             ];
         } catch (Exception $e) {
@@ -465,6 +422,73 @@ class Zippy_Photobook_Controller
                 }
             }
             return new WP_REST_Response(["status" => "success", "message" => "Folders have been deleted!"], 200);
+        } catch (Exception $e) {
+            return new WP_Error('delete_folder_error', $e->getMessage(), ['status' => 500]);
+        }
+    }
+
+    public static function get_storage_drive_service()
+    {
+        $access_token = get_option('zippy_photobook_drive_access_token', null);
+        if (!$access_token) {
+            Google_Drive_Controller::get_photobook_token();
+            $access_token = get_option('zippy_photobook_drive_access_token', null);
+            if (!$access_token) {
+                var_dump("Error when fetch token");
+                return false;
+            }
+        }
+
+        $client = new Client();
+        $client->setClientId(ZIPPY_OAUTH_CLIENT_ID);
+        $client->setClientSecret(ZIPPY_OAUTH_CLIENT_SECRET);
+        $client->setAccessToken($access_token);
+
+        if ($client->isAccessTokenExpired()) {
+            $refresh_token = get_option('zippy_photobook_drive_refresh_token');
+            if ($refresh_token) {
+                $client->fetchAccessTokenWithRefreshToken($refresh_token);
+                update_option('zippy_photobook_drive_access_token', $client->getAccessToken());
+            }
+        }
+        $client->addScope(Drive::DRIVE_FILE);
+        $drive_service = new Drive($client);
+        return $drive_service;
+    }
+
+    public static function handle_upload_template(WP_REST_Request $request)
+    {
+        $folder_id = $request->get_param('folder_id');
+        $item_id = $request->get_param('item_id');
+        if (!$_FILES['file'] || !$folder_id || !$item_id) {
+            return new WP_Error('upload error', 'Missing data', ['status' => 500]);
+        }
+
+        try {
+            $file = $_FILES['file'];
+            $service = self::get_storage_drive_service();
+            $folder_name = 'Photobook Template';
+            $is_folder_exist = self::check_folder_exists($service, $folder_id, $folder_name);
+            $template_folder = null;
+            if ($is_folder_exist['exists'] == true) {
+                $template_folder = $is_folder_exist;
+            } else {
+                $template_folder = self::create_new_folder($service, 'Photobook Template', $folder_id);
+                if (!$template_folder) {
+                    return new WP_Error('folder_error', 'create folder error', ['status' => 500]);
+                }
+            }
+            $upload_file = self::upload_single_file_to_drive($service, $file['name'], $file['tmp_name'], $template_folder['folder_id']);
+
+            $item = new WC_Order_Item_Product($item_id);
+            $current_version = $item->get_meta('template_version', 0);
+            $item->update_meta_data('template_version', intval($current_version) + 1);
+            $item->update_meta_data('photobook_template_id', $upload_file['file_id']);
+            $item->update_meta_data('photobook_template_link', $upload_file['web_link']);
+            $item->save();
+            $message = 'Template version ' . (intval($current_version) + 1) . 'updated successsfully!';
+
+            return new WP_REST_Response(["result" => $upload_file, "status" => "success", "message" => $message], 200);
         } catch (Exception $e) {
             return new WP_Error('delete_folder_error', $e->getMessage(), ['status' => 500]);
         }
