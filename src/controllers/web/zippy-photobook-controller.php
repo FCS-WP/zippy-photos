@@ -244,6 +244,9 @@ class Zippy_Photobook_Controller
                     $folderData[] = $isFolderExist;
                 } else {
                     $newFolder = self::create_new_folder($service, $folderName, $key == 0 ? $rootID : $folderData[$key - 1]['folder_id']);
+                    if ($key == 0) {
+                        $save_top_folder_id = WC()->session->set('top_folder_id', $newFolder['folder_id']);
+                    }
                     if (!$newFolder) {
                         return  ['status' => 'error', 'message' => 'failed to create new folder'];
                     }
@@ -339,9 +342,9 @@ class Zippy_Photobook_Controller
                 foreach ($fileGroup as $key => $fileTmpPath) {
                     if (!empty($fileTmpPath) && file_exists($fileTmpPath)) {
                         // You can access all details like this:
-                        $image_slot = ($requestNo * 2)-1 + $index;
+                        $image_slot = ($requestNo * 2) - 1 + $index;
                         $tmp_name = $files['tmp_name'][$index][$key];
-                        $file_name = 'slot_'. $image_slot . '-' . $files['name'][$index][$key];
+                        $file_name = 'slot_' . $image_slot . '-' . $files['name'][$index][$key];
                         $file_type = $files['type'][$index][$key];
 
                         // Process upload
@@ -393,6 +396,77 @@ class Zippy_Photobook_Controller
                 'file_name' => $filename,
                 'message' => $e->getMessage()
             ];
+        }
+    }
+
+    public static function change_name_and_remove_session_id($folder_id, $new_folder_name)
+    {
+        $service = self::get_drive_service_with_service_account();
+        $update_folder = self::rename_drive_folder($service, $folder_id, $new_folder_name);
+
+        if (WC()->session->get('custom_cart_id')) {
+            WC()->session->__unset('custom_cart_id');
+        }
+        if (WC()->session->get('top_folder_id')) {
+            WC()->session->__unset('top_folder_id');
+        }
+    }
+
+    public static function rename_drive_folder($service, $folder_id, $new_name)
+    {
+        $fileMetadata = new DriveFile([
+            'name' => $new_name
+        ]);
+
+        $updatedFolder = $service->files->update($folder_id, $fileMetadata);
+        return $updatedFolder;
+    }
+
+    public static function deleteFolderAndContents($service, $folderId)
+    {
+        // Step 1: Get all files in the folder
+        $files = $service->files->listFiles([
+            'q' => "'" . $folderId . "' in parents and trashed = false",
+            'fields' => 'files(id, name)',
+            'supportsAllDrives' => true,
+            'includeItemsFromAllDrives' => true,
+        ]);
+
+        // Step 2: Delete each file
+        foreach ($files->getFiles() as $file) {
+            try {
+                $service->files->delete($file->getId(), ['supportsAllDrives' => true]);
+            } catch (Exception $e) {
+                error_log("Failed to delete file {$file->getName()} ({$file->getId()}): " . $e->getMessage());
+            }
+        }
+
+        // Step 3: Delete the folder itself
+        try {
+            $service->files->delete($folderId, ['supportsAllDrives' => true]);
+            error_log("Deleted folder: $folderId");
+        } catch (Exception $e) {
+            error_log("Failed to delete folder $folderId: " . $e->getMessage());
+        }
+    }
+
+    public static function handle_delete_files_and_folders(WP_REST_Request $request)
+    {
+        $folder_ids = $request->get_param('folder_ids');
+        if (!$folder_ids || !is_array($folder_ids)) {
+            return new WP_Error('delete_folder_error', 'Missing param folder_ids', ['status' => 500]);
+        }
+
+        try {
+            $service = self::get_drive_service_with_service_account();
+            foreach ($folder_ids as $folderId) {
+                if ($folderId) {
+                    self::deleteFolderAndContents($service, $folderId);
+                }
+            }
+            return new WP_REST_Response(["status" => "success", "message" => "Folders have been deleted!"], 200);
+        } catch (Exception $e) {
+            return new WP_Error('delete_folder_error', $e->getMessage(), ['status' => 500]);
         }
     }
 }
