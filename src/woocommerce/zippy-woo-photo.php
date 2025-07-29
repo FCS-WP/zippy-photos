@@ -11,6 +11,7 @@ namespace Zippy_Addons\Src\Woocommerce;
 use WC_AJAX;
 use Zippy_Addons\Src\Controllers\Web\Zippy_Photobook_Controller;
 use Zippy_Addons\Src\Helpers\Zippy_Request_Helper;
+use WC_Order;
 
 defined('ABSPATH') or die();
 
@@ -66,17 +67,22 @@ class Zippy_Woo_Photo
 
   function handle_send_photobook_template_notification($order)
   {
-    if (!$order instanceof WC_Order) return;
+    if (!is_admin()) {
+      return;
+    }
 
     $to = $order->get_billing_email();
-    $preview_url = home_url('/photobook-preview/?order_id=' . $order->get_id()); // FIXED
+    $preview_url = home_url('/photobook-preview/?order_id=' . $order->get_id());
     $access_key = Zippy_Request_Helper::get_wc_order_key($order->get_order_key());
     $subject = 'Your photobook preview has been created!';
     $message = 'Hi ' . $order->get_billing_first_name() . ",<br><br>";
     $message .= "Click <a href='$preview_url'>here</a> to preview your photobook order.<br><br>";
     $message .= "Your access key: <strong>$access_key</strong>";
 
-    $headers = array('Content-Type: text/html; charset=UTF-8'); // FIXED
+    $headers = array(
+      'Content-Type: text/html; charset=UTF-8',
+      'From: Mach Photo <dev@zippy.sg>',
+    );
     wp_mail($to, $subject, $message, $headers);
   }
   function custom_div_before_add_to_cart()
