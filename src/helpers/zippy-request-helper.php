@@ -160,4 +160,12 @@ class Zippy_Request_Helper
         $variation_string = implode(', ', $variation_parts);
         return $product_name . ' - ' . $variation_string;
     }
+
+    public static function get_wc_order_key ($key)
+    {
+        if (strpos($key, 'wc_order_') === 0) {
+            return substr($key, strlen('wc_order_'));
+        }
+        return null;
+    }
 }

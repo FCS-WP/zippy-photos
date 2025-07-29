@@ -81,4 +81,6 @@ $(function () {
     observer.observe(target, { attributes: true });
   }
   renderPhotobook();
+
+  
 });

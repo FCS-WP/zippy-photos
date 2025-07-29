@@ -43,37 +43,49 @@ $(function () {
     const uploadUrl =
       window.location.origin + "/wp-json/zippy-addons/v1/photobook-template";
 
-    $.ajax({
-      url: uploadUrl,
-      type: "POST",
-      data: formData,
-      processData: false,
-      contentType: false,
-      headers: {
-        Authorization:
-          "Bearer FEhI30q7ySHtMfzvSDo6RkxZUDVaQ1BBU3lBcGhYS3BrQStIUT09",
-      },
-      success: function (response) {
-        if (response.status === "success") {
-          Swal.fire({
-            title: "SUCCESS",
-            text: response.message,
-            icon: "success",
-            timer: 3000,
-            showConfirmButton: false,
-          }).then(() => {
-            window.location.reload();
-          });
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("Upload error:", error);
-        Swal.fire({
-          title: "FAILED",
-          text: error,
-          icon: "error",
-          timer: 3000,
-          showConfirmButton: false,
+    Swal.fire({
+      title: "Uploading...",
+      text: "Please wait while we upload your template.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+
+        $.ajax({
+          url: uploadUrl,
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          headers: {
+            Authorization:
+              "Bearer FEhI30q7ySHtMfzvSDo6RkxZUDVaQ1BBU3lBcGhYS3BrQStIUT09",
+          },
+          success: function (response) {
+            Swal.close();
+
+            if (response.status === "success") {
+              Swal.fire({
+                title: "SUCCESS",
+                text: response.message,
+                icon: "success",
+                timer: 3000,
+                showConfirmButton: false,
+              }).then(() => {
+                window.location.reload();
+              });
+            }
+          },
+          error: function (xhr, status, error) {
+            Swal.close();
+
+            Swal.fire({
+              title: "FAILED",
+              text: error || "Upload failed.",
+              icon: "error",
+              timer: 3000,
+              showConfirmButton: false,
+            });
+          },
         });
       },
     });

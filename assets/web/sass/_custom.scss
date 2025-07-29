@@ -51,6 +51,7 @@ body {
 
     align-items: center;
 }
+
 .data-box {
     ul {
         margin: 0;
@@ -61,12 +62,14 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+
     .shipping-method-label {
         font-weight: 600;
         font-family: "Quicksand";
         font-size: 14px;
         padding-left: 10px;
     }
+
     .outlet-select {
         width: 250px;
         text-wrap: wrap;
@@ -74,6 +77,7 @@ body {
         padding: 10px;
         padding-right: 30px;
         min-height: 30px;
+
         option {
             text-wrap: wrap;
             padding: 10px;
@@ -83,8 +87,51 @@ body {
     @media (max-width: 767px) {
         display: flex;
         flex-direction: column;
+
         .outlet-select {
             width: 100%;
         }
     }
+}
+
+// Preview photobook
+
+.preview-container {
+    .preview-item {
+        display: flex;
+        margin-bottom: 50px;
+        gap: 20px;
+
+        .preview-file,
+        .preview-info {
+            width: 49%;
+
+            @media (max-width: 728px) {
+                width: 100%;
+            }
+        }
+
+        .preview-btns {
+            .p-btn-primary {
+                &:hover {
+                    background-color: #d71c0e;
+                }
+            }
+
+            .p-btn-secondary {
+                background-color: #83D2BF;
+                border-color: #83D2BF;
+                border-radius: 0;
+                &:hover {
+                    background-color: #fd604f;
+                }
+            }
+        }
+    }
+}
+
+.accepted {
+    padding: 10px 20px;
+    background-color: #aaff8f;
+    font-weight: 600;
 }

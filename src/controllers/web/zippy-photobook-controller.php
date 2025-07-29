@@ -493,4 +493,21 @@ class Zippy_Photobook_Controller
             return new WP_Error('delete_folder_error', $e->getMessage(), ['status' => 500]);
         }
     }
+
+    public static function handle_accept_template(WP_REST_Request $request)
+    {
+        try {
+            $item_id = $request->get_param('item_id');
+            if (!$item_id) {
+                return new WP_Error('upload error', 'Missing item_id', ['status' => 500]);
+            }
+            $item = new WC_Order_Item_Product($item_id);
+            $item->update_meta_data('photobook_template_accepted', true);
+            $item->save();
+
+            return new WP_REST_Response(["status" => "success", "message" => "Photobook templated has been accepted"], 200);
+        } catch (Exception $e) {
+            return new WP_Error('delete_folder_error', $e->getMessage(), ['status' => 500]);
+        }
+    }
 }

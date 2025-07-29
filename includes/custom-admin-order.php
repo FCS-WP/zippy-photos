@@ -27,7 +27,7 @@ function custom_order_item_values($product, $item, $item_id)
     //  Render Action Upload PDF 
     echo '<td class="custom-action">';
     if ($folder_id) {
-        echo render_custom_upload_button($item_id, $folder_id);
+        echo render_custom_upload_button($item, $item_id, $folder_id);
     } else {
         echo '-';
     }
@@ -35,13 +35,18 @@ function custom_order_item_values($product, $item, $item_id)
     echo '</td>';
 }
 
-function render_custom_upload_button($item_id, $folder_id)
+function render_custom_upload_button($item, $item_id, $folder_id)
 {
+    $accepted = $item->get_meta('photobook_template_accepted', 0);
     ob_start();
 ?>
     <div class="upload-pdf-wrapper" data-item-id="<?php echo esc_attr($item_id); ?>" data-folder-id="<?php echo esc_attr($folder_id); ?>">
-        <input type="file" class="custom-upload-input" accept="application/pdf" style="display:none;" />
-        <button type="button" class="button custom-upload-btn">Upload Template PDF</button>
+        <?php if ($accepted) : ?>
+            <span>✅ Client Accepted</span>
+        <?php else: ?>
+            <input type="file" class="custom-upload-input" accept="application/pdf" style="display:none;" />
+            <button type="button" class="button custom-upload-btn">Upload Template PDF</button>
+        <?php endif ?>
     </div>
 <?php
     return ob_get_clean();
