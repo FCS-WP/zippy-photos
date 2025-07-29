@@ -51,8 +51,34 @@ class Zippy_Woo_Photo
     add_action('wp_ajax_photobook', array($this, 'wc_photobook'));
     add_filter('woocommerce_add_cart_item_data', array($this, 'add_unique_cart_item_key'), 10, 3);
     add_action('woocommerce_checkout_order_processed', array($this, 'handle_when_place_order'), 10, 1);
+    register_activation_hook(ZIPPY_ADDONS_BASENAME, array($this, 'my_plugin_create_page_with_shortcode'));
+
+    add_shortcode('zippy_photobook_preview', array($this, 'zippy_photobook_preview_shortcode'));
+    add_filter('woocommerce_order_actions', array($this, 'add_custom_order_action'));
+    add_action('woocommerce_order_action_send_photobook_template_notification', array($this, 'handle_send_photobook_template_notification'));
   }
 
+  function add_custom_order_action($actions)
+  {
+    $actions['send_photobook_template_notification'] = __('Send Photobook Template', 'Mach Photo');
+    return $actions;
+  }
+
+  function handle_send_photobook_template_notification($order)
+  {
+    if (!$order instanceof WC_Order) return;
+
+    $to = $order->get_billing_email();
+    $preview_url = home_url('/photobook-preview/?order_id=' . $order->get_id()); // FIXED
+    $access_key = Zippy_Request_Helper::get_wc_order_key($order->get_order_key());
+    $subject = 'Your photobook preview has been created!';
+    $message = 'Hi ' . $order->get_billing_first_name() . ",<br><br>";
+    $message .= "Click <a href='$preview_url'>here</a> to preview your photobook order.<br><br>";
+    $message .= "Your access key: <strong>$access_key</strong>";
+
+    $headers = array('Content-Type: text/html; charset=UTF-8'); // FIXED
+    wp_mail($to, $subject, $message, $headers);
+  }
   function custom_div_before_add_to_cart()
   {
     if (!is_product()) {
@@ -199,7 +225,7 @@ class Zippy_Woo_Photo
 
     // Add item to cart
     $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation);
-    $folder_name = Zippy_Request_Helper::get_full_product_variation_name($product_id, $variation_id) .'-'. time();
+    $folder_name = Zippy_Request_Helper::get_full_product_variation_name($product_id, $variation_id) . '-' . time();
 
     // Create folder
     $drive_folder = Zippy_Photobook_Controller::create_folder_with_path(sanitize_text_field($session_cart_id . '/' . $folder_name));
@@ -252,5 +278,36 @@ class Zippy_Woo_Photo
     if ($top_folder_id) {
       $change_drive_name = Zippy_Photobook_Controller::change_name_and_remove_session_id($top_folder_id, $new_folder_name);
     }
+  }
+
+  function my_plugin_create_page_with_shortcode()
+  {
+    $page_title = 'Photobook Preview';
+    $page_slug = 'photobook-preview';
+
+    // Check if the page already exists
+    $existing_page = get_page_by_path($page_slug);
+
+    if (!$existing_page) {
+      $shortcode = '[zippy_photobook_preview]';
+
+      // Create the page
+      $page_data = array(
+        'post_title'   => $page_title,
+        'post_name'    => $page_slug,
+        'post_content' => $shortcode,
+        'post_status'  => 'publish',
+        'post_type'    => 'page',
+      );
+
+      wp_insert_post($page_data);
+    }
+  }
+
+  function zippy_photobook_preview_shortcode()
+  {
+    ob_start();
+    include plugin_dir_path(__FILE__) . 'templates/photobook/preview.php';
+    return ob_get_clean();
   }
 }

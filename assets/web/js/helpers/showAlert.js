@@ -1,10 +1,10 @@
 import Swal from "sweetalert2";
 
 export const AlertStatus = {
-  error: 'error',
-  success: 'success',
-  warning: 'warning'
-}
+  error: "error",
+  success: "success",
+  warning: "warning",
+};
 
 export const showAlert = async (status, title, text, timer = 3000) => {
   Swal.fire({
@@ -18,7 +18,7 @@ export const showAlert = async (status, title, text, timer = 3000) => {
 
 export const bookingSuccessfully = (handleConfirm) => {
   Swal.fire({
-    customClass:"booking_success",
+    customClass: "booking_success",
     title: "Booking Successful",
     text: "Your booking has been created successfully!",
     icon: "success",
@@ -58,38 +58,83 @@ export const alertInputEmail = async () => {
 
 export const alertConfirmDelete = async () => {
   const confirmed = Swal.fire({
-     title: "Are you sure?",
-     text: "You won't be able to revert this!",
-     icon: "warning",
-     showCancelButton: true,
-     confirmButtonColor: "#3085d6",
-     cancelButtonColor: "#d33",
-     confirmButtonText: "Yes, delete it!"
-   }).then((result) => {
-     if (result.isConfirmed) {
-       return true;
-     } else{
-       return false;
-     }
-   });
-   return confirmed;
- }
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, delete it!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+  return confirmed;
+};
 
-export const alertConfirm = (title, desc, confirmText, showCancelBtn = false) => {
+export const alertConfirm = (
+  title,
+  desc,
+  confirmText,
+  showCancelBtn = false
+) => {
   const confirmed = Swal.fire({
-     title: title,
-     text: desc,
-     icon: "warning",
-     showCancelButton: showCancelBtn,
-     confirmButtonColor: "#3085d6",
-     cancelButtonColor: "#d33",
-     confirmButtonText: confirmText
-   }).then((result) => {
-     if (result.isConfirmed) {
-       return true;
-     } else{
-       return false;
-     }
-   });
-   return confirmed;
-}
+    title: title,
+    text: desc,
+    icon: "warning",
+    showCancelButton: showCancelBtn,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: confirmText,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+  return confirmed;
+};
+
+export const inputAjaxAlert = (
+  item_id,
+  template_src,
+  order_id,
+  phone_number = "84384375658"
+) => {
+  Swal.fire({
+    title: "Add your comment:",
+    input: "textarea",
+    inputAttributes: {
+      autocapitalize: "off",
+    },
+    showCancelButton: true,
+    confirmButtonText: "Send request",
+    showLoaderOnConfirm: true,
+    preConfirm: async (userComments) => {
+      if (!userComments.trim()) {
+        Swal.showValidationMessage("Please enter your comments.");
+        return false;
+      }
+      return userComments;
+    },
+    allowOutsideClick: () => !Swal.isLoading(),
+  }).then((result) => {
+    if (result.isConfirmed && result.value) {
+      const userComment = result.value;
+      const message = `Hi Mach Photo,
+I would like to update the photobook template ${template_src} (order #${order_id}) based on the following new comments/feedback:
+
+${userComment}`;
+
+      const whatsappUrl = `https://wa.me/${phone_number}?text=${encodeURIComponent(
+        message
+      )}`;
+      console.log("whatsappUrl", whatsappUrl);
+      window.open(whatsappUrl, "_blank");
+    }
+  });
+};
