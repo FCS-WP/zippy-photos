@@ -76,8 +76,9 @@ class Zippy_Woo_Photo
     $access_key = Zippy_Request_Helper::get_wc_order_key($order->get_order_key());
     $subject = 'Your photobook preview has been created!';
     $message = 'Hi ' . $order->get_billing_first_name() . ",<br><br>";
-    $message .= "Click <a href='$preview_url'>here</a> to preview your photobook order.<br><br>";
-    $message .= "Your access key: <strong>$access_key</strong>";
+    $message .= "<p style='font-size: 15px;'>Click <a href='$preview_url'>here</a> or visit link below to preview your photobook order.</p><br><br>";
+    $message .= "<p style='font-size: 15px;'><a href='$preview_url'>$preview_url</a></p>";
+    $message .= "<p style='font-size: 15px;'>Your access key: <strong>$access_key</strong></p>";
 
     $headers = array(
       'Content-Type: text/html; charset=UTF-8',

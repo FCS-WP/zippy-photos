@@ -14,8 +14,7 @@ $customer_order_key = $_POST['customer_order_key'];
 if ($customer_order_key) {
     $error_message = $customer_order_key == $order_key ? '' : 'Invalid key. Please try again!';
 }
-
-get_header(); ?>
+?>
 
 <!-- Your preview HTML content -->
 
@@ -58,5 +57,3 @@ if (!$order_id) {
         ?>
     <?php endif ?>
 </div>
-
-<?php get_footer(); ?>
