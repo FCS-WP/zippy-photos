@@ -55,6 +55,7 @@ class Zippy_Woo_Photo
     register_activation_hook(ZIPPY_ADDONS_BASENAME, array($this, 'my_plugin_create_page_with_shortcode'));
 
     add_shortcode('zippy_photobook_preview', array($this, 'zippy_photobook_preview_shortcode'));
+    add_shortcode('zippy_photo_id', array($this, 'zippy_photo_id_shortcode'));
     add_filter('woocommerce_order_actions', array($this, 'add_custom_order_action'));
     add_action('woocommerce_order_action_send_photobook_template_notification', array($this, 'handle_send_photobook_template_notification'));
   }
@@ -63,6 +64,10 @@ class Zippy_Woo_Photo
   {
     $actions['send_photobook_template_notification'] = __('Send Photobook Template', 'Mach Photo');
     return $actions;
+  }
+
+  function zippy_photo_id_shortcode() {
+    echo '<div id="zippy_photo_id"></div>';
   }
 
   function handle_send_photobook_template_notification($order)

@@ -33,3 +33,9 @@ export const webApi = {
     return await makeMultipartRequest("/photobook-uploader", formData, "POST");
   },
 };
+
+export const photoIDApi = {
+  async getProducts(params) {
+    return await makeRequest('/photo-id', params);
+  }
+} 
