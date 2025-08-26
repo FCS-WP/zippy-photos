@@ -1,10 +1,11 @@
+import { Typography } from "@mui/material";
 import React from "react";
 
 const PhotoIDDesc = () => {
   return (
     <div>
       <h2>Photo ID</h2>
-      <p>
+      <Typography fontSize={15}>
         Need your photo for passport renewal or some official documents? Get
         them printed using our online templates that meet the requirements for
         each country. Please take note that this price is strictly for printing
@@ -13,7 +14,7 @@ const PhotoIDDesc = () => {
         please head down to one of our outlets, where urgent photos can be
         printed ~30 mins. Please take note that passport photo-taking services
         will cost more than our online photo printing service.
-      </p>
+      </Typography>
     </div>
   );
 };

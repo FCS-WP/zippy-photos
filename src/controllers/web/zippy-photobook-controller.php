@@ -145,6 +145,20 @@ class Zippy_Photobook_Controller
         return $result;
     }
 
+    public static function check_is_photo_id_category($product)
+    {
+        $terms = get_the_terms($product->get_id(), 'product_cat');
+        $result = false;
+        foreach ( $terms as $term ) {
+            // If this category is "passport" OR its parent is "passport"
+            if ( $term->slug === 'passport' || $term->parent === get_term_by( 'slug', 'passport', 'product_cat' )->term_id ) {
+                return true;
+            }
+        }
+        return $result;
+    }
+
+
     public static function get_data_photobook($product, $variation_id = null)
     {
         $product_id = $product->get_id();
@@ -207,20 +221,25 @@ class Zippy_Photobook_Controller
         }
     }
 
-    public static function create_folder_with_path($folderPath)
+    public static function create_folder_with_path($folderPath, $save_session = true)
     {
         $service = self::get_drive_service_with_service_account();
         $folderNames = explode('/', trim($folderPath, '/'));
+
         $rootID = get_option('zippy_root_folder_id', null);
         $folderData = [];
         try {
             foreach ($folderNames as $key => $folderName) {
-                $isFolderExist = self::check_folder_exists($service, $rootID, $folderName);
+                if ($save_session) {
+                    $isFolderExist = self::check_folder_exists($service, $rootID, $folderName);
+                } else {
+                    $isFolderExist = self::check_folder_exists($service, $key == 0 ? $rootID : $folderData[$key - 1]['folder_id'], $folderName);
+                }
                 if ($isFolderExist['exists'] == true) {
                     $folderData[] = $isFolderExist;
                 } else {
                     $newFolder = self::create_new_folder($service, $folderName, $key == 0 ? $rootID : $folderData[$key - 1]['folder_id']);
-                    if ($key == 0) {
+                    if ($key == 0 && $save_session) {
                         $save_top_folder_id = WC()->session->set('top_folder_id', $newFolder['folder_id']);
                     }
                     if (!$newFolder) {
@@ -229,7 +248,6 @@ class Zippy_Photobook_Controller
                     $folderData[] = $newFolder;
                 }
             }
-
             return end($folderData);
         } catch (Exception $e) {
             return null;
@@ -320,7 +338,7 @@ class Zippy_Photobook_Controller
         }
     }
 
-    private static function upload_single_file_to_drive($service, $filename, $file_tmp, $parent_folder_id)
+    public static function upload_single_file_to_drive($service, $filename, $file_tmp, $parent_folder_id)
     {
         $file_metadata = new DriveFile([
             'name' => $filename,

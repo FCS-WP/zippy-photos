@@ -112,6 +112,7 @@ function hide_photo_sizes_in_shop_page($query)
     }
 }
 
+// Photo Editor
 add_action('wp_ajax_custom_add_to_cart', 'custom_add_to_cart_handler');
 add_action('wp_ajax_nopriv_custom_add_to_cart', 'custom_add_to_cart_handler');
 
@@ -134,12 +135,18 @@ add_action('woocommerce_checkout_create_order_line_item', 'store_photo_url_to_li
 
 function store_photo_url_to_line_item_meta($item, $cart_item_key, $values, $order)
 {
+    // Photo Editor
     if (!empty($values['photo_url'])) {
         $item->add_meta_data('photo_url', $values['photo_url']);
     }
 
     if (!empty($values['paper_type'])) {
         $item->add_meta_data('paper_type', $values['paper_type']);
+    }
+
+    // Photo ID
+    if (!empty($values['photo_id_url'])) {
+        $item->add_meta_data('photo_id_url', $values['photo_id_url']);
     }
 }
 
@@ -191,10 +198,35 @@ function custom_cart_product_image($thumbnail, $cart_item, $cart_item_key) {
         return '<img src="' . $image_url . '" alt="Custom Photo">';
     }
 
+    // if (!empty($cart_item['photo_id_url'])) {
+    //     $img_link = esc_url(get_google_drive_thumbnail_url($cart_item['photo_id_url']));
+    //     return '<img src="' . $image_url . '" alt="Custom Photo">';
+    // }
+
     return $thumbnail;
 }
 
 add_filter('woocommerce_cart_item_name', 'custom_cart_item_name_photo_label', 10, 3);
+
+function get_google_drive_thumbnail_url($url) {
+    // Regex to extract file ID from different Google Drive link formats
+    $pattern = '/\/d\/([a-zA-Z0-9_-]+)/';
+    if (preg_match($pattern, $url, $matches)) {
+        $file_id = $matches[1];
+        // Generate the Google Drive thumbnail URL
+        return "https://drive.google.com/thumbnail?id={$file_id}";
+    }
+
+    // Alternative format: open?id=FILE_ID
+    $pattern2 = '/id=([a-zA-Z0-9_-]+)/';
+    if (preg_match($pattern2, $url, $matches2)) {
+        $file_id = $matches2[1];
+        return "https://drive.google.com/thumbnail?id={$file_id}";
+    }
+
+    // Invalid URL
+    return null;
+}
 
 function custom_cart_item_name_photo_label($product_name, $cart_item, $cart_item_key) {
     if (!empty($cart_item['photo_url'])) {
@@ -214,3 +246,26 @@ add_action('woocommerce_checkout_create_order_line_item', function($item, $cart_
         $item->add_meta_data('Photobook Note', $values['note'], true);
     }
 }, 10, 4);
+
+// 
+add_action('wp_ajax_custom_add_photo_id', 'custom_add_photo_id_handler');
+add_action('wp_ajax_nopriv_custom_add_photo_id', 'custom_add_photo_id_handler');
+
+function custom_add_photo_id_handler()
+{
+    if (!isset($_POST['photo_id_url']) || !isset($_POST['product_id'])) {
+        wp_send_json_error('Missing Data');
+    }
+    $product_id = $_POST['product_id'];
+    $variation_id = $_POST['variation_id'];
+    $quantity = $_POST['quantity'];
+    $photo_id_url = $_POST['photo_id_url'];
+
+    $action_add_to_cart = Zippy_Request_Helper::add_to_cart_photo_id($product_id, $variation_id, $quantity, $photo_id_url);
+
+    if (is_wp_error($action_add_to_cart)) {
+        wp_send_json_error($action_add_to_cart);
+    } else {
+        wp_send_json_success('Product added');
+    }
+}

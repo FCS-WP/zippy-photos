@@ -1,11 +1,18 @@
-import React from 'react'
+import React, { useRef, useState } from "react";
+import { StyledPaper } from "../mui-custom";
+import { Box, Button, Typography } from "@mui/material";
+import { usePhotoIDProvider } from "../../providers/PhotoIDProvider";
+import PhotoIDCropper from "./PhotoIDCropper";
 
 const PhotoIDDisplay = () => {
+  const { uploadedImage } = usePhotoIDProvider();
   return (
-    <div>
-        <h5>Product Image || Upload photo</h5>
-    </div>
-  )
-}
+    <StyledPaper>
+      <Box>
+        <PhotoIDCropper image={uploadedImage} />
+      </Box>
+    </StyledPaper>
+  );
+};
 
-export default PhotoIDDisplay
+export default PhotoIDDisplay;

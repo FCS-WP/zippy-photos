@@ -27,3 +27,8 @@ export const downloadPreviewImage = (dataUrl, filename = "download.jpg") => {
   link.click();
   document.body.removeChild(link);
 };
+
+export const mmToPx = (mm) => {
+  const dpi = 96;
+  return Math.round(mm * dpi / 25.4) * 2;
+}

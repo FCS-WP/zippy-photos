@@ -1,24 +1,38 @@
 import React, { useContext, useEffect, useState } from "react";
 import { PhotoIDContext } from "../contexts/MainContext";
 import { photoIDApi } from "../api";
+import { toast } from "react-toastify";
 
 export const PhotoIDProvider = ({ children }) => {
+  const params = new URLSearchParams(window.location.search);
+  const data = Object.fromEntries(params.entries());
+
   const [state, setState] = useState({
-    products: [],
+    productData: null,
     isApiLoading: true,
+    uploadedImage: null,
+    cropper: null,
+    urlData: data
   });
 
-  const { products, isApiLoading } = state;
+  const { productData, isApiLoading, uploadedImage, cropper, urlData } = state;
 
   const updateState = (updates) =>
     setState((prev) => ({ ...prev, ...updates }));
 
   const initDataProducts = async () => {
-    const { data: response } = await photoIDApi.getProducts();
+    const params = {
+      product_id : data.product_id,
+      variation_id: data.variation_id,
+    }
+    const { data: response } = await photoIDApi.getDataProduct(params);
     if (!response) {
       console.error("Can not get products");
+      toast.error('Can not create photo now. Try again later!!!');
+      return;
     }
-    updateState({ products: response.result });
+
+    updateState({ productData: response.result });
   };
 
   useEffect(() => {
@@ -26,9 +40,9 @@ export const PhotoIDProvider = ({ children }) => {
       updateState({ isApiLoading: true });
 
       await initDataProducts();
-      setTimeout(() => {
+      // setTimeout(() => {
         updateState({ isApiLoading: false });
-      }, 1500);
+      // }, 1500);
     };
     initData();
 
@@ -36,8 +50,11 @@ export const PhotoIDProvider = ({ children }) => {
   }, []);
 
   const value = {
-    products,
+    productData,
+    cropper,
+    urlData,
     isApiLoading,
+    uploadedImage,
     updateState,
   };
 

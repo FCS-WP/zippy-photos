@@ -29,13 +29,16 @@ export const webApi = {
   async getPhotobookConfig(params) {
     return await makeRequest("/photobook", params);
   },
-   async savePhotobookPhotos(formData) {
+  async savePhotobookPhotos(formData) {
     return await makeMultipartRequest("/photobook-uploader", formData, "POST");
   },
 };
 
 export const photoIDApi = {
-  async getProducts(params) {
-    return await makeRequest('/photo-id', params);
-  }
-} 
+  async getDataProduct(params) {
+    return await makeRequest("/photo-id", params);
+  },
+  async uploadPhotoID(formData) {
+    return await makeMultipartRequest("/photo-id", formData, "POST");
+  },
+};

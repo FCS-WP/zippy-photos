@@ -83,7 +83,13 @@ class Zippy_Photo_Router
 
         register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/photo-id', array(
             'methods' => 'GET',
-            'callback' => [Zippy_Photo_Id_Controller::class, 'get_photo_id_products'],
+            'callback' => [Zippy_Photo_Id_Controller::class, 'get_product_data'],
+            'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
+        ));
+
+        register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/photo-id', array(
+            'methods' => 'POST',
+            'callback' => [Zippy_Photo_Id_Controller::class, 'handle_photo_id'],
             'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
         ));
     }
