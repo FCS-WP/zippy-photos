@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Cropper, ImageRestriction } from "react-advanced-cropper";
+import { Cropper, FixedCropper, ImageRestriction } from "react-advanced-cropper";
 import { useMainProvider } from "../../providers/MainProvider";
 import { dataURLToFile } from "../../helpers/editorHelper";
 import { debounce } from "../../helpers/debounce";
@@ -92,11 +92,14 @@ const MiniCropper = ({ image, orientation }) => {
   };
 
   const handleLoadCroppedImage = () => {
-    const canvas = cropperRef.current.getCanvas();
+    const canvas = cropperRef.current.getCanvas({
+      width: cropperRef.current.getCoordinates().width,
+      height: cropperRef.current.getCoordinates().height,
+    });
     if (!canvas) return;
 
-    const dataUrl = canvas.toDataURL("image/jpeg");
-    const file = dataURLToFile(dataUrl, `cropped-${Date.now()}.jpg`);
+    const dataUrl = canvas.toDataURL("image/png");
+    const file = dataURLToFile(dataUrl, `cropped-${Date.now()}.png`);
 
     updateCroppedFiles(image.preview, file);
   };
@@ -110,14 +113,14 @@ const MiniCropper = ({ image, orientation }) => {
       <Cropper
         src={src}
         ref={cropperRef}
-        sizeRestrictions={ImageRestriction.fitArea}
+        imageRestriction={ImageRestriction.none}
         stencilProps={{
           aspectRatio: ratioValue,
-          movable: true,
+          movable: false,
           grid: true,
           resizable: true,
           lines: true,
-          handlers: true,
+          handlers: false,
         }}
         onUpdate={onUpdate}
         onReady={handleImageLoad}

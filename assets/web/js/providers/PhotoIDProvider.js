@@ -40,9 +40,9 @@ export const PhotoIDProvider = ({ children }) => {
       updateState({ isApiLoading: true });
 
       await initDataProducts();
-      // setTimeout(() => {
+      setTimeout(() => {
         updateState({ isApiLoading: false });
-      // }, 1500);
+      }, 1500);
     };
     initData();
 
