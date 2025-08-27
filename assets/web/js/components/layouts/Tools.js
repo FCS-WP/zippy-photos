@@ -5,7 +5,7 @@ import { AlertStatus, showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
 import AuthDialog from "../auth/AuthDialog";
 import { toast } from "react-toastify";
-import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 
 const Tools = () => {
   const { uploadedImages, setUploadedImages, croppedFiles, minimumOrder } =
@@ -195,14 +195,11 @@ const Tools = () => {
   return (
     <Box display={"flex"} justifyContent={"flex-end"} p={2}>
       <Tooltip title="Order now" placement="right"> 
-        <IconButton
+        <Button
+          sx={{ ":hover": { backgroundColor: '#c51414'}, backgroundColor: '#222', minHeight: 'auto !important', color: '#fff', px: '40px'}}
           loading={isLoading}
-          className="custom-iconbtn"
           onClick={handleSaveImages}
-          sx={{ ":hover": { backgroundColor: '#c51414'}, backgroundColor: '#222', minHeight: 'auto !important', color: '#fff'}}
-        >
-          <ShoppingCartCheckoutIcon />
-        </IconButton>
+        >Next Step <ArrowRightAltIcon /> </Button>
       </Tooltip>
       <AuthDialog
         open={open}

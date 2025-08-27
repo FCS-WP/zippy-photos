@@ -3,40 +3,14 @@ import { Button, Box, IconButton, Tooltip } from "@mui/material";
 import { useMainProvider } from "../../providers/MainProvider";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
-const ImageUploader = () => {
-  const { uploadedImages, setUploadedImages, photoSizes } = useMainProvider();
-  const MAX_FILE_SIZE_MB = 5;
-
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const validFiles = files.filter((file) => {
-      const isValid = file.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
-      if (!isValid) {
-        alert(
-          `"${file.name}" is too large. Max size is ${MAX_FILE_SIZE_MB}MB.`
-        );
-      }
-      return isValid;
-    });
-
-    const imagePreviews = validFiles.map((file) => ({
-      id: null,
-      file,
-      preview: URL.createObjectURL(file),
-      quantity: 1,
-      paper: "Matte",
-      size: photoSizes[0],
-    }));
-    setUploadedImages([...uploadedImages, ...imagePreviews]);
-  };
-
+const ImageUploader = ({ onChangeImages, showText = false }) => {
   return (
     <Box>
       <input
         type="file"
         accept="image/*"
         multiple
-        onChange={handleImageChange}
+        onChange={onChangeImages}
         id="imageUpload"
         style={{ display: "none" }}
       />
@@ -48,9 +22,12 @@ const ImageUploader = () => {
             ":hover": { backgroundColor: "#222" },
             minHeight: "auto !important",
             color: "#222",
+            borderRadius: `${showText ? 0 :'50%' }`,
+            fontSize: 14
           }}
         >
-          <UploadFileIcon />
+          <UploadFileIcon sx={{ mx: `${showText ? '5px' : 0 }` }}/>
+           {showText && ("Upload from devices")}
         </IconButton>
       </Tooltip>
     </Box>

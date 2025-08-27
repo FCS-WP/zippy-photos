@@ -1,12 +1,10 @@
-import { Button, IconButton, Tooltip } from "@mui/material";
+import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
-import { useMainProvider } from "../../providers/MainProvider";
 import { toast } from "react-toastify";
-import AddToDriveIcon from '@mui/icons-material/AddToDrive';
+import AddToDriveIcon from "@mui/icons-material/AddToDrive";
 const API_KEY = "";
 
-const GoogleDrivePicker = () => {
-  const { uploadedImages, setUploadedImages, photoSizes } = useMainProvider();
+const GoogleDrivePicker = ({ handlePreviewImages, showText = false }) => {
   const [pickerReady, setPickerReady] = useState(false);
   const accessTokenRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -148,30 +146,26 @@ const GoogleDrivePicker = () => {
     }
   };
 
-  const handlePreviewImages = (files) => {
-    const imagePreviews = files.map((file) => ({
-      id: null,
-      file,
-      preview: URL.createObjectURL(file),
-      quantity: 1,
-      paper: "Matte",
-      size: photoSizes[0],
-    }));
-    setUploadedImages([...uploadedImages, ...imagePreviews]);
-  };
-
   return (
-    <div>
-      <Tooltip title="Upload photos from Drive" placement="right" >
-        <IconButton 
+    <Box> 
+      <Tooltip title="Upload photos from Drive" placement="right">
+        <IconButton
           onClick={openOAuthPopup}
-          sx={{ ":hover": {backgroundColor: '#222'}, minHeight: 'auto !important', color: '#222'}}
-          className="custom-iconbtn" 
+          sx={{
+            ":hover": { backgroundColor: "#222", color: "#fff" },
+            minHeight: "auto !important",
+            color: "#222",
+            borderRadius: `${showText ? 0 :'50%' }`,
+            fontSize: 14
+          }}
+          className="custom-iconbtn"
         >
-          <AddToDriveIcon color="black"/>
+          <AddToDriveIcon color="black" sx={{ mx: `${showText ? '5px' : 0 }` }}/>  
+            {showText && ("Upload from Google Drive")}
         </IconButton>
+       
       </Tooltip>
-    </div>
+    </Box>
   );
 };
 

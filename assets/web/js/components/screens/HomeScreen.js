@@ -21,7 +21,7 @@ const HomeScreen = () => {
         <Grid size={{ xs: 12, md: 4, lg: 3 }} borderLeft={{ xs: 0, md: '1px solid lightgray' }} px={3} >
           <Box position={'sticky'}>
             <BulkSidebar></BulkSidebar>
-            <ControlBox />
+            <ControlBox/>
           </Box>
         </Grid>
       </Grid>

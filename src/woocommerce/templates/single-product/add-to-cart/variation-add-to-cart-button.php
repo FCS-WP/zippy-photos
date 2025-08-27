@@ -15,9 +15,9 @@ defined('ABSPATH') || exit;
 
 global $product;
 $isPhotobook = Zippy_Photobook_Controller::check_is_photobook_category($product);
+$isPhotoID = Zippy_Photobook_Controller::check_is_photo_id_category($product);
 ?>
 <div class="woocommerce-variation-add-to-cart variations_button">
-
 	<?php do_action('woocommerce_before_add_to_cart_button'); ?>
 	<?php if (!$isPhotobook) : ?>
 		<?php
@@ -38,7 +38,11 @@ $isPhotobook = Zippy_Photobook_Controller::check_is_photobook_category($product)
 	<?php do_action('woocommerce_after_add_to_cart_button'); ?>
 
 	<?php if (!$isPhotobook) : ?>
-		<button type="submit" class="single_add_to_cart_button button alt<?php echo esc_attr(wc_wp_theme_get_element_class_name('button') ? ' ' . wc_wp_theme_get_element_class_name('button') : ''); ?>"><?php echo esc_html($product->single_add_to_cart_text()); ?></button>
+		<?php if ($isPhotoID) :?>
+			<button type="button" class="custom_submit_photo_id_product button alt<?php echo esc_attr(wc_wp_theme_get_element_class_name('button') ? ' ' . wc_wp_theme_get_element_class_name('button') : ''); ?>">Start Creating</button>
+		<?php else: ?>
+			<button type="submit" class="single_add_to_cart_button button alt<?php echo esc_attr(wc_wp_theme_get_element_class_name('button') ? ' ' . wc_wp_theme_get_element_class_name('button') : ''); ?>"><?php echo esc_html($product->single_add_to_cart_text()); ?></button>
+		<?php endif; ?>
 	<?php endif; ?>
 
 	<input type="hidden" name="add-to-cart" value="<?php echo absint($product->get_id()); ?>" />

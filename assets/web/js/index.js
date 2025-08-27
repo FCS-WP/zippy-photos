@@ -7,6 +7,7 @@ import PhotoEditor from "./pages/PhotoEditor";
 import PhotobookSingle from "./pages/PhotobookSingle";
 import "./helpers/photobookHelper";
 import "./helpers/add_to_cart_variable";
+import PhotoID from "./pages/PhotoID";
 
 document.addEventListener("DOMContentLoaded", function () {
   const zippyMain = document.getElementById("zippy_photo_editor");
@@ -83,4 +84,18 @@ $(function () {
   renderPhotobook();
 
   
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const zippyPhotoId = document.getElementById("zippy_photo_id");
+  if (typeof zippyPhotoId != "undefined" && zippyPhotoId != null) {
+    const root = ReactDOM.createRoot(zippyPhotoId);
+    root.render(
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <PhotoID />
+        <ToastContainer />
+      </ThemeProvider>
+    );
+  }
 });

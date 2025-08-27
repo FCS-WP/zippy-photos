@@ -131,6 +131,32 @@ class Zippy_Request_Helper
         }
     }
 
+    public static function add_to_cart_photo_id($product_id, $variation_id, $quantity, $photo_id_url)
+    {
+        if (!WC()->cart) {
+            wc_load_cart();
+        }
+
+        try {
+            $cart_item_data = [
+                'photo_id_url' => esc_url_raw($photo_id_url),
+                'unique_key' => md5(uniqid(rand(), true)),
+            ];
+
+            $variation = wc_get_product($variation_id);
+            $attributes = $variation->get_attributes();
+
+            if (!WC()->cart) {
+                wc_load_cart();
+            }
+
+            WC()->cart->add_to_cart($product_id, $quantity, $variation_id,  $attributes, $cart_item_data);
+            return true;
+        } catch (Exception $e) {
+            return new WP_Error($e, 400);
+        }
+    }
+
     public static function get_full_product_variation_name($product_id, $variation_id)
     {
         $product = wc_get_product($product_id);
@@ -161,7 +187,7 @@ class Zippy_Request_Helper
         return $product_name . ' - ' . $variation_string;
     }
 
-    public static function get_wc_order_key ($key)
+    public static function get_wc_order_key($key)
     {
         if (strpos($key, 'wc_order_') === 0) {
             return substr($key, strlen('wc_order_'));

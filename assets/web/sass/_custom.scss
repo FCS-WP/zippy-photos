@@ -98,6 +98,7 @@ body {
 
 .preview-container {
     margin-bottom: 50px;
+
     .preview-item {
         display: flex;
         margin-bottom: 50px;
@@ -123,6 +124,7 @@ body {
                 background-color: #83D2BF;
                 border-color: #83D2BF;
                 border-radius: 0;
+
                 &:hover {
                     background-color: #fd604f;
                 }
@@ -135,4 +137,26 @@ body {
     padding: 10px 20px;
     background-color: #aaff8f;
     font-weight: 600;
+}
+
+.photo-id-cropper {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.d-none {
+    display: none;
+}
+
+.custom-btn {
+    padding: 10px 40px !important;
+    color: #fff !important;
+    border-radius: 0 !important;
+    &.custom-btn-secondary {
+        background-color: #333;
+    }
+
+    &.custom-btn-primary {
+        background-color: #fd604f;
+    }
 }
