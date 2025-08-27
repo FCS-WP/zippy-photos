@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, LinearProgress } from "@mui/material";
 import React, { useState } from "react";
 import { usePhotoIDProvider } from "../../providers/PhotoIDProvider";
 import Swal from "sweetalert2";
@@ -42,16 +42,16 @@ const PhotoIDStep = () => {
   const handleNextStep = async () => {
     setIsLoading(true);
     if (!cropper) {
-          showAlert(AlertStatus.warning, "Failed", "Images not found!");
-          return;
-        }
-        const userID = window.admin_data ? window.admin_data.userID : 0;
-        if (!userID || userID == 0) {
-          setOpen(true);
-          return;
-        } else {
-          await handleSubmitForm();
-        }
+      showAlert(AlertStatus.warning, "Failed", "Images not found!");
+      return;
+    }
+    const userID = window.admin_data ? window.admin_data.userID : 0;
+    if (!userID || userID == 0) {
+      setOpen(true);
+      return;
+    } else {
+      await handleSubmitForm();
+    }
   };
 
   const handleRegister = async (
@@ -129,13 +129,13 @@ const PhotoIDStep = () => {
   };
 
   const defaultSize = {
-      width: productData?.variation_data.width
-        ? mmToPx(productData?.variation_data.width)
-        : 400,
-      height: productData?.variation_data.height
-        ? mmToPx(productData?.variation_data.height)
-        : 600,
-    };
+    width: productData?.variation_data.width
+      ? mmToPx(productData?.variation_data.width)
+      : 400,
+    height: productData?.variation_data.height
+      ? mmToPx(productData?.variation_data.height)
+      : 600,
+  };
 
   const getCroppedFile = (cropper) => {
     if (!cropper) return;
@@ -150,7 +150,8 @@ const PhotoIDStep = () => {
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
         if (blob) {
-          const fileName = format(new Date(), 'yyyy-MM-dd') + '_' + (new Date()).getTime();
+          const fileName =
+            format(new Date(), "yyyy-MM-dd") + "_" + new Date().getTime();
           const file = new File([blob], fileName, { type: "image/png" });
           resolve(file);
         } else {
@@ -158,7 +159,7 @@ const PhotoIDStep = () => {
         }
       }, "image/png");
     });
-  }
+  };
 
   const handleSubmitForm = async () => {
     setIsLoading(true);
@@ -166,22 +167,35 @@ const PhotoIDStep = () => {
     const userId = window.admin_data.userID ?? 0;
     const formData = new FormData();
     formData.append(`file`, file);
-    formData.append(`product[variation]`, parseInt(productData?.variation_data.id));
+    formData.append(
+      `product[variation]`,
+      parseInt(productData?.variation_data.id)
+    );
     formData.append(`product[id]`, parseInt(productData?.id));
     formData.append(`product[qty]`, parseInt(urlData.quantity));
     formData.append(`user_id`, parseInt(userId));
 
     const { data: response } = await photoIDApi.uploadPhotoID(formData);
 
-    if (!response || response.status !== 'success') {
-      showAlert(AlertStatus.error, 'Failed', 'This service not available now! Please try again later or contact with us!');
+    if (!response || response.status !== "success") {
+      showAlert(
+        AlertStatus.error,
+        "Failed",
+        "This service not available now! Please try again later or contact with us!"
+      );
       setIsLoading(false);
       return;
     }
 
-    const trigger_add_to_cart = await handleAddPhotoIdToCart(response.result.photo_id_url);
+    const trigger_add_to_cart = await handleAddPhotoIdToCart(
+      response.result.photo_id_url
+    );
     if (!trigger_add_to_cart) {
-      showAlert(AlertStatus.error, 'Failed', 'This service not available now! Please try again later or contact with us!');
+      showAlert(
+        AlertStatus.error,
+        "Failed",
+        "This service not available now! Please try again later or contact with us!"
+      );
       setIsLoading(false);
       return;
     }
@@ -191,17 +205,17 @@ const PhotoIDStep = () => {
     return;
   };
 
-  const handleAddPhotoIdToCart = async (photoUrl) =>{ 
+  const handleAddPhotoIdToCart = async (photoUrl) => {
     const paramsAddToCart = {
       action: "custom_add_photo_id",
-      product_id : parseInt(productData?.id),
+      product_id: parseInt(productData?.id),
       variation_id: parseInt(productData?.variation_data.id),
       quantity: parseInt(urlData.quantity),
       photo_id_url: photoUrl,
-    }
+    };
 
     const { data: addToCartData } = await webApi.addToCartAjax(paramsAddToCart);
-    
+
     if (addToCartData) {
       const event = new CustomEvent("wc_fragment_refresh");
       document.body.dispatchEvent(event);
@@ -209,10 +223,20 @@ const PhotoIDStep = () => {
     } else {
       return false;
     }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setIsLoading(false);
   }
 
   return (
     <>
+      {isLoading && (
+        <Box mb={3}>
+          <LinearProgress color="info" sx={{ height: 10, borderRadius: 5 }} />
+        </Box>
+      )}
       <Box
         display={"flex"}
         justifyContent={"space-between"}
@@ -221,7 +245,6 @@ const PhotoIDStep = () => {
         <Button
           className="btn custom-btn custom-btn-secondary"
           onClick={handleBackStep}
-          loading={isLoading}
           disabled={isLoading}
         >
           Back
@@ -230,7 +253,6 @@ const PhotoIDStep = () => {
           className="btn custom-btn custom-btn-primary"
           onClick={handleNextStep}
           disabled={isLoading}
-          loading={isLoading}
         >
           Next
         </Button>
@@ -239,7 +261,7 @@ const PhotoIDStep = () => {
         open={open}
         handleLogin={handleLogin}
         handleRegister={handleRegister}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
       />
     </>
   );

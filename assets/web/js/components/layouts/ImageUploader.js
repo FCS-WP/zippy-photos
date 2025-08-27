@@ -3,7 +3,7 @@ import { Button, Box, IconButton, Tooltip } from "@mui/material";
 import { useMainProvider } from "../../providers/MainProvider";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 
-const ImageUploader = ({ onChangeImages }) => {
+const ImageUploader = ({ onChangeImages, showText = false }) => {
   return (
     <Box>
       <input
@@ -22,9 +22,12 @@ const ImageUploader = ({ onChangeImages }) => {
             ":hover": { backgroundColor: "#222" },
             minHeight: "auto !important",
             color: "#222",
+            borderRadius: `${showText ? 0 :'50%' }`,
+            fontSize: 14
           }}
         >
-          <UploadFileIcon />
+          <UploadFileIcon sx={{ mx: `${showText ? '5px' : 0 }` }}/>
+           {showText && ("Upload from devices")}
         </IconButton>
       </Tooltip>
     </Box>
