@@ -83,7 +83,7 @@ class Zippy_Photo_Router
 
         register_rest_route(ZIPPY_BOOKING_API_NAMESPACE, '/photo-id', array(
             'methods' => 'GET',
-            'callback' => [Zippy_Photo_Id_Controller::class, 'get_product_data'],
+            'callback' => [Zippy_Photo_Id_Controller::class, 'get_product_data_v2'],
             'permission_callback' => array(Zippy_Booking_Permission::class, 'zippy_permission_callback'),
         ));
 

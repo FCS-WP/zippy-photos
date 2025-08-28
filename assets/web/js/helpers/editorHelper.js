@@ -2,7 +2,7 @@ export const DPI = 150;
 
 export const inchToPx = (inch) => {
   return inch * DPI;
-}
+};
 
 export const dataURLToFile = (dataURL, filename) => {
   const arr = dataURL.split(",");
@@ -30,5 +30,14 @@ export const downloadPreviewImage = (dataUrl, filename = "download.jpg") => {
 
 export const mmToPx = (mm) => {
   const dpi = 96;
-  return Math.round(mm * dpi / 25.4) * 2;
+  return Math.round((mm * dpi) / 25.4) * 2.5;
+};
+
+export const shallowEqual = (obj1, obj2) => {
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  if (keys1.length !== keys2.length) return false;
+
+  return keys1.every((key) => obj1[key] === obj2[key]);
 }

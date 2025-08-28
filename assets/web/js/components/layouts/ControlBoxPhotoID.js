@@ -44,8 +44,12 @@ const ControlBoxPhotoID = () => {
       justifyContent={"space-around"}
       flexWrap={"wrap"}
     >
-      <GoogleDrivePicker handlePreviewImages={handlePreviewImages} showText={true}/>
-      <ImageUploader onChangeImages={handleUploadImages} showText={true}/>
+      <Box border={1} borderColor={"#c3c3c3"}>
+        <GoogleDrivePicker handlePreviewImages={handlePreviewImages} showText={true}/>
+      </Box>
+      <Box border={1} borderColor={"#c3c3c3"}>
+        <ImageUploader onChangeImages={handleUploadImages} showText={true}/>
+      </Box>
     </Box>
   );
 };

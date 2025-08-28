@@ -9,7 +9,8 @@ import { format } from "date-fns";
 import { photoIDApi, webApi } from "../../api";
 
 const PhotoIDStep = () => {
-  const { cropper, urlData, productData, uploadedPhoto } = usePhotoIDProvider();
+  const { cropper, urlData, productData, uploadedPhoto, selectedVariation } =
+    usePhotoIDProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -43,6 +44,7 @@ const PhotoIDStep = () => {
     setIsLoading(true);
     if (!cropper) {
       showAlert(AlertStatus.warning, "Failed", "Images not found!");
+      setIsLoading(false);
       return;
     }
     const userID = window.admin_data ? window.admin_data.userID : 0;
@@ -129,11 +131,11 @@ const PhotoIDStep = () => {
   };
 
   const defaultSize = {
-    width: productData?.variation_data.width
-      ? mmToPx(productData?.variation_data.width)
+    width: productData?.template?.width
+      ? mmToPx(productData?.template?.width)
       : 400,
-    height: productData?.variation_data.height
-      ? mmToPx(productData?.variation_data.height)
+    height: productData?.template?.height
+      ? mmToPx(productData?.template?.height)
       : 600,
   };
 
@@ -167,12 +169,9 @@ const PhotoIDStep = () => {
     const userId = window.admin_data.userID ?? 0;
     const formData = new FormData();
     formData.append(`file`, file);
-    formData.append(
-      `product[variation]`,
-      parseInt(productData?.variation_data.id)
-    );
+    formData.append(`product[variation]`, parseInt(selectedVariation.id));
     formData.append(`product[id]`, parseInt(productData?.id));
-    formData.append(`product[qty]`, parseInt(urlData.quantity));
+    formData.append(`product[qty]`, 1);
     formData.append(`user_id`, parseInt(userId));
 
     const { data: response } = await photoIDApi.uploadPhotoID(formData);
@@ -209,7 +208,7 @@ const PhotoIDStep = () => {
     const paramsAddToCart = {
       action: "custom_add_photo_id",
       product_id: parseInt(productData?.id),
-      variation_id: parseInt(productData?.variation_data.id),
+      variation_id: parseInt(selectedVariation.id),
       quantity: parseInt(urlData.quantity),
       photo_id_url: photoUrl,
     };
@@ -228,7 +227,7 @@ const PhotoIDStep = () => {
   const handleClose = () => {
     setOpen(false);
     setIsLoading(false);
-  }
+  };
 
   return (
     <>

@@ -150,9 +150,9 @@ export const ImageEditor = ({ image, onClose }) => {
     onClose();
   };
 
-  const onUpdate = () => {
-    previewRef.current?.refresh();
-  };
+  // const onUpdate = () => {
+  //   previewRef.current?.refresh();
+  // };
 
   const changed = Object.values(adjustments).some((el) => Math.floor(el * 100));
 
@@ -181,26 +181,27 @@ export const ImageEditor = ({ image, onClose }) => {
         <Cropper
           src={src}
           ref={cropperRef}
-          sizeRestrictions={ImageRestriction.stencil}
+          imageRestriction={ImageRestriction.none}
           stencilProps={{
             aspectRatio: ratioValue,
-            movable: cropperEnabled,
+            movable: false,
             grid: true,
-            resizable: true,
+            resizable: false,
             lines: cropperEnabled,
-            handlers: cropperEnabled,
+            handlers: true,
             overlayClassName: cn(
               "image-editor__cropper-overlay",
               !cropperEnabled && "image-editor__cropper-overlay--faded"
             ),
           }}
-          backgroundComponent={AdjustableCropperBackground}
-          backgroundWrapperProps={{
-            scaleImage: cropperEnabled,
-            moveImage: cropperEnabled,
-          }}
-          backgroundProps={adjustments}
-          onUpdate={onUpdate}
+          // backgroundComponent={AdjustableCropperBackground}
+          
+          // backgroundWrapperProps={{
+          //   scaleImage: cropperEnabled,
+          //   moveImage: cropperEnabled,
+          // }}
+          // backgroundProps={adjustments}
+          // onUpdate={onUpdate}
           onReady={handleImageLoad}
         />
         {mode !== "crop" && (

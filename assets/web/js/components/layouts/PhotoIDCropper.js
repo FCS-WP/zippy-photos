@@ -22,22 +22,22 @@ import { toast } from "react-toastify";
 const PhotoIDCropper = ({ image }) => {
   const { productData, updateState } = usePhotoIDProvider();
   const [src, setSrc] = useState(image?.preview);
-  const templateURL = productData?.variation_data.template;
+  const templateURL = productData?.template?.url;
   const cropperRef = useRef(null);
   const uploaderRef = useRef(null);
   const [prepareData, setPrepareData] = useState(true);
   const [dragOver, setDragOver] = useState(false);
 
   const defaultSize = {
-    width: productData?.variation_data.width
-      ? mmToPx(productData?.variation_data.width)
+    width: productData?.template?.width
+      ? mmToPx(productData?.template?.width)
       : 400,
-    height: productData?.variation_data.height
-      ? mmToPx(productData?.variation_data.height)
+    height: productData?.template?.height
+      ? mmToPx(productData?.template?.height)
       : 600,
   };
 
-  const handleReadyImage = () => {
+  const handleReadyImage = (props) => {
     const cropper = cropperRef.current;
     const ratio = defaultSize.width / defaultSize.height;
     if (cropper) {
@@ -54,13 +54,19 @@ const PhotoIDCropper = ({ image }) => {
 
     setTimeout(async () => {
       addElementToPreviewCropper();
-      const adjustLeft = await getAdjustmentLeft();
-      const left = (adjustLeft.width - adjustLeft.width * ratio) / 2;
+      /**
+       *
+       * If imageRestriction.none => Use this code
+       *  const image = cropper.getImage();
+       *  let scale = cropper.getCoordinates().width / image.width;
+       *  cropper.transformImage({ scale: scale })
+       *
+       **/
 
       cropper.setCoordinates({
         width: cropper.getCoordinates().width,
         height: cropper.getCoordinates().height,
-        left: left,
+        left: 0,
         top: 0,
       });
 
@@ -112,9 +118,13 @@ const PhotoIDCropper = ({ image }) => {
   }, [image]);
 
   const addElementToPreviewCropper = () => {
+    if (!templateURL) {
+      return;
+    }
     const previewElement = document.querySelector(
       ".advanced-cropper-rectangle-stencil__preview"
     );
+    previewElement.innerHTML = "";
     const image = document.createElement("img");
     image.src = templateURL;
     image.alt = "";
@@ -170,7 +180,7 @@ const PhotoIDCropper = ({ image }) => {
   };
 
   return (
-    <>
+    <Box minWidth={defaultSize.width}>
       <input
         type="file"
         style={{ display: "none" }}
@@ -180,6 +190,7 @@ const PhotoIDCropper = ({ image }) => {
       />
       <Box
         height={defaultSize.height}
+        width={defaultSize.width}
         sx={{
           position: "relative",
           border: dragOver ? "2px dashed #1976d2" : "2px solid #ccc",
@@ -199,15 +210,15 @@ const PhotoIDCropper = ({ image }) => {
               aspectRatio: defaultSize.width / defaultSize.height,
               handlers: false,
               lines: false,
-              movable: true,
-              resizable: true,
+              movable: false,
+              resizable: false,
             }}
             stencilSize={defaultSize}
             transformImage={{
               scale: 1,
             }}
             onReady={handleReadyImage}
-            imageRestriction={ImageRestriction.fitArea}
+            imageRestriction={ImageRestriction.stencil}
             className="photo-id-cropper"
             onChange={handleChangeCropper}
           />
@@ -222,13 +233,15 @@ const PhotoIDCropper = ({ image }) => {
             }}
           >
             <Box>
-              <Typography variant="h4" width={"100%"}>
-                Drop or ppload your photo to continue
+              <Typography variant="h6" width={"100%"} textAlign={"center"}>
+                Drop or upload your photo to continue
               </Typography>
-              <Box sx={{
-                textAlign: 'center',
-                pt: 2
-              }}>
+              <Box
+                sx={{
+                  textAlign: "center",
+                  pt: 2,
+                }}
+              >
                 <IconButton
                   onClick={triggerUpload}
                   sx={{
@@ -241,7 +254,7 @@ const PhotoIDCropper = ({ image }) => {
                     borderRadius: 1,
                   }}
                 >
-                  <UploadFileIcon sx={{ mr: 1 }}/> Upload now
+                  <UploadFileIcon sx={{ mr: 1 }} /> Upload now
                 </IconButton>
               </Box>
             </Box>
@@ -251,7 +264,7 @@ const PhotoIDCropper = ({ image }) => {
       <Box className="d-none">
         <Button onClick={handleDownloadImage}>Export Image</Button>
       </Box>
-    </>
+    </Box>
   );
 };
 
