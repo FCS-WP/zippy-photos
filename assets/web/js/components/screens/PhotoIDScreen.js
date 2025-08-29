@@ -5,6 +5,7 @@ import PhotoIDDisplay from "../layouts/PhotoIDDisplay";
 import { usePhotoIDProvider } from "../../providers/PhotoIDProvider";
 import PhotoIDControlV2 from "../layouts/PhotoIDControlV2";
 import PhotoIDStep from "../layouts/PhotoIDStep";
+import { StyledPaper } from "../mui-custom";
 
 const PhotoIDScreen = () => {
   const { isApiLoading } = usePhotoIDProvider();
@@ -17,25 +18,27 @@ const PhotoIDScreen = () => {
   };
 
   return (
-    <Grid container spacing={3}>
-      {isApiLoading ? (
-        <Grid size={12}>{renderLoading()}</Grid>
-      ) : (
-        <>
-          <Grid size={{ xs: 12, md: 8 }}>
-            <PhotoIDDisplay />
-          </Grid>
+    <StyledPaper >
+      <Grid container spacing={4}>
+        {isApiLoading ? (
+          <Grid size={12}>{renderLoading()}</Grid>
+        ) : (
+          <>
+            <Grid size={{ xs: 12, md: 8 }} height={'100%'}>
+              <PhotoIDDisplay />
+            </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
-            <PhotoIDControlV2 />
-          </Grid>
+            <Grid size={{ xs: 12, md: 4 }} height={'100%'}>
+              <PhotoIDControlV2 />
+            </Grid>
 
-          <Grid size={12}>
-            <PhotoIDStep />
-          </Grid>
-        </>
-      )}
-    </Grid>
+            <Grid size={12}>
+              <PhotoIDStep />
+            </Grid>
+          </>
+        )}
+      </Grid>
+    </StyledPaper>
   );
 };
 

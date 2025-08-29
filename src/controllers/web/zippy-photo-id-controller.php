@@ -69,7 +69,7 @@ class Zippy_Photo_Id_Controller
         }
     }
 
-    public static function get_product_data(WP_REST_Request $request)
+    public static function get_product_data_v1(WP_REST_Request $request)
     {
         try {
             $rules = [
@@ -121,6 +121,72 @@ class Zippy_Photo_Id_Controller
             }
 
             return new WP_REST_Response(["result" => $data, "status" => "success", "message" => "Get Data Successfully"], 200);
+        } catch (\Exception $e) {
+            return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
+        }
+    }
+
+    public static function get_product_data_v2(WP_REST_Request $request)
+    {
+        try {
+            $rules = [
+                'product_id' =>  ['type' => 'int', 'required' => true],
+            ];
+
+            $validation = Zippy_Request_Helper::validate_request($request->get_params(), $rules);
+
+            if (is_wp_error($validation)) {
+                return $validation;
+            }
+
+            $product_id = $request->get_param('product_id');
+            $product = wc_get_product($product_id);
+
+            if (!$product) {
+                return new WP_Error('no_product', 'Product not found', array('status' => 404));
+            }
+
+            $template = get_field('template_default', $product_id) ?? '';
+            $width_default = get_field('width_default', $product_id) ?? 40;
+            $height_default = get_field('height_default', $product_id) ?? 60;
+            $template_url = $template ? $template['url'] : '';
+
+            $product_data = array(
+                'id'    => $product->get_id(),
+                'name'  => $product->get_name(),
+                'price' => $product->get_regular_price(),
+                'sale' => $product->get_sale_price(),
+                'slug'         => $product->get_slug(),
+                'link'  => get_permalink($product->get_id()),
+                'image' => wp_get_attachment_url($product->get_image_id()),
+                'type'  => $product->get_type(),
+                'description'  => $product->get_description(),
+                'variations'   => [],
+                'template' => ["url" => $template_url, "width" => intval($width_default), "height" => intval($height_default)],
+            );
+
+            if ($product->is_type('variable')) {
+                $variations = array();
+                foreach ($product->get_children() as $child_id) {
+                    $variation = wc_get_product($child_id);
+                    if ($variation) {
+                        $variations[] = array(
+                            'id'       => $variation->get_id(),
+                            'sku'      => $variation->get_sku(),
+                            'price'    => $variation->get_price(),
+                            'regular'  => $variation->get_regular_price(),
+                            'sale'     => $variation->get_sale_price(),
+                            'stock'    => $variation->get_stock_quantity(),
+                            'attrs'    => $variation->get_attributes(),
+                            'description'  => $variation->get_description(),
+                            'image'    => wp_get_attachment_url($variation->get_image_id()),
+                        );
+                    }
+                }
+                $product_data['variations'] = $variations;
+            }
+
+            return new WP_REST_Response(["result" => $product_data, "status" => "success", "message" => "Get Data Successfully"], 200);
         } catch (\Exception $e) {
             return new WP_Error('product_fetch_error', $e->getMessage(), ['status' => 500]);
         }
@@ -180,7 +246,7 @@ class Zippy_Photo_Id_Controller
         if (!WC()->cart) {
             wc_load_cart();
         }
-        
+
         $added = WC()->cart->add_to_cart(
             $product_data['id'],
             $product_data['qty'],

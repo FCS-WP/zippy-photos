@@ -86,6 +86,9 @@ do_action('woocommerce_before_cart'); ?>
                                     if ($cart_item['note']) {
                                         echo '<div> <strong>Note: </strong>' . $cart_item['note'] . '</div>';
                                     }
+                                    if ($cart_item['country']) {
+                                        echo '<div><p class="custom-metadata">Photo ID country: ' . $cart_item['country'] . '</p></div>';
+                                    }
                                     if ($cart_item['photo_id_url']) {
                                         echo '<div><a class="custom-view-folder" href="' . $cart_item['photo_id_url'] . '" target="_blank">Photo ID url: ' . $cart_item['photo_id_url'] . '</a></div>';
                                     }
