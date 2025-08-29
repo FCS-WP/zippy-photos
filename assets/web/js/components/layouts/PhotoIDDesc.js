@@ -7,7 +7,7 @@ const PhotoIDDesc = () => {
   return (
     <Box className="photo-id-box" width={'100%'}>
       <Typography fontSize={14}>
-        { !productData.description ? (
+        { !!productData.description ? (
           productData.description
         ) : (
           <Box textAlign={'center'}>
