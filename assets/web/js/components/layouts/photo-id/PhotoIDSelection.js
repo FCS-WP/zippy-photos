@@ -1,4 +1,11 @@
-import { Box, FormControl, MenuItem, Select, Typography } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 import { usePhotoIDProvider } from "../../../providers/PhotoIDProvider";
@@ -12,6 +19,8 @@ const PhotoIDSelection = () => {
     regular: null,
     sale: null,
   });
+
+  const [country, setCountry] = useState("");
 
   const [customerData, setCustomerData] = useState(null);
 
@@ -48,6 +57,15 @@ const PhotoIDSelection = () => {
         )}
       </>
     );
+  };
+
+  const handleMetaData = (e) => {
+    setCountry(e.target.value);
+    updateState({
+      metadata: {
+        country: e.target.value,
+      },
+    });
   };
 
   const handleDataAttrs = () => {
@@ -124,9 +142,9 @@ const PhotoIDSelection = () => {
   };
 
   const showTitleSlug = (key) => {
-    const removeDash = key.replace('-', ' ');
+    const removeDash = key.replace("-", " ");
     return removeDash.toUpperCase();
-  }
+  };
 
   useEffect(() => {
     if (customerData) {
@@ -141,12 +159,7 @@ const PhotoIDSelection = () => {
   return (
     <Box>
       {/* Box Price */}
-      <Box>
-        <Typography mb={2} fontSize={18} fontWeight={500}>
-          Price
-        </Typography>
-        {renderPrice(photoPrice)}
-      </Box>
+      <Box>{renderPrice(photoPrice)}</Box>
 
       {/* Render Attributes Of Variation */}
 
@@ -173,6 +186,21 @@ const PhotoIDSelection = () => {
                   </MenuItem>
                 ))}
               </Select>
+
+              {attrKey == "country" && customerData["country"] === "Others" && (
+                <Box mt={1}>
+                  <TextField
+                    color="#333"
+                    fontSize={14}
+                    className="custom-input input-country"
+                    size="small"
+                    label="Enter Your Country (*)"
+                    variant="standard"
+                    onChange={handleMetaData}
+                    value={country}
+                  />
+                </Box>
+              )}
             </FormControl>
           </Box>
         ))}

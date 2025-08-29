@@ -13,10 +13,11 @@ export const PhotoIDProvider = ({ children }) => {
     uploadedImage: null,
     selectedVariation: null,
     cropper: null,
-    urlData: data
+    urlData: data,
+    metadata: null,
   });
 
-  const { productData, isApiLoading, uploadedImage, cropper, urlData, selectedVariation } = state;
+  const { productData, isApiLoading, uploadedImage, cropper, urlData, selectedVariation, metadata } = state;
 
   const updateState = (updates) =>
     setState((prev) => ({ ...prev, ...updates }));
@@ -58,6 +59,7 @@ export const PhotoIDProvider = ({ children }) => {
     isApiLoading,
     uploadedImage,
     updateState,
+    metadata
   };
 
   return (

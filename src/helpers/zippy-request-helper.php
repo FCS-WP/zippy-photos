@@ -131,7 +131,7 @@ class Zippy_Request_Helper
         }
     }
 
-    public static function add_to_cart_photo_id($product_id, $variation_id, $quantity, $photo_id_url)
+    public static function add_to_cart_photo_id($product_id, $variation_id, $quantity, $photo_id_url, $country = null)
     {
         if (!WC()->cart) {
             wc_load_cart();
@@ -142,6 +142,9 @@ class Zippy_Request_Helper
                 'photo_id_url' => esc_url_raw($photo_id_url),
                 'unique_key' => md5(uniqid(rand(), true)),
             ];
+            if ($country) {
+                $cart_item_data['country'] = $country;
+            }
 
             $variation = wc_get_product($variation_id);
             $attributes = $variation->get_attributes();

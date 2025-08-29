@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { photoIDApi, webApi } from "../../api";
 
 const PhotoIDStep = () => {
-  const { cropper, urlData, productData, uploadedPhoto, selectedVariation } =
+  const { cropper, urlData, productData, uploadedPhoto, selectedVariation, metadata } =
     usePhotoIDProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -46,6 +46,13 @@ const PhotoIDStep = () => {
       showAlert(AlertStatus.warning, "Failed", "Images not found!");
       setIsLoading(false);
       return;
+    }
+    if (selectedVariation?.attrs?.country === 'Others') {
+      if (!metadata?.country) {
+        showAlert('error', 'Missing Info', 'Please enter your country');
+        setIsLoading(false);
+        return;
+      }
     }
     const userID = window.admin_data ? window.admin_data.userID : 0;
     if (!userID || userID == 0) {
@@ -209,10 +216,13 @@ const PhotoIDStep = () => {
       action: "custom_add_photo_id",
       product_id: parseInt(productData?.id),
       variation_id: parseInt(selectedVariation.id),
-      quantity: parseInt(urlData.quantity),
-      photo_id_url: photoUrl,
+      quantity: 1,
+      metadata: {
+        photo_id_url: photoUrl,
+        country: selectedVariation.attrs.country === 'Others' ? metadata.country : null,
+      }
     };
-
+    
     const { data: addToCartData } = await webApi.addToCartAjax(paramsAddToCart);
 
     if (addToCartData) {

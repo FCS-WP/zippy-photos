@@ -10,3 +10,7 @@ yarn.lock
 assets/dist
 
 vendor
+
+src/helpers/drive/photobook-auth.json
+
+zippy-addons.php

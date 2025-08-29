@@ -148,6 +148,9 @@ function store_photo_url_to_line_item_meta($item, $cart_item_key, $values, $orde
     if (!empty($values['photo_id_url'])) {
         $item->add_meta_data('photo_id_url', $values['photo_id_url']);
     }
+    if (!empty($values['country'])) {
+        $item->add_meta_data('country', $values['country']);
+    }
 }
 
 // Create Order with Photos Products
@@ -253,15 +256,17 @@ add_action('wp_ajax_nopriv_custom_add_photo_id', 'custom_add_photo_id_handler');
 
 function custom_add_photo_id_handler()
 {
-    if (!isset($_POST['photo_id_url']) || !isset($_POST['product_id'])) {
+    if (!isset($_POST['metadata']) || !isset($_POST['product_id'])) {
         wp_send_json_error('Missing Data');
     }
     $product_id = $_POST['product_id'];
     $variation_id = $_POST['variation_id'];
     $quantity = $_POST['quantity'];
-    $photo_id_url = $_POST['photo_id_url'];
+    $metadata = $_POST['metadata'];
+    $photo_id_url = $metadata['photo_id_url'];
+    $country = $metadata['country'];
 
-    $action_add_to_cart = Zippy_Request_Helper::add_to_cart_photo_id($product_id, $variation_id, $quantity, $photo_id_url);
+    $action_add_to_cart = Zippy_Request_Helper::add_to_cart_photo_id($product_id, $variation_id, $quantity, $photo_id_url, $country);
 
     if (is_wp_error($action_add_to_cart)) {
         wp_send_json_error($action_add_to_cart);
