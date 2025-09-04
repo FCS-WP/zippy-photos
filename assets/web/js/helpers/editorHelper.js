@@ -1,4 +1,4 @@
-export const DPI = 150;
+export const DPI = 96;
 
 export const inchToPx = (inch) => {
   return inch * DPI;

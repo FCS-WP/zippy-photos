@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { ImageEditor } from "../editor/ImageEditor";
 import SizeSelect from "./SizeSelect";
 import { useMainProvider } from "../../providers/MainProvider";
+import { ImageEditorV2 } from "../editor/ImageEditorV2";
 
 const EditPhotoDialog = ({ isOpen, image, onClose }) => {
   const [size, setSize] = useState(image.size);
@@ -38,14 +39,14 @@ const EditPhotoDialog = ({ isOpen, image, onClose }) => {
 
   return (
     <Dialog fullWidth={true} maxWidth={"lg"} open={isOpen} onClose={onClose}>
-      <Box m={2} display={"flex"} justifyContent={"flex-end"}>
+      <Box m={3} display={"flex"} justifyContent={"flex-end"}>
         <Box width={300}>
           <SizeSelect onChange={handleChangeSize} image={image} />
         </Box>
       </Box>
-      <DialogContent sx={{ p: 0 }}>
+      <DialogContent sx={{ p: 0, mb: 3 }}>
         <Box>
-          <ImageEditor image={image} onClose={onClose} />
+          <ImageEditorV2 image={image} onClose={onClose} />
         </Box>
       </DialogContent>
     </Dialog>
