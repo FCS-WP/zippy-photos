@@ -90,7 +90,6 @@ const BoxAddProducts = ({ selectedMenu, refetchProducts }) => {
     debounce(async (keyword) => {
       if (keyword.trim()) {
         const dataProducts = await handleSearchProducts(keyword);
-        console.log("dataProducts",dataProducts)
         if (dataProducts) {
           setFilteredProducts(dataProducts);
         } else {

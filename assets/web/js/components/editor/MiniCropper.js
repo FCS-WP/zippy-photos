@@ -1,17 +1,29 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Cropper, FixedCropper, ImageRestriction } from "react-advanced-cropper";
+import {
+  Cropper,
+  FixedCropper,
+  ImageRestriction,
+} from "react-advanced-cropper";
 import { useMainProvider } from "../../providers/MainProvider";
-import { dataURLToFile } from "../../helpers/editorHelper";
+import { dataURLToFile, inchToPx } from "../../helpers/editorHelper";
 import { debounce } from "../../helpers/debounce";
+import { Box, Button } from "@mui/material";
 
 const MiniCropper = ({ image, orientation }) => {
   const cropperRef = useRef(null);
   const previewRef = useRef(null);
+  const wrapperRef = useRef(null);
+  const [wrapperView, setWrapperView] = useState(null);
   const { updateDataImage, updateCroppedFiles } = useMainProvider();
   const [src, setSrc] = useState(image.preview);
   const [ratioValue, setRatioValue] = useState(
     image.size.width_in / image.size.height_in
   );
+
+  const defaultSize = {
+    width: inchToPx(image.size.width_in),
+    height: inchToPx(image.size.height_in),
+  };
 
   const onUpdate = () => {
     previewRef.current?.refresh();
@@ -49,42 +61,23 @@ const MiniCropper = ({ image, orientation }) => {
   };
 
   const handleImageLoad = () => {
-    const cropper = cropperRef.current;
-    if (cropper && cropper.isLoaded()) {
-      const imageSize = cropper.getVisibleArea();
+    // const cropper = cropperRef.current;
+    // const customSize = {
+    //   width: defaultSize.width * 3,
+    //   height: defaultSize.height * 3,
+    // };
 
-      if (imageSize) {
-        const fullWidth = imageSize.width;
-        const fullHeight = fullWidth / ratioValue;
+    // const stencilWidth =
+    //   orientation == "portrait" ? customSize.width : customSize.height;
+    // const stencilHeight =
+    //   orientation == "portrait" ? customSize.height : customSize.width;
 
-        let top = 0;
-        let height = fullHeight;
-
-        if (fullHeight > imageSize.height) {
-          height = imageSize.height;
-          top = 0;
-          const adjustedWidth = height * ratioValue;
-          const left = (imageSize.width - adjustedWidth) / 2;
-
-          cropper.setCoordinates({
-            width: adjustedWidth,
-            height: height,
-            left,
-            top,
-          });
-        } else {
-          const left = 0;
-          top = (imageSize.height - fullHeight) / 2;
-
-          cropper.setCoordinates({
-            width: fullWidth,
-            height: fullHeight,
-            left,
-            top,
-          });
-        }
-      }
-    }
+    // cropper.setCoordinates({
+    //   width: stencilWidth,
+    //   height: stencilHeight,
+    //   left: 0,
+    //   top: 0,
+    // });
 
     setTimeout(() => {
       handleLoadCroppedImage();
@@ -104,27 +97,42 @@ const MiniCropper = ({ image, orientation }) => {
     updateCroppedFiles(image.preview, file);
   };
 
+  const refreshImage = () => {
+    const cropper = cropperRef.current;
+    if (cropper) {
+      cropper.refresh();
+    }
+  };
+
   useEffect(() => {
     refreshRatio();
+    refreshImage();
   }, [image, orientation]);
 
   return (
-    <div className="mini-cropper-wrapped">
-      <Cropper
-        src={src}
-        ref={cropperRef}
-        imageRestriction={ImageRestriction.none}
-        stencilProps={{
-          aspectRatio: ratioValue,
-          movable: false,
-          grid: true,
-          resizable: true,
-          lines: true,
-          handlers: false,
-        }}
-        onUpdate={onUpdate}
-        onReady={handleImageLoad}
-      />
+    <div ref={wrapperRef}>
+      <Box className="mini-cropper-wrapped">
+        <FixedCropper
+          src={src}
+          ref={cropperRef}
+          stencilSize={defaultSize}
+          imageRestriction={ImageRestriction.stencil}
+          stencilProps={{
+            aspectRatio: ratioValue,
+            movable: false,
+            grid: true,
+            resizable: false,
+            lines: true,
+            handlers: false,
+          }}
+          transformImage={{
+            scale: 1,
+          }}
+          className="photo-id-cropper"
+          onUpdate={onUpdate}
+          onReady={handleImageLoad}
+        />
+      </Box>
     </div>
   );
 };

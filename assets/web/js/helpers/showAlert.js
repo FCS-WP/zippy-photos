@@ -133,7 +133,6 @@ ${userComment}`;
       const whatsappUrl = `https://wa.me/${phone_number}?text=${encodeURIComponent(
         message
       )}`;
-      console.log("whatsappUrl", whatsappUrl);
       window.open(whatsappUrl, "_blank");
     }
   });

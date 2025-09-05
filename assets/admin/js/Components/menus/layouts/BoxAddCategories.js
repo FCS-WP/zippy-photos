@@ -90,7 +90,6 @@ const BoxAddCategories = ({ selectedMenu, refetchProducts }) => {
     debounce(async (keyword) => {
       if (keyword.trim()) {
         const dataProducts = await handleSearchCategories(keyword);
-        console.log("dataProducts", dataProducts);
         if (dataProducts) {
           setFilteredCategories(dataProducts);
         } else {
