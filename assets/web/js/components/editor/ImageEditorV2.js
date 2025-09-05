@@ -17,6 +17,7 @@ import {
   inchToPx,
 } from "../../helpers/editorHelper";
 import { NavigationV2 } from "./NavigationV2";
+import { AdjustableCropperBackground } from "./AdjustableCropperBackground";
 
 export const ImageEditorV2 = ({ image, onClose }) => {
   const cropperRef = useRef(null);
@@ -25,15 +26,30 @@ export const ImageEditorV2 = ({ image, onClose }) => {
   const [src, setSrc] = useState(image.preview);
   const [mode, setMode] = useState("crop");
   const [orientation, setOrientation] = useState("portrait");
+  const deviceWidth = window.innerWidth;
+  let width = inchToPx(image.size.width_in);
+  let height = inchToPx(image.size.height_in);
+
+  if (width > 500) {
+    width = width / 4;
+    height = height / 4;
+  }
+
+  if (deviceWidth < 768 && width > 300) {
+    width = width / 2;
+    height = height / 2;
+  }
+
+  const selectedSize = {
+    width,
+    height,
+  };
 
   const [ratioValue, setRatioValue] = useState(
     image.size.width_in / image.size.height_in
   );
-  const selectedSize = {
-    width: inchToPx(image.size.width_in),
-    height: inchToPx(image.size.height_in),
-  };
 
+  console.log("selectedSize", selectedSize);
   const onChangeOrientation = (type) => {
     setOrientation(type);
   };
@@ -122,6 +138,7 @@ export const ImageEditorV2 = ({ image, onClose }) => {
 
   const handleReadyImage = (props) => {
     const cropper = cropperRef.current;
+    console.log(cropper);
     if (cropper) {
       let customSize = {
         width: selectedSize.width * 3,
@@ -205,7 +222,7 @@ export const ImageEditorV2 = ({ image, onClose }) => {
 
   return (
     <Grid container>
-      <Grid size={{ xs: 12, sm: 7 }}>
+      <Grid size={{ xs: 12, md: 7 }}>
         <Box display={"flex"} justifyContent={"center"}>
           <Box
             width={
@@ -241,12 +258,9 @@ export const ImageEditorV2 = ({ image, onClose }) => {
                 resizable: false,
                 lines: cropperEnabled,
                 handlers: false,
-                //   overlayClassName: cn(
-                //     "image-editor__cropper-overlay",
-                //     !cropperEnabled && "image-editor__cropper-overlay--faded"
-                //   ),
               }}
-              //   backgroundProps={adjustments}
+              backgroundComponent={AdjustableCropperBackground}
+              backgroundProps={adjustments}
               transformImage={{
                 scale: 1,
               }}
@@ -263,7 +277,7 @@ export const ImageEditorV2 = ({ image, onClose }) => {
           </Box>
         </Box>
       </Grid>
-      <Grid size={{ xs: 12, sm: 5 }}>
+      <Grid size={{ xs: 12, md: 5 }}>
         <NavigationV2
           mode={mode}
           onRotate={rotate}

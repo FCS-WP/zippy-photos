@@ -17,7 +17,7 @@ $theme-color: #61DAFB;
 		width: 100%;
 		left: 50%;
 		transform: translateX(-50%);
-		bottom: 20px;
+		bottom: 10px;
 		position: absolute;
 	}
 	&__cropper-overlay {
@@ -104,7 +104,7 @@ $theme-color: #61DAFB;
 		position: absolute;
 		transition-duration: 0.5s;
 		transition-property: font-size, opacity;
-		color: white;
+		color: black;
 		font-size: 10px;
 		font-weight: 500;
 		top: -20px;
@@ -252,4 +252,10 @@ $theme-color: #61DAFB;
 
 .object-fit-contain {
 	object-fit: contain;
+}
+
+.next-step-btn {
+	.MuiButton-loadingIndicator {
+		color: #FFF;
+	}
 }

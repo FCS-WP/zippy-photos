@@ -198,6 +198,7 @@ const Tools = () => {
         <Button
           sx={{ ":hover": { backgroundColor: '#c51414'}, backgroundColor: '#222', minHeight: 'auto !important', color: '#fff', px: '40px'}}
           loading={isLoading}
+          className="next-step-btn"
           onClick={handleSaveImages}
         >Next Step <ArrowRightAltIcon /> </Button>
       </Tooltip>
