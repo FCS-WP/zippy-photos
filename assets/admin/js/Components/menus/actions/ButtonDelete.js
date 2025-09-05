@@ -22,7 +22,6 @@ const ButtonDelete = ({ data, type, menuId = null, onDeleted }) => {
         product_ids: ids,
       };
       const { data: delProduct } = await Api.removeProductsFromMenu(params);
-      console.log(delProduct)
       if (!delProduct || delProduct.success !== true) {
         toast.error(delProduct.message ?? "Failed to delete product");
         return;

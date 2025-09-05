@@ -49,7 +49,6 @@ export const ImageEditorV2 = ({ image, onClose }) => {
     image.size.width_in / image.size.height_in
   );
 
-  console.log("selectedSize", selectedSize);
   const onChangeOrientation = (type) => {
     setOrientation(type);
   };
@@ -138,7 +137,6 @@ export const ImageEditorV2 = ({ image, onClose }) => {
 
   const handleReadyImage = (props) => {
     const cropper = cropperRef.current;
-    console.log(cropper);
     if (cropper) {
       let customSize = {
         width: selectedSize.width * 3,
