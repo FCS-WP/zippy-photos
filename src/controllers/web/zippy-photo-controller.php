@@ -207,7 +207,7 @@ class Zippy_Photo_Controller
                     ],
                 ],
                 'meta_key' => 'no',
-                'orderby' => 'meta_value',
+                'orderby' => 'meta_value_num',
                 'order' => 'ASC',
             ];
 
