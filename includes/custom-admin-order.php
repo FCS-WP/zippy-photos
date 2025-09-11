@@ -19,7 +19,7 @@ function custom_order_item_values($product, $item, $item_id)
     echo '<td class="paper-type">';
 
     if ($photo_url) {
-        echo '<div class="custom-img-col"><a target="_blank" href="' . esc_url($photo_url) . '"><img class="ordered-img" src="' . esc_url($photo_url) . '" alt="ordered-img"/></a></div>';
+        echo '<div class="custom-img-col"><a target="_blank" href="' . esc_url($photo_url) . '"><img class="ordered-img" src="' . esc_url($photo_url) . '" alt="Click to view"/></a></div>';
     } else {
         echo '-';
     }

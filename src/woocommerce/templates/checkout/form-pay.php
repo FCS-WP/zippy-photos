@@ -48,9 +48,7 @@ $order_id = $order->get_id();
                             <?php if ($photo_url) : ?>
                                 <div class="custom-box-checkout">
                                     <div class="image-box">
-                                        <a href="<?php echo esc_html($photo_url) ?>">
-                                            <img src="<?php echo esc_html($photo_url) ?>" alt="product-image">
-                                        </a>
+                                        <a target="_blank" href="<?php echo esc_url($photo_url) ?>"> Click to View Photo</a>
                                     </div>
                                     <div class="data-box">
                                         <p> Size:

@@ -198,7 +198,8 @@ function custom_cart_product_image($thumbnail, $cart_item, $cart_item_key) {
     // Get custom image from cart item meta if available
     if (!empty($cart_item['photo_url'])) {
         $image_url = esc_url($cart_item['photo_url']);
-        return '<img src="' . $image_url . '" alt="Custom Photo">';
+        $image_url = str_replace('view?usp=drivesdk', 'preview', $image_url);
+        return '<iframe src="'. $image_url .'" width="100%" height="250" allow="autoplay"></iframe>';
     }
 
     // if (!empty($cart_item['photo_id_url'])) {
