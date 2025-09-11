@@ -16,13 +16,11 @@ $photo_paper_type = $item->get_meta('paper_type') ?? null;
 ?>
 <tr class="<?php echo esc_attr(apply_filters('woocommerce_order_item_class', 'woocommerce-table__line-item order_item', $item, $order)); ?>">
 	<?php if ($photo_url) : ?>
-		
+		<?php $preview_photo_url = str_replace('view?usp=drivesdk', 'preview', $photo_url); ?>
 		<td class="woocommerce-table__product-name product-name">
 			<div class="custom-box-checkout">
 				<div class="image-box">
-					<a href="<?php echo esc_url($photo_url) ?>">
-						<img src="<?php echo esc_url($photo_url) ?>" alt="product-image">
-					</a>
+					<a target="_blank" href="<?php echo esc_url($photo_url) ?>"> Click to View Photo</a>
 				</div>
 				<strong>x <?php echo $item->get_quantity() ?></strong>
 			</div>
@@ -68,7 +66,7 @@ $photo_paper_type = $item->get_meta('paper_type') ?? null;
 					</strong>
 				</p>
 				<p>
-					Photo: <a style="color: blue; text-decoration: underline;" href="<?php echo esc_url($photo_url) ?>">View</a> 
+					Photo: <a style="color: blue; text-decoration: underline;" href="<?php echo esc_url($photo_url) ?>">View</a>
 				</p>
 			</div>
 		</td>

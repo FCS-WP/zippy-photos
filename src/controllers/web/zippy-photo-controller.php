@@ -173,6 +173,50 @@ class Zippy_Photo_Controller
         ]);
     }
 
+    public static function handle_save_photos(WP_REST_Request $request) 
+    {
+        if (empty($_FILES['files'])) {
+            return new WP_REST_Response(['error' => 'No files uploaded.'], 400);
+        }
+
+        $rules = [
+            'folder_id' =>  ['type' => 'string', 'required' => true],
+        ];
+        
+        $validation = Zippy_Request_Helper::validate_request($request->get_params(), $rules);
+        
+        if (is_wp_error($validation)) {
+            return $validation;
+        }
+
+        $drive_id = $request->get_param('folder_id');
+
+        $uploaded_files = self::restructure_nested_files_array($_FILES['files']);
+        $results = [];
+        foreach ($uploaded_files as $index => $file) {
+            $product_id = intval($_POST['files'][$index]['product_id']);
+            // Handle upload single file: 
+            $service = Zippy_Photobook_Controller::get_storage_drive_service();
+            $upload_file = Zippy_Photobook_Controller::upload_single_file_to_drive($service, $file['name'], $file['tmp_name'], $drive_id);
+            $temp_id = intval($_POST['files'][$index]['temp_id'] ?? 0);
+            
+            if (!$upload_file) {
+                return new WP_Error('save_file_error', 'Can not save file to drive', ['status' => 500]);
+            }
+
+            $results[] = [
+                'product_id'  => $product_id,
+                'temp_id'  => $temp_id,
+                'photo_url'  => esc_url_raw($upload_file['web_link']),
+            ];
+        }
+        return rest_ensure_response([
+            'success' => true,
+            'results' => $results,
+            'message' => "Save photos successfully.",
+        ]);
+    }
+
     public static function restructure_nested_files_array($files)
     {
         $result = [];
@@ -267,5 +311,26 @@ class Zippy_Photo_Controller
         $order->calculate_totals();
         $order->save();
         return $order;
+    }
+
+    public static function handle_get_photo_folder (WP_REST_Request $request) {
+        $rules = [
+            'user_id' =>  ['type' => 'int', 'required' => true],
+        ];
+
+        $user_id = $request->get_param('user_id');
+        
+        $validation = Zippy_Request_Helper::validate_request($request->get_params(), $rules);
+        
+        if (is_wp_error($validation)) {
+            return $validation;
+        }
+        $drive_folder = Zippy_Photobook_Controller::create_folder_with_path(sanitize_text_field('PhotoGallery/user_id_' . $user_id), false);
+
+        if (!$drive_folder) {
+            return wp_send_json_error(['message' => 'Upload to drive failed!']);
+        }
+
+        return new WP_REST_Response(["drive_folder" => $drive_folder, "status" => "success", "message" => "successfully"], 200);
     }
 }

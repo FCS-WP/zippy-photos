@@ -5,12 +5,13 @@ import { AlertStatus, showAlert } from "../../helpers/showAlert";
 import { webApi } from "../../api";
 import AuthDialog from "../auth/AuthDialog";
 import { toast } from "react-toastify";
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
 const Tools = () => {
   const { uploadedImages, setUploadedImages, croppedFiles, minimumOrder } =
     useMainProvider();
   const [isLoading, setIsLoading] = useState(false);
+  const [currentUploaded, setCurrentUploaded] = useState(0);
   const [open, setOpen] = useState(false);
 
   const updateIdForImage = (newArr = []) => {
@@ -151,28 +152,28 @@ const Tools = () => {
     return results;
   };
 
+  const getPhotoGalleryID = async () => {
+    const user_id = window.admin_data ? window.admin_data.userID : 0;
+    const params =  {
+      user_id
+    };
+    const { data: response } = await webApi.getPhotoGallery(params);
+    if (!response) {
+      return null;
+    }
+    return response.drive_folder.folder_id;
+  }
+
   const handleSubmitForm = async () => {
     setIsLoading(true);
-    const formData = new FormData();
-
-    uploadedImages.forEach((item, index) => {
-      formData.append(`files[${index}][file]`, getCroppedFile(item.preview));
-      formData.append(`files[${index}][photo_id]`, item.id ?? null);
-      formData.append(`files[${index}][temp_id]`, index);
-      formData.append(`files[${index}][product_id]`, item.size.id);
-    });
-    const { data: savedPhotos } = await webApi.savePhotos(formData);
-
-    if (savedPhotos.success !== true) {
-      console.log("Failed to save photos");
+    // Get Photo Editor ID: 
+    const folderId = await getPhotoGalleryID();
+    if (!folderId) {
+      showAlert(AlertStatus.warning, "Failed", "Something went wrong! try again later.");
+      return;
     }
 
-    const actionAddToCart = await handleAddPhotosToCart(savedPhotos.results);
-    if (!actionAddToCart) {
-      toast.error("Failed to handle photo");
-      return false;
-    }
-
+    const handleFiles = await handle_upload_files(folderId);
     setIsLoading(false);
     window.location.href = "/cart";
     return;
@@ -192,15 +193,97 @@ const Tools = () => {
     }
   };
 
+  const get_isolate_imgs = () => {
+    let step = 2;
+
+    let result = [];
+    let temp_array = [];
+    let counter = 0;
+
+    uploadedImages.map((item, index) => {
+      temp_array.push(item);
+      counter++;
+      if (counter == step || index === uploadedImages.length - 1) {
+        result.push(temp_array);
+        temp_array = [];
+        counter = 0;
+      }
+    });
+
+    return result;
+  };
+
+  const handle_upload_files = async (folderId) => {
+    setIsLoading(true);
+    const isolatedImgs = get_isolate_imgs();
+
+    if (!isolatedImgs || isolatedImgs.length == 0) {
+      return false;
+    }
+
+    const postFilePromises = isolatedImgs.map((item, index) => {
+      const isLastItem = index === isolatedImgs.length - 1;
+      return save_to_drives(folderId, item, isLastItem, index + 1);
+    });
+
+    try {
+      const results = await Promise.all(postFilePromises);
+      return true;
+    } catch (err) {
+      setIsLoading(false);
+      return false;
+    }
+  };
+
+  const save_to_drives = async (
+    folderId,
+    imgs,
+    isLastItem = false,
+    requestNo
+  ) => {
+    let formData = new FormData();
+    formData.append("request_no", requestNo);
+    formData.append("last_photos", isLastItem);
+    formData.append("folder_id", folderId);
+
+    imgs.forEach((item, index) => {
+      formData.append(`files[${index}][file]`, getCroppedFile(item.preview));
+      formData.append(`files[${index}][photo_id]`, item.id ?? null);
+      formData.append(`files[${index}][temp_id]`, index);
+      formData.append(`files[${index}][product_id]`, item.size.id);
+    });
+
+    const { data: savedPhotos } = await webApi.savePhotos(formData);
+
+    if (savedPhotos.success !== true) {
+      console.log("Failed to save photos. Request number: ", requestNo);
+    }
+
+    const actionAddToCart = await handleAddPhotosToCart(savedPhotos.results);
+
+    if (actionAddToCart.data) {
+      setCurrentUploaded((prev) => prev + imgs.length);
+    }
+    return true;
+  };
+
   return (
     <Box display={"flex"} justifyContent={"flex-end"} p={2}>
-      <Tooltip title="Order now" placement="right"> 
+      <Tooltip title="Order now" placement="right">
         <Button
-          sx={{ ":hover": { backgroundColor: '#c51414'}, backgroundColor: '#222', minHeight: 'auto !important', color: '#fff', px: '40px'}}
+          sx={{
+            ":hover": { backgroundColor: "#c51414" },
+            backgroundColor: "#222",
+            minHeight: "auto !important",
+            color: "#fff",
+            px: "40px",
+          }}
           loading={isLoading}
           className="next-step-btn"
           onClick={handleSaveImages}
-        >Next Step <ArrowRightAltIcon /> </Button>
+        >
+          Next Step <ArrowRightAltIcon />{" "}
+        </Button>
       </Tooltip>
       <AuthDialog
         open={open}
