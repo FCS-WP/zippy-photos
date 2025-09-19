@@ -6,16 +6,18 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import TonalityIcon from "@mui/icons-material/Tonality";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import SaveIcon from "@mui/icons-material/Save";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
 import CropLandscapeIcon from "@mui/icons-material/CropLandscape";
 import CropPortraitIcon from "@mui/icons-material/CropPortrait";
 import FlipIcon from "@mui/icons-material/Flip";
+import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 
 export const NavigationV2 = ({
   onRotate,
   onFlip,
+  onZoom,
   onChange,
   onDownload,
   mode,
@@ -206,6 +208,34 @@ export const NavigationV2 = ({
           color="primary"
         >
           <AdjustIcon />
+        </IconButton>
+        {/* Zoom */}
+        <IconButton
+          sx={{
+            ":hover": { backgroundColor: "#222" },
+            minHeight: "auto !important",
+            color: "#222",
+            borderRadius: `50%`,
+            fontSize: 14,
+          }}
+          onClick={() => onZoom(1.1)}
+          color="primary"
+        >
+          <ZoomInIcon />
+        </IconButton>
+
+        <IconButton
+          sx={{
+            ":hover": { backgroundColor: "#222" },
+            minHeight: "auto !important",
+            color: "#222",
+            borderRadius: `50%`,
+            fontSize: 14,
+          }}
+          onClick={() => onZoom(0.9)}
+          color="primary"
+        >
+          <ZoomOutIcon />
         </IconButton>
       </div>
       <Divider sx={{ my: 2 }} />

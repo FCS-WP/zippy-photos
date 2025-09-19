@@ -7,17 +7,17 @@ import {
 } from "@mui/material";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import {
-  Cropper,
-  CropperWrapper,
-  DraggableElement,
   FixedCropper,
   ImageRestriction,
-  RectangleStencil,
 } from "react-advanced-cropper";
 import { usePhotoIDProvider } from "../../providers/PhotoIDProvider";
 import { mmToPx } from "../../helpers/editorHelper";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { toast } from "react-toastify";
+import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import ZoomOutIcon from "@mui/icons-material/ZoomOut";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { alertConfirmDelete } from "../../helpers/showAlert";
 
 const PhotoIDCropper = ({ image }) => {
   const { productData, updateState } = usePhotoIDProvider();
@@ -74,20 +74,11 @@ const PhotoIDCropper = ({ image }) => {
     }, 1000);
   };
 
-  const getAdjustmentLeft = () => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.src = image.preview;
-
-      img.onload = () => {
-        resolve({
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-        });
-      };
-
-      img.onerror = (err) => reject(err);
-    });
+  const handleZoomImage = (scale, options) => {
+    const cropper = cropperRef.current;
+    if (cropper) {
+      cropper.zoomImage(scale, options);
+    }
   };
 
   const handleDownloadImage = () => {
@@ -179,8 +170,21 @@ const PhotoIDCropper = ({ image }) => {
     handleUploadFile(file);
   };
 
+  const handleDeleteImage = async (e) => {
+    const confirm = await alertConfirmDelete();
+    if (confirm) {
+      updateState({ uploadedImage: null, cropper: null });
+      uploaderRef.current.value = null;
+    }
+  };
+
   return (
-    <Box minWidth={defaultSize.width}>
+    <Box
+      minWidth={defaultSize.width}
+      display={"flex"}
+      flexDirection={"column"}
+      alignItems={"center"}
+    >
       <input
         type="file"
         style={{ display: "none" }}
@@ -261,6 +265,59 @@ const PhotoIDCropper = ({ image }) => {
           </Box>
         )}
       </Box>
+      {image && (
+        <Box
+          width={"100%"}
+          display={"flex"}
+          py={1}
+          justifyContent={"space-between"}
+        >
+          <Box display={"flex"} gap={2}>
+            <IconButton
+              sx={{
+                ":hover": { backgroundColor: "#222" },
+                minHeight: "auto !important",
+                color: "#222",
+                borderRadius: `50%`,
+                fontSize: 14,
+              }}
+              onClick={() => handleZoomImage(1.1)}
+              color="primary"
+            >
+              <ZoomInIcon />
+            </IconButton>
+
+            <IconButton
+              sx={{
+                ":hover": { backgroundColor: "#222" },
+                minHeight: "auto !important",
+                color: "#222",
+                borderRadius: `50%`,
+                fontSize: 14,
+              }}
+              onClick={() => handleZoomImage(0.9)}
+              color="primary"
+            >
+              <ZoomOutIcon />
+            </IconButton>
+          </Box>
+
+          <IconButton
+            sx={{
+              ":hover": { backgroundColor: "#222" },
+              minHeight: "auto !important",
+              color: "#222",
+              borderRadius: `50%`,
+              fontSize: 14,
+            }}
+            onClick={() => handleDeleteImage()}
+            color="primary"
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      )}
+
       <Box className="d-none">
         <Button onClick={handleDownloadImage}>Export Image</Button>
       </Box>

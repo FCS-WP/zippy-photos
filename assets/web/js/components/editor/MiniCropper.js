@@ -7,7 +7,9 @@ import {
 import { useMainProvider } from "../../providers/MainProvider";
 import { dataURLToFile, inchToPx } from "../../helpers/editorHelper";
 import { debounce } from "../../helpers/debounce";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
+import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import ZoomOutIcon from "@mui/icons-material/ZoomOut";
 
 const MiniCropper = ({ image, orientation }) => {
   const cropperRef = useRef(null);
@@ -104,6 +106,14 @@ const MiniCropper = ({ image, orientation }) => {
     }
   };
 
+  const onZoom = (scale, options) => {
+    const cropper = cropperRef.current;
+    if (cropper) {
+      cropper.zoomImage(scale, options);
+    }
+  }
+
+
   useEffect(() => {
     refreshRatio();
     refreshImage();
@@ -132,6 +142,36 @@ const MiniCropper = ({ image, orientation }) => {
           onUpdate={onUpdate}
           onReady={handleImageLoad}
         />
+      </Box>
+      <Box display={'flex'} pt={2} justifyContent={'space-between'}>
+          <IconButton
+          sx={{
+            ":hover": { backgroundColor: "#222" },
+            minHeight: "auto !important",
+            color: "#222",
+            borderRadius: `50%`,
+            fontSize: 14,
+          }}
+       
+          onClick={() => onZoom(1.1)}
+          color="primary"
+        >
+          <ZoomInIcon />
+        </IconButton>
+
+        <IconButton
+          sx={{
+            ":hover": { backgroundColor: "#222" },
+            minHeight: "auto !important",
+            color: "#222",
+            borderRadius: `50%`,
+            fontSize: 14,
+          }}
+          onClick={() => onZoom(0.9)}
+          color="primary"
+        >
+          <ZoomOutIcon />
+        </IconButton>
       </Box>
     </div>
   );
