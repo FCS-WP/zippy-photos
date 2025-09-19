@@ -1,15 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import cn from "classnames";
 import {
-  Cropper,
-  CropperPreview,
   FixedCropper,
   ImageRestriction,
 } from "react-advanced-cropper";
-import { Navigation } from "./Navigation";
 import { Slider } from "./Slider";
 import "react-advanced-cropper/dist/style.css";
-import { Box, Button, Grid, IconButton } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { useMainProvider } from "../../providers/MainProvider";
 import {
   dataURLToFile,
@@ -22,7 +18,7 @@ import { AdjustableCropperBackground } from "./AdjustableCropperBackground";
 export const ImageEditorV2 = ({ image, onClose }) => {
   const cropperRef = useRef(null);
   const previewRef = useRef(null);
-  const { updateDataImage, updateCroppedFiles } = useMainProvider();
+  const { updateDataImage } = useMainProvider();
   const [src, setSrc] = useState(image.preview);
   const [mode, setMode] = useState("crop");
   const [orientation, setOrientation] = useState("portrait");
@@ -109,34 +105,9 @@ export const ImageEditorV2 = ({ image, onClose }) => {
     setSrc(blob);
   };
 
-  const handleImageLoad = () => {
-    const cropper = cropperRef.current;
-    if (cropper && cropper.isLoaded()) {
-      const imageSize = cropper.getVisibleArea();
-
-      if (imageSize) {
-        const fullWidth = imageSize.width;
-        const fullHeight = fullWidth / ratioValue;
-
-        let top = 0;
-        let height = fullHeight;
-        height = imageSize.height;
-        top = 0;
-        const adjustedWidth = height * ratioValue;
-        const left = (imageSize.width - adjustedWidth) / 2;
-
-        cropper.setCoordinates({
-          width: adjustedWidth,
-          height: height,
-          left,
-          top,
-        });
-      }
-    }
-  };
-
   const handleReadyImage = (props) => {
     const cropper = cropperRef.current;
+    console.log("Cropper: ", cropper)
     if (cropper) {
       let customSize = {
         width: selectedSize.width * 3,
@@ -147,7 +118,7 @@ export const ImageEditorV2 = ({ image, onClose }) => {
         orientation == "portrait" ? customSize.width : customSize.height;
       const stencilHeight =
         orientation == "portrait" ? customSize.height : customSize.width;
-
+      
       cropper.setCoordinates({
         width: stencilWidth,
         height: stencilHeight,
@@ -193,7 +164,12 @@ export const ImageEditorV2 = ({ image, onClose }) => {
     cropperRef.current?.refresh();
   };
 
-  const changed = Object.values(adjustments).some((el) => Math.floor(el * 100));
+  const onZoom = (scale, options) => {
+    const cropper = cropperRef.current;
+    if (cropper) {
+      cropper.zoomImage(scale, options);
+    }
+  }
 
   const cropperEnabled = mode === "crop";
 
@@ -281,6 +257,7 @@ export const ImageEditorV2 = ({ image, onClose }) => {
           onRotate={rotate}
           onFlip={flip}
           onChange={setMode}
+          onZoom={onZoom}
           onUpload={onUpload}
           onDownload={onDownload}
           onSaveFile={onSaveFile}

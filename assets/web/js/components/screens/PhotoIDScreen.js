@@ -1,6 +1,5 @@
-import { Box, CircularProgress, Grid } from "@mui/material";
 import React from "react";
-import PhotoIDDesc from "../layouts/PhotoIDDesc";
+import { Box, CircularProgress, Grid } from "@mui/material";
 import PhotoIDDisplay from "../layouts/PhotoIDDisplay";
 import { usePhotoIDProvider } from "../../providers/PhotoIDProvider";
 import PhotoIDControlV2 from "../layouts/PhotoIDControlV2";
@@ -18,17 +17,17 @@ const PhotoIDScreen = () => {
   };
 
   return (
-    <StyledPaper >
+    <StyledPaper className="p-xs-0">
       <Grid container spacing={4}>
         {isApiLoading ? (
           <Grid size={12}>{renderLoading()}</Grid>
         ) : (
           <>
-            <Grid size={{ xs: 12, md: 8 }} height={'100%'}>
+            <Grid size={{ xs: 12, md: 8 }} height={"100%"}>
               <PhotoIDDisplay />
             </Grid>
 
-            <Grid size={{ xs: 12, md: 4 }} height={'100%'}>
+            <Grid size={{ xs: 12, md: 4 }} height={"100%"}>
               <PhotoIDControlV2 />
             </Grid>
 

@@ -296,3 +296,9 @@ $theme-color: #61DAFB;
 .woocommerce-cart-form__cart-item.cart_item .product-thumbnail {
 	min-width: 160px;
 }
+
+.p-xs-0 {
+	@media (max-width: 480px) {
+		padding: 20px 0 !important;
+	}
+}
