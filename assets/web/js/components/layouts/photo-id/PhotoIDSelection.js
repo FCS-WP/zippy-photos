@@ -13,15 +13,14 @@ import { shallowEqual } from "../../../helpers/editorHelper";
 
 const PhotoIDSelection = () => {
   const { productData, updateState } = usePhotoIDProvider();
-  const [attrs, setAttrs] = useState(null);
   const [attrKeys, setAttrKeys] = useState([]);
+  const [dataCountries, setDataCountries] = useState([]);
   const [photoPrice, setPhotoPrice] = useState({
     regular: null,
     sale: null,
   });
 
   const [country, setCountry] = useState("");
-
   const [customerData, setCustomerData] = useState(null);
 
   const renderPrice = (value) => {
@@ -70,35 +69,43 @@ const PhotoIDSelection = () => {
 
   const handleDataAttrs = () => {
     if (!productData.variations || productData.variations.length < 1) {
-      setAttrs(null);
       return;
     }
     let variationAttrs = [];
+    let countries = [];
+    let initCustomerData = [];
 
     productData.variations.map((variation) => {
       const attrKeys = Object.keys(variation.attrs);
-
+      const countryCode = variation.attrs["country"];
+      if (!countries[countryCode]) {
+        countries[countryCode] = [];
+      }
       attrKeys.map((key) => {
         if (!variationAttrs[key]) {
           variationAttrs[key] = [];
         }
+        if (!countries[countryCode][key]) {
+          countries[countryCode][key] = [];
+        }
         if (!variationAttrs[key].includes(variation.attrs[key])) {
           variationAttrs[key] = [...variationAttrs[key], variation.attrs[key]];
         }
+        if (!countries[countryCode][key].includes(variation.attrs[key])) {
+          countries[countryCode][key].push(variation.attrs[key]);
+        }
       });
     });
-
-    let initCustomerData = [];
 
     const variationKeys = Object.keys(variationAttrs);
     setAttrKeys(variationKeys);
 
     variationKeys.forEach((item) => {
-      initCustomerData[item] = variationAttrs[item][0];
+      initCustomerData[item] = productData?.default_attributes?.[item] || variationAttrs[item][0];
     });
 
     setCustomerData(initCustomerData);
-    setAttrs(variationAttrs);
+    setDataCountries(countries);
   };
 
   const updatePhotoPrice = (updates) =>
@@ -156,13 +163,32 @@ const PhotoIDSelection = () => {
     handleDataAttrs();
   }, []);
 
+  const handleSelection = (e, attrKey) => {
+    if (attrKey == "country") {
+      triggerResetData(e.target.value);
+    } else {
+      updateCustomerData({ [attrKey]: e.target.value });
+    }
+  };
+
+  const triggerResetData = (country) => {
+    const newData = [];
+    newData["country"] = country;
+
+    attrKeys.forEach((item) => {
+      if (attrKeys !== "country") {
+        newData[item] = dataCountries[country][item][0];
+      }
+    });
+    updateCustomerData(newData);
+  };
+
   return (
     <Box>
       {/* Box Price */}
       <Box>{renderPrice(photoPrice)}</Box>
 
       {/* Render Attributes Of Variation */}
-
       {attrKeys.length > 0 &&
         attrKeys.map((attrKey, index) => (
           <Box key={index}>
@@ -176,15 +202,22 @@ const PhotoIDSelection = () => {
                 variant="outlined"
                 value={customerData[attrKey]}
                 sx={{ p: 0 }}
-                onChange={(e) =>
-                  updateCustomerData({ [attrKey]: e.target.value })
-                }
+                onChange={(e) => handleSelection(e, attrKey)}
               >
-                {attrs[attrKey].map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                ))}
+                {attrKey == "country" &&
+                  Object.keys(dataCountries).map((item) => (
+                    <MenuItem key={item} value={item}>
+                      {item}
+                    </MenuItem>
+                  ))}
+
+                {attrKey !== "country" &&
+                  dataCountries[customerData.country] &&
+                  dataCountries[customerData.country][attrKey].map((item) => (
+                    <MenuItem key={item} value={item}>
+                      {item}
+                    </MenuItem>
+                  ))}
               </Select>
 
               {attrKey == "country" && customerData["country"] === "Others" && (
