@@ -4,18 +4,24 @@ import { usePhotoIDProvider } from "../../providers/PhotoIDProvider";
 
 const PhotoIDDesc = () => {
   const { productData } = usePhotoIDProvider();
+  const HtmlContent = ({ htmlString }) => {
+    return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
+  };
+
   return (
-    <Box className="photo-id-box" width={'100%'}>
-      <Typography fontSize={14}>
-        { !!productData.description ? (
-          productData.description
-        ) : (
-          <Box textAlign={'center'}>
-          <Typography variant="h5" fontWeight={700} color="secondary">WELCOME TO MACH PHOTO</Typography>
-          <Typography variant="h6">Create Your Photo ID</Typography>
+    <Box className="photo-id-box" fontSize={14} width={"100%"}>
+      {!!productData.description ? (
+        <HtmlContent htmlString={productData.description} />
+      ) : (
+        <Typography fontSize={14}>
+          <Box textAlign={"center"}>
+            <Typography variant="h5" fontWeight={700} color="secondary">
+              WELCOME TO MACH PHOTO
+            </Typography>
+            <Typography variant="h6">Create Your Photo ID</Typography>
           </Box>
-        ) }
-      </Typography>
+        </Typography>
+      )}
     </Box>
   );
 };

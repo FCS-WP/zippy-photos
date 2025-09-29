@@ -167,6 +167,7 @@ class Zippy_Photo_Id_Controller
 
             if ($product->is_type('variable')) {
                 $variations = array();
+                $default_attributes = $product->get_default_attributes(); 
                 foreach ($product->get_children() as $child_id) {
                     $variation = wc_get_product($child_id);
                     if ($variation) {
@@ -184,6 +185,7 @@ class Zippy_Photo_Id_Controller
                     }
                 }
                 $product_data['variations'] = $variations;
+                $product_data['default_attributes'] = $default_attributes;
             }
 
             return new WP_REST_Response(["result" => $product_data, "status" => "success", "message" => "Get Data Successfully"], 200);
