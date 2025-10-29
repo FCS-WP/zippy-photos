@@ -46,7 +46,7 @@ class Zippy_Booking_Web
 
   public function booking_assets()
   {
-    if (is_admin()) return;
+    if (is_admin() || is_front_page()) return;
     $version = time();
 
     $current_user_id = get_current_user_id();
@@ -60,7 +60,7 @@ class Zippy_Booking_Web
 
     wp_localize_script('booking-js', 'admin_data', array(
       'userID' => $current_user_id,
-      'user_email' => $user_info->user_email
+      'user_email' => $user_info ? $user_info->user_email : ''
     ));
   }
 

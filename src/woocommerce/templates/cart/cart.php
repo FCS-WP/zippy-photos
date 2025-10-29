@@ -80,16 +80,16 @@ do_action('woocommerce_before_cart'); ?>
                                     }
                                     ?>
                                     <?php
-                                    if ($cart_item['folder_link']) {
+                                    if (isset($cart_item['folder_link'])) {
                                         echo '<div><a class="custom-view-folder" href="' . $cart_item['folder_link'] . '" target="_blank">View Photobook Folder</a></div>';
                                     }
-                                    if ($cart_item['note']) {
+                                    if (isset($cart_item['note'])) {
                                         echo '<div> <strong>Note: </strong>' . $cart_item['note'] . '</div>';
                                     }
-                                    if ($cart_item['country']) {
+                                    if (isset($cart_item['country'])) {
                                         echo '<div><p class="custom-metadata">Photo ID country: ' . $cart_item['country'] . '</p></div>';
                                     }
-                                    if ($cart_item['photo_id_url']) {
+                                    if (isset($cart_item['photo_id_url'])) {
                                         echo '<div><a class="custom-view-folder" href="' . $cart_item['photo_id_url'] . '" target="_blank">Photo ID image: Click to view</a></div>';
                                     }
                                     ?>
