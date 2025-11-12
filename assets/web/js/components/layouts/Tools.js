@@ -154,28 +154,40 @@ const Tools = () => {
 
   const getPhotoGalleryID = async () => {
     const user_id = window.admin_data ? window.admin_data.userID : 0;
-    const params =  {
-      user_id
+    const params = {
+      user_id,
     };
     const { data: response } = await webApi.getPhotoGallery(params);
     if (!response) {
       return null;
     }
     return response.drive_folder.folder_id;
-  }
+  };
 
   const handleSubmitForm = async () => {
     setIsLoading(true);
-    // Get Photo Editor ID: 
+    // Get Photo Editor ID:
     const folderId = await getPhotoGalleryID();
     if (!folderId) {
-      showAlert(AlertStatus.warning, "Failed", "Something went wrong! try again later.");
+      showAlert(
+        AlertStatus.warning,
+        "Failed",
+        "Something went wrong! try again later."
+      );
       return;
     }
 
     const handleFiles = await handle_upload_files(folderId);
-    setIsLoading(false);
-    window.location.href = "/cart";
+    if (handleFiles) {
+      setIsLoading(false);
+      window.location.href = "/cart";
+    } else {
+      showAlert(
+        AlertStatus.warning,
+        "Failed",
+        "Edited images failed to save. Please download the images and re-upload them, or contact us via WhatsApp for assistance."
+      );
+    }
     return;
   };
 
