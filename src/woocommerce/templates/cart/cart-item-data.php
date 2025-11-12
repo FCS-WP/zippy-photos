@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <ul class="m-0" style="list-style-type: disclosure-closed;">
 	<?php foreach ( $item_data as $data ) : ?>
-        <li class="small custom-cart-variation">
+        <li class="small mb-0 custom-cart-variation">
             <div class="d-flex flex-wrap align-items-center">
                 <span class="me-2 <?php echo sanitize_html_class( 'variation-' . $data['key'] ); ?>"><?php echo wp_kses_post( $data['key'] ); ?>:</span>
                 <span class="value <?php echo sanitize_html_class( 'variation-' . $data['key'] ); ?>"><?php echo wp_kses_post( wpautop( $data['display'] ) ); ?></span>

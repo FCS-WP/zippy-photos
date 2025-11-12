@@ -1,8 +1,12 @@
 .custom-table {
     .ctc.product-name .name {
         font-weight: 600;
-        font-size: 14px;
+        font-size: 16px;
+        
     }
+    .ctc.product-name li *{
+            font-size: 14px!important;
+        }
     .ctc.product-price .amount,
     .ctc.product-subtotal .amount{
         font-weight: 600;
@@ -10,6 +14,9 @@
     .cth {
         font-weight: 600;
         font-size: 14px;
+    }
+    .ctc.product-price {
+        margin-top: 10px;
     }
 
 }

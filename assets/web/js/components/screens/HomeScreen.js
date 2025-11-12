@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -14,9 +14,12 @@ import ControlBox from "../layouts/ControlBox";
 import theme from "../../../theme/customTheme";
 import BulkSidebar from "../layouts/BulkSidebar";
 import { useMainProvider } from "../../providers/MainProvider";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+const MAX_FILE_SIZE_MB = 20;
 
 const HomeScreen = () => {
   const [dragOver, setDragOver] = useState(false);
+  const uploaderRef = useRef(null);
   const {
     uploadedImages,
     setUploadedImages,
@@ -37,9 +40,35 @@ const HomeScreen = () => {
   const handleDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
-    const MAX_FILE_SIZE_MB = 20;
 
     const files = Array.from(e.dataTransfer.files);
+    const validFiles = files.filter((file) => {
+      const isValid = file.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
+      if (!isValid) {
+        alert(
+          `"${file.name}" is too large. Max size is ${MAX_FILE_SIZE_MB}MB.`
+        );
+      }
+      return isValid;
+    });
+
+    const imagePreviews = validFiles.map((file) => ({
+      id: null,
+      file,
+      preview: URL.createObjectURL(file),
+      quantity: 1,
+      paper: "Matte",
+      size: photoSizes[0],
+    }));
+    setUploadedImages([...uploadedImages, ...imagePreviews]);
+  };
+
+  const triggerUpload = () => {
+    uploaderRef.current.click();
+  };
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
     const validFiles = files.filter((file) => {
       const isValid = file.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
       if (!isValid) {
@@ -71,6 +100,14 @@ const HomeScreen = () => {
     >
       <Tools />
       <Grid container spacing={3} mb={{ md: 3 }}>
+        <input
+          type="file"
+          multiple={true}
+          style={{ display: "none" }}
+          onChange={handleFileSelect}
+          accept="image/*"
+          ref={uploaderRef}
+        />
         <Grid
           size={{ xs: 12, md: 8, lg: 9 }}
           sx={{
@@ -99,9 +136,36 @@ const HomeScreen = () => {
                 }}
               >
                 <Box>
-                  <Typography variant="h6" width={"100%"} textAlign={"center"}>
-                    Upload or your photo to continue
-                  </Typography>
+                  <Box>
+                    <Typography
+                      variant="h6"
+                      width={"100%"}
+                      textAlign={"center"}
+                    >
+                      Drop or upload your photo to continue
+                    </Typography>
+                    <Box
+                      sx={{
+                        textAlign: "center",
+                        pt: 2,
+                      }}
+                    >
+                      <IconButton
+                        onClick={triggerUpload}
+                        sx={{
+                          ":hover": { backgroundColor: "#222" },
+                          backgroundColor: "#fff",
+                          minHeight: "auto !important",
+                          color: "#222",
+                          fontSize: 14,
+                          px: 3,
+                          borderRadius: 1,
+                        }}
+                      >
+                        <UploadFileIcon sx={{ mr: 1 }} /> Upload now
+                      </IconButton>
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             )}

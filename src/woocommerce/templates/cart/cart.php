@@ -27,7 +27,7 @@ do_action('woocommerce_before_cart'); ?>
                 <?php do_action('woocommerce_before_cart_contents'); ?>
                 <div class="cth row gy-3 align-items-center mb-4 d-none d-xl-flex">
                          <div class="ctc text-center product-thumbnail col-2">Product Image</div>
-                         <div class="ctc text-center product-name col-6">Product Name</div>
+                         <div class="ctc product-name col-6">Product Name</div>
                          <div class="ctc text-center product-quantity col-2">Quantity</div>
                          <div class="ctc text-center product-subtotal col-2">Subtotal</div>
                 </div>
@@ -86,16 +86,16 @@ do_action('woocommerce_before_cart'); ?>
                             <ul class="m-0" style="list-style-type: disclosure-closed;">
                                 <?php
                                     if (isset($cart_item['folder_link'])) {
-                                        echo '<li class="small"><a class="custom-view-folder fw-bold" href="' . $cart_item['folder_link'] . '" target="_blank">View Photobook Folder</a></li>';
+                                        echo '<li class="small mb-0"><a class="custom-view-folder fw-bold" href="' . $cart_item['folder_link'] . '" target="_blank">View Photobook Folder</a></li>';
                                     }
                                     if (isset($cart_item['note']) && $cart_item['note'] !== '') {
-                                        echo '<li class="small"> <strong>Note: </strong>' . $cart_item['note'] . '</li>';
+                                        echo '<li class="small mb-0"> <strong>Note: </strong>' . $cart_item['note'] . '</li>';
                                     }
                                     if (isset($cart_item['country'])) {
-                                        echo '<li class="small"><p class="custom-metadata">Photo ID country: ' . $cart_item['country'] . '</p></li>';
+                                        echo '<li class="small mb-0"><span class="custom-metadata">Photo ID country: <strong> ' . $cart_item['country'] . ' </strong> </span></li>';
                                     }
                                     if (isset($cart_item['photo_id_url'])) {
-                                        echo '<li class="small"><a class="custom-view-folder fw-bold" href="' . $cart_item['photo_id_url'] . '" target="_blank">View Photo ID</a></li>';
+                                        echo '<li class="small mb-0"><a class="custom-view-folder fw-bold" href="' . $cart_item['photo_id_url'] . '" target="_blank">View Photo ID</a></li>';
                                     }
                                 ?>
                             </ul>
